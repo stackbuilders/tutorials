@@ -47,14 +47,18 @@ configuration =
 
 rules :: Rules ()
 rules = do
+  match "stylesheets/*" $ do
+    route idRoute
+    compile compressCssCompiler
+
   match "templates/*" (compile templateCompiler)
 
   match "tutorials/haskell/*/*.md" $ do
     route (setExtension "html")
     compile $
       pandocCompiler
-        >>= loadAndApplyTemplate "templates/tutorial.html" defaultContext
-        >>= loadAndApplyTemplate "templates/default.html" defaultContext
+        >>= loadAndApplyTemplate "templates/tutorial.html" tutorialContext
+        >>= loadAndApplyTemplate "templates/default.html" tutorialContext
         >>= relativizeUrls
 
 
@@ -71,3 +75,14 @@ feedConfiguration =
     , feedRoot = ""
     , feedTitle = ""
     }
+
+
+-- |
+--
+--
+
+tutorialContext :: Context String
+tutorialContext =
+  dateField "published" "%B %e, %Y"
+    `mappend` dateField "updated" "%B %e, %Y"
+    `mappend` defaultContext
