@@ -1,0 +1,18 @@
+dependencies:
+
+  cache_directories:
+    - "~/.stack/"
+    - ".stack-work/"
+
+  override:
+    - stack setup
+    - stack build --only-dependencies
+
+  pre:
+    - mkdir -p .stack-work/
+    - bash ./install-stack.sh
+
+test:
+
+  override:
+    - stack build
