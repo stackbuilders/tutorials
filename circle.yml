@@ -10,7 +10,7 @@ dependencies:
 
   pre:
     - mkdir -p .stack-work/
-    - bash ./install-stack.sh
+    - bash ./scripts/install-stack.sh
 
 test:
 
