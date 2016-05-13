@@ -1,45 +1,168 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE HTML>
+<html>
 
   <head>
-
-    <meta charset="utf-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>
       $title$ - Tutorials
     </title>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
+          crossorigin="anonymous">
+
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+    <meta name="viewport" content="width=device-width,
+                                   initial-scale=1.0,
+                                   maximum-scale=5.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="uUpeU0Xsc1oiaKwIVW1RnAbHbKozHBAJdd9XA-fJm-k">
+
+    <link rel="shortcut icon" type="image/png"
+          href="$base_url$/assets/img/favicon.png">
+
+    <link rel="alternate" hreflang="en"
+          href="/tutorials"> <!-- TODO: make this dynamic -->
+    <link rel="stylesheet" type="text/css"
+          href="$base_url$/assets/stylesheets/application.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://fonts.googleapis.com/css?family=Muli">
+    <link rel="stylesheet" type="text/css"
+          href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="$base_url$/assets/css/news-page.css">
+    <link rel="stylesheet" type="text/css"
+          href="$base_url$/assets/css/highlight.style.css">
 
     <link rel="stylesheet" href="/stylesheets/tutorials.css">
-
+    <script type="text/javascript">(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-17522809-1', 'auto');ga('send', 'pageview');</script>
   </head>
 
-  <body>
+  <body itemscope="" itemtype="http://schema.org/WebPage">
 
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="/">Tutorials</a>
+    <div itemprop="mainEntity" itemscope itemtype="http://schema.org/Organization">
+      <nav class="navbar navbar-default navbar-fixed-top
+                  navbar--transparent">
+        <div class="navbar__header container">
+          <div class="row">
+            <div class="navbar__header__logo">
+              <a class="img-logo" href="$base_url$/" title="Stack Builders">
+                <img itemprop="image" src="$base_url$/assets/images/stack-builders-logo-nav-horizontal.svg" alt="Stack Builders logo">
+                <span class="hidden" itemprop="name">
+                  Stack Builders
+                </span>
+              </a>
+              <button class="navbar-toggle" type="button" data-target="#navbarOptions" data-toggle="collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+            </div>
+            <div class="nav navbar-nav navbar-right"><div class="navbar__header__contact_info">
+                <div class="navbar__header__contact_info__languages">
+                  <!-- <a href="$base_url$/es/news/page/1">Español</a> -->
+                </div>
+                <div class="navbar__header__contact_info__phone"><a href="tel:212-686-5870" itemprop="telephone">212 686-5870</a>&nbsp;
+                  <i class="fa fa-phone"></i>
+                </div>
+              </div>
+            </div>
+            <div class="navbar__links nav navbar-center collapse navbar-collapse" id="navbarOptions" itemprop="breadcrumb">
+              <ul class="list-inline">
+                <li><a href="$base_url$/services">Services</a></li>
+                <li><a href="$base_url$/portfolio">Portfolio</a></li>
+                <li><a href="$base_url$/news/page/1">News</a></li>
+                <li><a href="/tutorials">Tutorials</a></li>
+                <li><a href="$base_url$/join">Join Us</a></li>
+                <li><a href="$base_url$/contact">Contact</a></li>
+                <!-- <li class="navbar__links__contact_info__languages"><a href="$base_url$/es/news/page/1">Español</a></li> -->
+              </ul>
+            </div>
+          </div>
         </div>
-        <div id="navbar" class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li class="active"><a href="/">Home</a></li>
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
-
-    <div class="container">
-      $body$
+      </nav>
     </div>
 
-  </body>
+    <section class="blog__hero">
+      <div class="container">
+        <h1>
+          Stack Builders Tutorials
+        </h1>
+        <h3>
+          A collection of thoughts and notes by our team
+        </h3>
+      </div>
+    </section>
 
+    <div class="tutorials container">
+        $body$
+    </div>
+
+    <section class="careers__we_are_hiring">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12 v-center-container">
+            <h2>
+              Do You Have What it Takes To Be a Stack Builder?
+            </h2>
+            <div class="careers__we_are_hiring__cta">
+              <a class="btn btn-cta-secondary" href="$base_url$/join" title="Join Our Team">
+                Join Our Team
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-6 footer__right">
+            <a href="$base_url$/" title="Stack Builders">
+              <img class="footer__logo svg-logo" src="$base_url$/assets/images/stack-builders-logo-blackwhite.svg" alt="Stack Builders logo">
+            </a>
+          </div>
+          <div class="col-sm-6">
+            <div class="footer__conversation">
+              <h6>
+                Join The Conversation
+              </h6>
+              <div class="footer__conversation__social">
+                <a href="https://twitter.com/stackbuilders" target="_blank" rel="nofollow">
+                  <i class="fa fa-twitter-square fa-3x" aria-hidden="true"></i>
+                </a>
+                <a href="https://www.facebook.com/Stack-Builders-207670466070752/" target="_blank" rel="nofollow">
+                  <i class="fa fa-facebook-square fa-3x" aria-hidden="true"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 footer__copyright">© Stack Builders Inc. 2016</div>
+        </div>
+      </div>
+    </footer>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+<script type="text/javascript"
+        src="//code.jquery.com/jquery-1.12.0.min.js">
+</script>
+<script type="text/javascript"
+        src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js">
+</script><script type="text/javascript"
+                 src="$base_url$/assets/javascripts/all.min.js">
+</script>
+<script type="text/javascript"
+        src="//platform.twitter.com/widgets.js">
+</script>
+<!--[if lt IE 9]><script type="text/javascript" src="//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script type="text/javascript" src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+
+  </body>
 </html>

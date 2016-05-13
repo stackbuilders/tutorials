@@ -1,40 +1,44 @@
-<h2>
-  $title$
-</h2>
+<div class="row">
+  <div class="tutorial-content">
+    <h2>
+      $title$
+    </h2>
 
-<p>
-  First published: $published$;
-  $if(updated)$
-    Last updated: $updated$
-  $endif$
-</p>
+    <p>
+      First published: $published$;
+      $if(updated)$
+        Last updated: $updated$
+      $endif$
+    </p>
 
-<p>
-  Tested with:
-  <ul>
-    $if(lts)$
-      <li>
-        Resolver:
-        <a href="https://www.stackage.org/lts-$lts$">
-          LTS Haskell $lts$ (ghc-$ghc$)
-        </a>
-      </li>
-    $endif$
-    $if(nightly)$
-      <li>
-        Resolver:
-        <a href="https://www.stackage.org/nightly-$nightly$">
-          Stackage Nightly $nightly$ (ghc-$ghc$)
-        </a>
-      </li>
-    $endif$
-  </ul>
-</p>
+    <p>
+      Tested with:
+      <ul>
+        $if(lts)$
+          <li>
+            Resolver:
+            <a href="https://www.stackage.org/lts-$lts$">
+              LTS Haskell $lts$ (ghc-$ghc$)
+            </a>
+          </li>
+        $endif$
+        $if(nightly)$
+          <li>
+            Resolver:
+            <a href="https://www.stackage.org/nightly-$nightly$">
+              Stackage Nightly $nightly$ (ghc-$ghc$)
+            </a>
+          </li>
+        $endif$
+      </ul>
+    </p>
 
-<hr>
+    <hr>
 
-$body$
+    $body$
 
-<hr>
+    <hr>
 
-Feedback? $author$
+    Feedback? $author$
+  </div>
+</div>

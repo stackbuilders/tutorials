@@ -1,10 +1,22 @@
-body {
-  padding-top: 50px;
+/* body { */
+/*   padding-top: 50px; */
+/* } */
+
+.tutorials {
+  height: 100%;
+  padding: 5px 3em 5px 3em;
+  margin: 1em auto 2em;
 }
 
-@media (min-width: 768px) {
-  .container {
-    max-width: 730px;
+.tutorials .row {
+  max-width: 70%;
+  margin: 0 auto;
+  padding-top: 2em;
+}
+
+@media (max-width: 991px) {
+  .tutorial-content, .tutorials .row {
+    max-width: 100%;
   }
 }
 

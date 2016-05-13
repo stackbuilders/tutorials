@@ -55,14 +55,14 @@ rules = do
         archiveContext =
           listField "tutorials" tutorialContext (return tutorials)
             `mappend` constField "title" "Archives"
-            `mappend` defaultContext
+            `mappend` commonContext
 
       makeItem ""
         >>= loadAndApplyTemplate "templates/archive.html" archiveContext
         >>= loadAndApplyTemplate "templates/default.html" archiveContext
         >>= relativizeUrls
 
-  match "index.html" $ do
+  match "tutorials/index.html" $ do
     route idRoute
     compile $ do
       tutorials <- recentFirst =<< loadAll "tutorials/haskell/*/*.md"
@@ -70,7 +70,7 @@ rules = do
         indexContext =
           listField "tutorials" tutorialContext (return tutorials)
             `mappend` constField "title" "Home"
-            `mappend` defaultContext
+            `mappend` commonContext
 
       getResourceBody
         >>= applyAsTemplate indexContext
@@ -111,8 +111,13 @@ feedConfiguration =
 --
 --
 
+commonContext :: Context String
+commonContext =
+  constField "base_url" "//www.stackbuilders.com"
+    `mappend` defaultContext
+
 tutorialContext :: Context String
 tutorialContext =
   dateField "published" "%B %e, %Y"
     `mappend` dateField "updated" "%B %e, %Y"
-    `mappend` defaultContext
+    `mappend` commonContext

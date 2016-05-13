@@ -1,7 +1,9 @@
-<ul>
-  $for(tutorials)$
-    <li>
-      $published$ <a href="$url$">$title$</a>
-    </li>
-  $endfor$
-</ul>
+<div itemscope itemtype="http://schema.org/TechArticle">
+  <div class="index row">
+    <ul>
+      $for(tutorials)$
+          $published$ <a href="$url$">$title$</a>
+      $endfor$
+    </ul>
+  </div>
+</div>
