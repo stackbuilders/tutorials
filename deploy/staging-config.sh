@@ -1,0 +1,5 @@
+export HOST="stackbuilders@staging.stackbuilders.com"
+export REPOSITORY="git@github.com:stackbuilders/tutorials.git"
+export REVISION="origin/tutorials"
+export BUILD_SCRIPT="deploy/stack-tutorials-build.sh"
+export RESTART_COMMAND="sudo systemctl restart stackbuilders-tutorials-app"
