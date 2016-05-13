@@ -1,0 +1,6 @@
+export DEPLOY_PATH="/var/projects/stack-tutorials"
+export HOST="stackbuilders@www.stackbuilders.com"
+export REPOSITORY="git@github.com:stackbuilders/tutorials.git"
+export REVISION="origin/production"
+export BUILD_SCRIPT="deploy/stack-tutorials-build.sh"
+export RESTART_COMMAND="sudo systemctl restart stackbuilders-tutorials-app"
