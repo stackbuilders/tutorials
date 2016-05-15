@@ -3,7 +3,7 @@ title: CSV encoding and decoding in Haskell with Cassava
 published: 2016-05-17
 ghc: 7.10.3
 lts: 5.15
-library: cassava-0.4.5
+library: cassava-0.4.5.0
 language: haskell
 author: Juan Pedro
 author-name: Juan Pedro Villa Isaza (@jpvillaisaza)
@@ -676,12 +676,6 @@ decode data, or we may need different data types for encoding and
 decoding, but the process is very similar to the one described in this
 tutorial.
 
-## Follow-up resources
-
-- [Cassava][cassava]
-
 [cassava]: http://hackage.haskell.org/package/cassava
-
-[rfc-4180]: https://tools.ietf.org/html/rfc4180
-
 [open-gov]: https://www.data.gov/open-gov/
+[rfc-4180]: https://tools.ietf.org/html/rfc4180

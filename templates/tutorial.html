@@ -22,11 +22,18 @@
         $if(nightly)$
           <li>
             Resolver:
-            <a href="https://www.stackage.org/nightly-$nightly$">
+            <a href="http://www.stackage.org/nightly-$nightly$">
               Stackage Nightly $nightly$ (ghc-$ghc$)
             </a>
           </li>
         $endif$
+	$if(library)$
+	<li>
+	  <a href="https://hackage.haskell.org/package/$library$">
+	    $library$
+	  </a>
+	</li>
+	$endif$
       </ul>
     </p>
 
@@ -36,6 +43,12 @@
 
     <hr>
 
-    Feedback? $author$
+    <p>
+      Thanks for reading this tutorial! If you have any feedback,
+      please
+      tweet <a href="https://twitter.com/stackbuilders">@stackbuilders</a>
+      and let us know what you think.
+    </p>
+
   </div>
 </div>
