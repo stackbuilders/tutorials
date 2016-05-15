@@ -1,7 +1,6 @@
 ---
 title: CSV encoding and decoding in Haskell with Cassava
-published: 2016-05-15
-updated: 2016-05-30
+published: 2016-05-17
 ghc: 7.10.3
 lts: 5.15
 library: cassava-0.4.5
@@ -10,7 +9,7 @@ author: Juan Pedro
 author-name: Juan Pedro Villa Isaza (@jpvillaisaza)
 ---
 
-> Is that right? Or is it left?
+> “Is that right? Or is it left?”
 
 Comma-separated values (CSV) files are frequently used for exchanging
 and converting data between spreadsheet programs and databases. Thus,
@@ -87,7 +86,7 @@ extensions:
 {-# LANGUAGE RecordWildCards #-}
 ```
 
-Next, let's declare the module and add a list of explicit imports:
+Next, let's declare the module and add a list of explicit exports:
 
 ```haskell
 module OpenData
@@ -98,7 +97,9 @@ module OpenData
   , encodeItems
   , encodeItemsToFile
   , filterCountryItems
+  , itemHeader
   , japanItem
+  , japanRecord
   )
   where
 ```
@@ -123,6 +124,7 @@ import Data.Csv
   ( DefaultOrdered(headerOrder)
   , FromField(parseField)
   , FromNamedRecord(parseNamedRecord)
+  , Header
   , ToField(toField)
   , ToNamedRecord(toNamedRecord)
   , (.:)
@@ -184,7 +186,7 @@ japanRecord =
 
 We'd like to decode a value equivalent to the following item:
 
-```
+```haskell
 japanItem :: Item
 japanItem =
   Item
@@ -193,6 +195,9 @@ japanItem =
     , itemType = Country
     }
 ```
+
+(If you're adding code to an `OpenData` module, then don't forget to
+add `japanRecord` and `japanItem`. We'll use them as examples below.)
 
 In order to decode one such record into a value of type `Item`, we
 need `Item` to be an instance of either `FromRecord` or
@@ -269,6 +274,20 @@ file with the Japan open data item:
 Right (["Item","Link","Type"],[Item {itemName = "Japan", itemLink = "http://www.data.go.jp/", itemType = Country}])
 ```
 
+If you're testing the implementation, then remember to add the
+extensions and the imports to GHCi (or to a `.ghci` file):
+
+```
+> :set -XOverloadedStrings
+> :set -XRecordWildCards
+>
+> import Control.Exception (IOException)
+> import qualified Control.Exception as Exception
+> import qualified Data.Foldable as Foldable
+>
+> ...
+```
+
 Note that we have to include a header record because we're telling
 Cassava to expect one such line by using the `Cassava.decodeByName`
 function. Try removing the header record and see what happens.
@@ -303,7 +322,7 @@ then decode its contents into a vector of items:
 decodeItemsFromFile
   :: FilePath
   -> IO (Either String (Vector Item))
-decodeItemsFromFile filePath = do
+decodeItemsFromFile filePath =
   catchShowIO (ByteString.readFile filePath)
     >>= return . either Left decodeItems
 ```
@@ -360,7 +379,7 @@ instance FromNamedRecord Item where
 Let's try again:
 
 ```
-> decodeItemsFromFile "opendatasites.csv"
+> decodeItemsFromFile "items.csv"
 Right ...
 ```
 
@@ -370,8 +389,8 @@ open data websites. To do so, let's define a function to filter items:
 
 ```haskell
 filterCountryItems
-    :: Vector Item
-    -> Vector Item
+  :: Vector Item
+  -> Vector Item
 filterCountryItems =
   Vector.filter isCountryItem
 ```
@@ -404,6 +423,7 @@ import OpenData
 
 -- base
 import qualified Control.Monad as Monad
+import qualified System.Exit as Exit
 ```
 
 And we can simply decode the `items.csv` file and then print the
@@ -427,13 +447,15 @@ main = do
       print (length countryItems)
 ```
 
+Let's run this:
+
 ```
 > main
 Open data!
 Number of country items: 53
 ```
 
-There are 53 open data countries and we'd like to write a CSV file
+There are 53 open data countries and we'd now like to write a CSV file
 containing those countries.
 
 Let's go back to the `OpenData` module and add more instances. The
@@ -575,7 +597,7 @@ encodeItemsToFile filePath =
 Again, we use the `catchShowIO` function to handle things like not
 having write permissions for the given file path.
 
-Let's add one more thing to our `Main` module to write the country
+Let's add one more line to our `Main` module to write the country
 items to a file called `countries.csv`:
 
 ```haskell
@@ -598,6 +620,31 @@ main = do
       Monad.void (encodeItemsToFile "countries.csv" countryItems)
 ```
 
+Let's run the `main` function again:
+
+```
+> main
+Open data!
+Number of country items: 53
+```
+
+The output is the same, but the countries are now in a `countries.csv`
+file. Here's the first part of the file:
+
+```
+$ head countries.csv
+Item,Link,Type
+"Argentina ",http://datos.argentina.gob.ar/,"International Country"
+Australia,http://data.gov.au/,"International Country"
+Austria,http://data.gv.at/,"International Country"
+Bahrain,http://www.bahrain.bh/wps/portal/data/,"International Country"
+Belgium,http://data.gov.be/,"International Country"
+Brazil,http://dados.gov.br/,"International Country"
+Canada,http://open.canada.ca/en,"International Country"
+Chile,http://datos.gob.cl/,"International Country"
+China,http://govinfo.nlc.gov.cn/,"International Country"
+```
+
 Finally, we can check that reading the original file and filtering the
 countries yields the same result as reading the countries file. Here
 are the filtered items:
@@ -606,7 +653,7 @@ are the filtered items:
 > :{
 | eitherCountryItemsA <-
 |   fmap filterCountryItems
-|     <$> decodeItemsFromFile "opendatasites.csv"
+|     <$> decodeItemsFromFile "items.csv"
 | :}
 ```
 

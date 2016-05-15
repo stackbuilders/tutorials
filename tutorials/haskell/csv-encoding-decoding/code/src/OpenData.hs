@@ -127,6 +127,19 @@ filterCountryItems =
 --
 --
 
+itemHeader :: Header
+itemHeader =
+  Vector.fromList
+    [ "Item"
+    , "Link"
+    , "Type"
+    ]
+
+
+-- |
+--
+--
+
 japanItem :: Item
 japanItem =
   Item
@@ -135,18 +148,6 @@ japanItem =
     , itemType = Country
     }
 
-
--- |
---
---
-
-itemHeader :: Header
-itemHeader =
-  Vector.fromList
-    [ "Item"
-    , "Link"
-    , "Type"
-    ]
 
 -- |
 --

@@ -118,6 +118,6 @@ commonContext =
 
 tutorialContext :: Context String
 tutorialContext =
-  dateField "published" "%B %e, %Y"
-    `mappend` dateField "updated" "%B %e, %Y"
+  dateField "updated" "%B %e, %Y"
+    `mappend` dateField "published" "%B %e, %Y"
     `mappend` commonContext
