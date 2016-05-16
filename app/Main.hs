@@ -91,6 +91,9 @@ rules = do
         >>= loadAndApplyTemplate "templates/default.html" tutorialContext
         >>= relativizeUrls
 
+  match "tutorials/haskell/*/*.png" $ do
+    route idRoute
+    compile copyFileCompiler
 
 -- |
 --
