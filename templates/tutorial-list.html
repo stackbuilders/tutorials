@@ -1,9 +1,9 @@
 <div itemscope itemtype="http://schema.org/TechArticle">
   <div class="index row">
+    $for(tutorials)$
     <ul>
-      $for(tutorials)$
-          $published$ <a href="$url$">$title$</a>
-      $endfor$
+      $published$ <a href="$url$">$title$</a>
     </ul>
+    $endfor$
   </div>
 </div>
