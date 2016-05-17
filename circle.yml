@@ -7,6 +7,7 @@ dependencies:
   override:
     - stack setup
     - stack build --only-dependencies
+    - stack install hapistrano
 
   pre:
     - mkdir -p .stack-work/
@@ -15,4 +16,18 @@ dependencies:
 test:
 
   override:
-    - stack build
+    - stack build:
+        timeout: 300
+
+deployment:
+  staging:
+    branch: tutorial
+    commands:
+      - "source deploy/staging-config.sh && ~/.local/bin/hap deploy":
+          timeout: 6000
+
+  production:
+    branch: production
+    commands:
+      - "source deploy/production-config.sh && ~/.local/bin/hap deploy":
+          timeout: 6000
