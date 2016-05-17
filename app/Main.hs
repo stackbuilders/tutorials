@@ -10,6 +10,8 @@ module Main
   )
   where
 
+import Data.Monoid ((<>))
+
 -- filepath
 import System.FilePath
 
@@ -54,8 +56,8 @@ rules = do
       let
         archiveContext =
           listField "tutorials" tutorialContext (return tutorials)
-            `mappend` constField "title" "Archives"
-            `mappend` commonContext
+            <> constField "title" "Archives"
+            <> commonContext
 
       makeItem ""
         >>= loadAndApplyTemplate "templates/archive.html" archiveContext
@@ -69,8 +71,8 @@ rules = do
       let
         indexContext =
           listField "tutorials" tutorialContext (return tutorials)
-            `mappend` constField "title" "Home"
-            `mappend` commonContext
+            <> constField "title" "Home"
+            <> commonContext
 
       getResourceBody
         >>= applyAsTemplate indexContext
@@ -84,7 +86,7 @@ rules = do
   match "templates/*" (compile templateCompiler)
 
   match "tutorials/haskell/*/*.md" $ do
-    route (customRoute (\i -> takeDirectory (toFilePath i) `mappend` ".html"))
+    route (customRoute (\i -> takeDirectory (toFilePath i) <> ".html"))
     compile $
       pandocCompiler
         >>= loadAndApplyTemplate "templates/tutorial.html" tutorialContext
@@ -120,7 +122,12 @@ commonContext =
     `mappend` defaultContext
 
 tutorialContext :: Context String
-tutorialContext =
-  dateField "updated" "%B %e, %Y"
-    `mappend` dateField "published" "%B %e, %Y"
-    `mappend` commonContext
+tutorialContext = libs
+  <> dateField "updated" "%B %e, %Y"
+  <> dateField "published" "%B %e, %Y"
+  <> commonContext
+  where
+    libs = listFieldWith "libs" libraryContext $ \item -> do
+      libraries <- getMetadataField' (itemIdentifier item) "libraries"
+      mapM makeItem (words libraries)
+    libraryContext = field "lib" (return . itemBody)
