@@ -5,35 +5,39 @@
     </h2>
 
     <p>
-      First published: $published$
+      First published: $published$<br/>
+      by $author-name$
     </p>
 
     <p>
       Tested with:
       <ul>
         $if(lts)$
-          <li>
-            Resolver:
-            <a href="https://www.stackage.org/lts-$lts$">
-              LTS Haskell $lts$ (ghc-$ghc$)
-            </a>
-          </li>
+        <li>
+          Resolver:
+          <a href="https://www.stackage.org/lts-$lts$">
+            LTS Haskell $lts$ (ghc-$ghc$)
+          </a>
+        </li>
         $endif$
         $if(nightly)$
-          <li>
-            Resolver:
-            <a href="http://www.stackage.org/nightly-$nightly$">
-              Stackage Nightly $nightly$ (ghc-$ghc$)
-            </a>
-          </li>
+        <li>
+          Resolver:
+          <a href="http://www.stackage.org/nightly-$nightly$">
+            Stackage Nightly $nightly$ (ghc-$ghc$)
+          </a>
+        </li>
         $endif$
-	$if(library)$
-	<li>
-	  <a href="https://hackage.haskell.org/package/$library$">
-	    $library$
-	  </a>
-	</li>
-	$endif$
+        $if(libs)$
+        <li>
+          Libraries:
+          $for(libs)$
+          <a href="https://hackage.haskell.org/package/$lib$">
+            $lib$
+          </a>
+          $endfor$
+        </li>
+        $endif$
       </ul>
     </p>
 
