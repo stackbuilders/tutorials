@@ -21,7 +21,7 @@ test:
 
 deployment:
   staging:
-    branch: tutorial
+    branch: tutorials
     commands:
       - "source deploy/staging-config.sh && ~/.local/bin/hap deploy":
           timeout: 6000
