@@ -4,10 +4,10 @@ published: 2016-05-17
 updated: 2016-05-30
 ghc: 7.10.3
 lts: 5.16
-library: JuicyPixels repa
+libraries: JuicyPixels-3.2.7 repa-3.4.0.2
 language: haskell
 author: Mark
-author-name: Mark Karpov (@mrkkrp)
+author-name: Mark Karpov
 ---
 
 In this tutorial we will learn how to efficiently generate, transform, and
@@ -104,8 +104,8 @@ data Image a = Image
     }
 ```
 
-The definition is simple and intuitive, here we have width and height of
-image and single vector that contains pixel data.
+The definition is simple and intuitive: we have width and height of image
+and single vector that contains pixel data.
 
 `!` before `Int` is called “strictness annotation”. Haskell, being a lazy
 language (should I have said “the lazy language”?) does not normally
@@ -147,9 +147,9 @@ to `Int` in `MyData`, not the `Int` itself:
 
 ![Boxed data in Haskell](/tutorials/haskell/image-processing/boxed-data.png)
 
-[Thunk](https://wiki.haskell.org/Thunk) is name for data that not yet
-evaluated. When `{-# UNPACK #-}` pragma is used, data becomes part of parent
-structure:
+[Thunk](https://wiki.haskell.org/Thunk) is a name for data that hasn't been
+evaluated yet. When `{-# UNPACK #-}` pragma is used, data becomes part of
+parent structure:
 
 ![Unboxed data in Haskell](/tutorials/haskell/image-processing/unboxed-data.png)
 
@@ -237,7 +237,8 @@ write a console program that takes format of resulting image as first
 argument and path to source image as second argument. When the program is
 run, it converts image and saves it changing its extension appropriately.
 
-Try to do it yourself first, here are the imports you will need:
+Try to do it yourself first, here are the imports and language extensions
+you will need:
 
 ```haskell
 {-# LANGUAGE RecordWildCards #-}
@@ -246,7 +247,7 @@ Try to do it yourself first, here are the imports you will need:
 module Main (main) where
 
 import Codec.Picture
-import Codec.Picture.Types -- to work with mutable images later
+import Codec.Picture.Types (newMutableImage, freezeImage)
 import Control.Monad
 import Data.Array.Repa (Array, DIM1, DIM2, U, D, Z (..), (:.)(..), (!))
 import System.Environment (getArgs)
@@ -281,14 +282,17 @@ convertImg fmt path = do
         Png  -> savePngImage
         Tiff -> saveTiffImage)
       (replaceExtension path (toExt fmt)) -- replace file extension
-      img -- pass it 'DynamicImage' to save
+      img -- pass it 'DynamicImage' we've read
 
+-- | Get file extension corresponding to known image format.
 toExt :: ImgFormat -> String
 toExt Bmp      = "bmp"
 toExt Jpg      = "jpeg"
 toExt Png      = "png"
 toExt Tiff     = "tiff"
 
+-- | Get image format corresponding to given extension or 'Nothing' if we
+-- don't support that format.
 fromExt :: String -> Maybe ImgFormat
 fromExt "bmp"  = Just Bmp
 fromExt "jpeg" = Just Jpg
@@ -374,7 +378,8 @@ As simple as that, we have rotated an image upside down:
 ![Before rotation](/tutorials/haskell/image-processing/before-rotation.png)
 ![After rotation](/tutorials/haskell/image-processing/after-rotation.png)
 
-Here is how our program performs:
+Here is how our program performs (`image-processing` is name of compiled
+executable):
 
 ```
 $ image-processing before-rotation.png after-rotation.png +RTS -s
@@ -392,29 +397,29 @@ Juicy Pixels provides a couple of useful functions to generate images:
 
 ```haskell
 generateImage :: Pixel a
-  => (Int -> Int -> a)  -- Generating function, with x and y parameters
-  -> Int                -- Width in pixels
-  -> Int                -- Height in pixels
+  => (Int -> Int -> a)  -- ^ Generating function, with x and y parameters
+  -> Int                -- ^ Width in pixels
+  -> Int                -- ^ Height in pixels
   -> Image a
 
 generateFoldImage :: Pixel a
-  => (acc -> Int -> Int -> (acc, a)) -- Function taking the state, x and y
-  -> acc                -- Initial state
-  -> Int                -- Width in pixels
-  -> Int                -- Height in pixels
+  => (acc -> Int -> Int -> (acc, a)) -- ^ Function taking the state, x and y
+  -> acc                -- ^ Initial state
+  -> Int                -- ^ Width in pixels
+  -> Int                -- ^ Height in pixels
   -> (acc, Image a)
 
 withImage :: (Pixel a, PrimMonad m)
-  => Int                -- Image width
-  -> Int                -- Image height
-  -> (Int -> Int -> m a) -- Generating function
+  => Int                -- ^ Image width
+  -> Int                -- ^ Image height
+  -> (Int -> Int -> m a) -- ^ Generating function
   -> m (Image a)
 ```
 
 If your image can be expressed as function from coordinates to pixels,
-`generateImage` looks super-simple and straightforward. `generateFildImage`
+`generateImage` looks super-simple and straightforward. `generateFoldImage`
 allows to pass around an accumulator (i.e. you can have some sort of state).
-`withImage` is more interesting, it allows to use funtion that returns
+`withImage` is more interesting: it allows to use funtion that returns
 values inside instances of `PrimMonad`. `PrimMonad` is outside of scope of
 this tutorial, but if you are interested you can read about it
 [here](https://www.schoolofhaskell.com/user/commercial/content/primitive-haskell).
@@ -505,9 +510,9 @@ and `:.` live on both type level and term (value) level. For example:
   can be used to access data in that matrix.
 
 Positions are numbered from 0, and so `Z :. 2 :. 2` is bottom right corner
-of such matrix. In reality, all elements are stored in flat, one-dimentional
-vector and shapes just help to access right elements. In fact we can
-re-shape a Repa array without modifying array itself:
+of such matrix. In reality, all elements are stored in a flat,
+one-dimentional vector and shapes just help access right elements. In fact
+we can re-shape a Repa array without modifying array itself:
 
 ```haskell
 λ> let arr = R.fromListUnboxed (Z :. 3 :. 3) [1..9] :: Array U DIM2 Int
@@ -538,7 +543,6 @@ representation of pixels and Repa arrays, here they are:
 type RGB8 = (Pixel8, Pixel8, Pixel8)
 
 -- | Produce delayed Repa array from image with true color pixels.
-
 fromImage :: Image PixelRGB8 -> Array D DIM2 RGB8
 fromImage img@Image {..} =
   R.fromFunction
@@ -548,7 +552,6 @@ fromImage img@Image {..} =
        in (r, g, b))
 
 -- | Get image with true color pixels from manifest Repa array.
-
 toImage :: Array U DIM2 RGB8 -> Image PixelRGB8
 toImage a = generateImage gen width height
   where
@@ -566,7 +569,7 @@ alias for `Z :. Int :. Int`.
 ## Image rotation revisited
 
 Let's re-write code that rotates an image with Repa and see if it's worth
-it. To use Repa we need to compile our with the following flags:
+it. To use Repa we need to compile our code with the following flags:
 
 * `-Odph`
 * `-rtsopts`
@@ -611,11 +614,13 @@ rotateImgRepa g = R.backpermute e remap g
     {-# INLINE remap #-}
 ```
 
-`computeUnboxedP` builds manifest unboxed array in parallel. It's
+`computeUnboxedP` builds manifest unboxed array in parallel. It's a
 type-specialized version of more general `computeP` function:
 
 ```haskell
-computeP :: (Load r1 sh e, Target r2 e, Source r2 e, Monad m) => Array r1 sh e -> m (Array r2 sh e)
+computeP :: (Load r1 sh e, Target r2 e, Source r2 e, Monad m)
+  => Array r1 sh e     -- ^ The delayed array to compute
+  -> m (Array r2 sh e) -- ^ Manifest array — result
 ```
 
 An interesting thing here is that `computeP` wants to live in monad, *any
@@ -624,7 +629,8 @@ produced with another `computeP` but only when it's already evaluated or
 else you get run-time warning and slow code. If you keep all `computeP` and
 `computeUnboxedP` functions in the same monad you are safe. So the type just
 helps avoid writing incorrect code (although it's still possible to use
-something like `runIdentity . computeP`).
+something like `runIdentity . computeP`). For sequential evaluation we have
+`computeS`, it may be a better choice for relatively small data-sets.
 
 `backpermute` is “backwards permutation of an array's elements” and it's
 just right tool for the job. Let's see what we get:
@@ -684,7 +690,7 @@ $ image-processing my-image.png +RTS -s -N2
 Four cores improve the result a bit:
 
 ```
-$ image-processing my-image.png +RTS -s -N2
+$ image-processing my-image.png +RTS -s -N4
 …
   Total   time    0.152s  (  0.084s elapsed)
 …
@@ -702,27 +708,27 @@ our `toImage` function in combination with `JuicyPixels`. There is also
 but I got segfaults with it, no idea why.
 
 Please feel free to comment on the tutorial, I'm not an expert of Repa
-programming, in fact this is one of my first experiences with Repa, so maybe
-you can come up with idea how to improve the tutorial or maybe make the code
-faster. Thanks for reading!
+programming, in fact this is one of my first experiences with the library,
+so maybe you can come up with an idea how to improve the tutorial or maybe
+make the code faster. Thanks for reading!
 
 ## See also
 
 List of resources that may be of interest:
 
-* [Data parallel programming with Repa](http://chimera.labs.oreilly.com/books/1230000000929/ch05.html) — Chapter 5 from Simon Marlow's “Parallel and Concurrent Programming in Haskell”, highly recommended reading
+* [Data parallel programming with Repa](http://chimera.labs.oreilly.com/books/1230000000929/ch05.html) — Chapter 5 from Simon Marlow's “Parallel and Concurrent Programming in Haskell”, highly recommended reading.
 
-* [Numeric Haskell: A Repa Tutorial](https://wiki.haskell.org/Numeric_Haskell:_A_Repa_Tutorial)
+* [Numeric Haskell: A Repa Tutorial](https://wiki.haskell.org/Numeric_Haskell:_A_Repa_Tutorial).
 
-* [`JuicyPixels`](https://hackage.haskell.org/package/JuicyPixels) on Hackage
+* [`JuicyPixels`](https://hackage.haskell.org/package/JuicyPixels) on Hackage.
 
-* [`repa`](https://hackage.haskell.org/package/repa) on Hackage
+* [`repa`](https://hackage.haskell.org/package/repa) on Hackage.
 
-* [`repa-algorithms`](https://hackage.haskell.org/package/repa-algorithms) on Hackage
+* [`repa-algorithms`](https://hackage.haskell.org/package/repa-algorithms) on Hackage.
 
-* [`repa-io`](https://hackage.haskell.org/package/repa-io) on Hackage
+* [`repa-io`](https://hackage.haskell.org/package/repa-io) on Hackage.
 
-* [`JuicyPixels-repa`](https://hackage.haskell.org/package/JuicyPixels-repa) on Hackage
+* [`JuicyPixels-repa`](https://hackage.haskell.org/package/JuicyPixels-repa) on Hackage.
 
 ## What your fellow Haskellers did
 

@@ -4,7 +4,7 @@
 module Main (main) where
 
 import Codec.Picture
-import Codec.Picture.Types -- to work with mutable images later
+import Codec.Picture.Types (newMutableImage, freezeImage)
 import Control.Monad
 import Data.Array.Repa (Array, DIM1, DIM2, U, D, Z (..), (:.)(..), (!))
 import System.Environment (getArgs)
@@ -37,14 +37,17 @@ convertImg fmt path = do
         Png  -> savePngImage
         Tiff -> saveTiffImage)
       (replaceExtension path (toExt fmt)) -- replace file extension
-      img -- pass it 'DynamicImage' to save
+      img -- pass it 'DynamicImage' we've read
 
+-- | Get file extension corresponding to known image format.
 toExt :: ImgFormat -> String
 toExt Bmp      = "bmp"
 toExt Jpg      = "jpeg"
 toExt Png      = "png"
 toExt Tiff     = "tiff"
 
+-- | Get image format corresponding to given extension or 'Nothing' if we
+-- don't support that format.
 fromExt :: String -> Maybe ImgFormat
 fromExt "bmp"  = Just Bmp
 fromExt "jpeg" = Just Jpg
@@ -93,7 +96,6 @@ originalFnc x y =
 type RGB8 = (Pixel8, Pixel8, Pixel8)
 
 -- | Produce delayed Repa array from image with true color pixels.
-
 fromImage :: Image PixelRGB8 -> Array D DIM2 RGB8
 fromImage img@Image {..} =
   R.fromFunction
@@ -103,7 +105,6 @@ fromImage img@Image {..} =
        in (r, g, b))
 
 -- | Get image with true color pixels from manifest Repa array.
-
 toImage :: Array U DIM2 RGB8 -> Image PixelRGB8
 toImage a = generateImage gen width height
   where
