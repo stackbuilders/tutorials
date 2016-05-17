@@ -5,8 +5,7 @@ ghc: 7.10.3
 lts: 5.15
 libraries: cassava-0.4.5.0
 language: haskell
-author: Juan Pedro
-author-name: Juan Pedro Villa Isaza (@jpvillaisaza)
+author-name: Juan Pedro Villa Isaza
 ---
 
 > “Is that right? Or is it left?”
