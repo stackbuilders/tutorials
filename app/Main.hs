@@ -141,7 +141,7 @@ feedConfiguration =
 
 commonContext :: Context String
 commonContext =
-  constField "base_url" "//www.stackbuilders.com"
+  constField "base_url" ""
     `mappend` defaultContext
 
 tutorialContext :: Context String
