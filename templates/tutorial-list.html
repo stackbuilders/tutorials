@@ -1,7 +1,18 @@
-<div itemscope itemtype="http://schema.org/TechArticle">
+<div>
+  <div class="row">
+    <p>
+      At Stack Builders, we consider it our mission not only to develop robust and reliable
+      applications for clients, but to help the industry as a whole by lowering the barrier to
+      entry for technology that we consider important. We hope that you enjoy, and find useful,
+      our tutorials. If you have suggestions for additional tutorials, please feel free to open an
+      issue or PR on our
+      <a href="https://github.com/stackbuilders/tutorials" target="_new">
+        tutorials repository on GitHub</a>.
+    </p>
+  </div>
   <div class="index row">
     $for(tutorials)$
-    <ul>
+    <ul itemscope itemtype="http://schema.org/TechArticle">
       $published$ <a href="$url$">$title$</a>
     </ul>
     $endfor$
