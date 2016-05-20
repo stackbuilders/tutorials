@@ -162,14 +162,9 @@ data EnvType = Staging | Production deriving (Show, Read)
 commonContext :: [(String, String)] -> Context String
 commonContext env =
   let
-    flc []     = []
-    flc (x:xs) = toUpper x : xs
-
-    e    = maybe Production (fromMaybe Production . readMaybe . flc) $ lookup "SNAP_ENV" env
-    host Production = "//www.stackbuilders.com"
-    host _          = "//staging.stackbuilders.com"
+    host = fromMaybe "" $ lookup "SITE_ROOT_URL" env
   in
-    constField "host" (host e)
+    constField "host" host
       <> defaultContext
 
 tutorialContext :: [(String, String)] -> Context String
