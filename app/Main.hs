@@ -13,6 +13,10 @@ module Main
 -- base
 import Data.Monoid ((<>))
 import Data.List (isSuffixOf)
+import System.Environment
+import Data.Maybe (fromMaybe)
+import Data.Char (toUpper)
+import Text.Read (readMaybe)
 
 -- filepath
 import System.FilePath
@@ -27,7 +31,7 @@ import Hakyll
 
 main :: IO ()
 main =
-  hakyllWith configuration rules
+  getEnvironment >>= (hakyllWith configuration . rules)
 
 
 -- |
@@ -64,17 +68,20 @@ cleanIndex url
 --
 --
 
-rules :: Rules ()
-rules = do
+rules :: [(String, String)] -> Rules ()
+rules env = do
+  let commonCtx = commonContext env
+  let tutorialCtx = tutorialContext env
+
   create ["archive.html"] $ do
     route idRoute
     compile $ do
       tutorials <- recentFirst =<< loadAll "tutorials/haskell/*/*.md"
       let
         archiveContext =
-          listField "tutorials" tutorialContext (return tutorials)
+          listField "tutorials" tutorialCtx (return tutorials)
             <> constField "title" "Archives"
-            <> commonContext
+            <> commonCtx
 
       makeItem ""
         >>= loadAndApplyTemplate "templates/archive.html" archiveContext
@@ -88,9 +95,9 @@ rules = do
       tutorials <- recentFirst =<< loadAll "tutorials/haskell/*/*.md"
       let
         indexContext =
-          listField "tutorials" tutorialContext (return tutorials)
+          listField "tutorials" tutorialCtx (return tutorials)
             <> constField "title" "Home"
-            <> commonContext
+            <> commonCtx
 
       getResourceBody
         >>= applyAsTemplate indexContext
@@ -111,14 +118,25 @@ rules = do
     route (customRoute tutorialRoute)
     compile $
       pandocCompiler
-        >>= loadAndApplyTemplate "templates/tutorial.html" tutorialContext
-        >>= loadAndApplyTemplate "templates/default.html" tutorialContext
+        >>= loadAndApplyTemplate "templates/tutorial.html" tutorialCtx
+        >>= loadAndApplyTemplate "templates/default.html" tutorialCtx
         >>= relativizeUrls
         >>= cleanIndexUrls
 
   match "tutorials/haskell/*/*.png" $ do
     route idRoute
     compile copyFileCompiler
+
+  create ["tutorials/sitemap.xml"] $ do
+    route   idRoute
+    compile $ do
+      posts <- recentFirst =<< loadAll "tutorials/haskell/*/*.md"
+      let allPosts = return posts
+      let sitemapCtx = listField "entries" tutorialCtx allPosts
+
+      makeItem ""
+       >>= loadAndApplyTemplate "templates/sitemap.xml" sitemapCtx
+       >>= cleanIndexHtmls
 
 -- |
 --
@@ -139,16 +157,26 @@ feedConfiguration =
 --
 --
 
-commonContext :: Context String
-commonContext =
-  constField "base_url" ""
-    `mappend` defaultContext
+data EnvType = Staging | Production deriving (Show, Read)
 
-tutorialContext :: Context String
-tutorialContext = libs
+commonContext :: [(String, String)] -> Context String
+commonContext env =
+  let
+    flc []     = []
+    flc (x:xs) = toUpper x : xs
+
+    e    = maybe Production (fromMaybe Production . readMaybe . flc) $ lookup "SNAP_ENV" env
+    host Production = "//www.stackbuilders.com"
+    host _          = "//staging.stackbuilders.com"
+  in
+    constField "host" (host e)
+      <> defaultContext
+
+tutorialContext :: [(String, String)] -> Context String
+tutorialContext env = libs
   <> dateField "updated" "%B %e, %Y"
   <> dateField "published" "%B %e, %Y"
-  <> commonContext
+  <> commonContext env
   where
     libs = listFieldWith "libs" libraryContext $ \item -> do
       libraries <- getMetadataField' (itemIdentifier item) "libraries"
