@@ -15,14 +15,15 @@ process images in Haskell. This sort of task is interesting to solve in a
 pure functional language, because it's parallel in nature — processing of
 images requires performing identical manipulations on many pieces of data
 (pixels). On the other hand, such manipulation cannot be performed
-efficiently with help of familiar primitives for parallel Haskell computing:
-`Eval` monad, evaluation strategies, and `Par` monad with `IVar`s, because
-these rely on laziness which works with boxed data, while for efficient
-processing of large arrays of numbers it's desirable to use unboxed data.
+efficiently with the help of familiar primitives for parallel Haskell
+computing (the `Eval` monad, evaluation strategies, and the `Par` monad with
+`IVar`s) because these rely on laziness which works with boxed data, while
+for efficient processing of large arrays of numbers it's desirable to use
+unboxed data.
 
 This tutorial assumes basic knowledge of Haskell, as after reading
 [Learn You a Haskell for Great Good](http://learnyouahaskell.com/) or
-similar book. You don't need to know much more than that, but some
+similar books. You don't need to know much more than that, but some
 unfamiliar terms will show up unavoidably, so if you don't yet understand
 underlying concepts, it's OK, you still can use the libraries, get the work
 done, and return to the subtle topics later (I give links for further
@@ -31,12 +32,12 @@ up).
 
 ## Available libraries
 
-There are a number of libraries for image processing available in Haskell
-ecosystem, some make use of external tools written in other languages,
-others are written entirely in Haskell. First, I would like to list
-libraries that are conventionally used for image processing and manipulation
-with short descriptions, because we don't have space to cover them all in
-this tutorial.
+There are a number of libraries for image processing available in the
+Haskell ecosystem. Some make use of external tools written in other
+languages, others are written entirely in Haskell. First, I would like to
+list libraries that are conventionally used for image processing and
+manipulation with short descriptions, because we don't have space to cover
+them all in this tutorial.
 
 * [`JuicyPixels`](https://hackage.haskell.org/package/JuicyPixels) is a
   lightweight library written in Haskell that allows to load and save images
@@ -47,7 +48,7 @@ this tutorial.
 
 * [`repa`](https://hackage.haskell.org/package/repa) stands for “REgular
   PArallel arrays” and is not specifically tied to image processing, but
-  it's the standard choice when you want to perform calculations on large
+  it's the standard choice when you want to perform calculations on a large
   collection of numeric data in parallel in Haskell. We cover how to use it
   for image processing in this tutorial.
 
@@ -56,31 +57,31 @@ this tutorial.
   collection of operations already coded for you (like edge detection,
   cropping, filtering, etc.). Its principles of operation are very similar
   to those of Repa, so after reading this tutorial you should have good
-  intuition how to code with `friday` too. To load images
+  intuition of how to code with `friday` too. To load images,
   [`friday-devil`](https://hackage.haskell.org/package/friday-devil) is
   usually used, but note that it requires external
   [DevIL](http://openil.sourceforge.net/) library.
 
 * [`gloss`](https://hackage.haskell.org/package/gloss) describes itself as
-  “Painless 2D vector graphics, animations and simulations”. It indeed can
+  “Painless 2D vector graphics, animations and simulations”. Indeed, it can
   do more than just image editing and there are some nice demos to get you
   started creating animations and simulations. Note that `gloss` uses
   [OpenGL](https://www.opengl.org/) under the hood.
 
-We will use lightweight and “all in Haskell” `JuicyPixels` for reading and
-writing image files and `repa` for efficient processing of numeric data.
+We will use the lightweight library `JuicyPixels` for reading and writing
+image files, and `repa` for efficient processing of numeric data.
 
 ## Juicy Pixels
 
 `JuicyPixels` is useful on its own if your task does not require parallel
 computations. Simple things like badge or identicon generation can be done
-sequentially (overhead of scheduling parallel execution for small amounts of
-data can even make sequential execution preferable) and `JuicyPixels`' API
-makes them ridiculously simple.
+sequentially (the overhead of scheduling parallel execution for small
+amounts of data can even make sequential execution preferable) and
+`JuicyPixels` API makes them ridiculously simple.
 
 ### Types and data structures used in Juicy Pixels
 
-If we quickly glance through
+If we quickly glance through the
 [`Codec.Picture`](https://hackage.haskell.org/package/JuicyPixels/docs/Codec-Picture.html)
 module, its types and functions look really straightforward. The basic type
 in the module is
@@ -104,16 +105,16 @@ data Image a = Image
     }
 ```
 
-The definition is simple and intuitive: we have width and height of image
-and single vector that contains pixel data.
+The definition is simple and intuitive: we have the width and height of
+image and single vector that contains pixel data.
 
-`!` before `Int` is called “strictness annotation”. Haskell, being a lazy
-language (should I have said “the lazy language”?) does not normally
-evaluate fields inside of data structure when data constructor itself is
-evaluated. When only constructor is evaluated data is said to be in “weak
-head normal form” for some obscure historical reason (fully evaluated data
-is said to be in “normal form”). The `!` sign says: “Hey, we are all in one
-boat now, if you evaluate constructor, evaluate me too”.
+`!` before `Int` is called a “strictness annotation”. Haskell, being a lazy
+language (should I have said “the lazy language”?), does not normally
+evaluate fields inside of a data structure when data constructor itself is
+evaluated. When only the constructor is evaluated, data is said to be in
+“weak head normal form” for some obscure historical reason (fully evaluated
+data is said to be in “normal form”). The `!` sign says: “Hey, we are all in
+one boat now, if you evaluate the constructor, evaluate me too”.
 
 Here is how it works. Suppose we have this data type:
 
@@ -121,7 +122,7 @@ Here is how it works. Suppose we have this data type:
 data MyData = MyData !Int Int
 ```
 
-One `Int` has strictness annotation while the other does not. Load the
+One `Int` has a strictness annotation while the other does not. Load the
 definition in GHCi and try for yourself:
 
 ```haskell
@@ -148,18 +149,18 @@ to `Int` in `MyData`, not the `Int` itself:
 ![Boxed data in Haskell](/tutorials/haskell/image-processing/boxed-data.png)
 
 [Thunk](https://wiki.haskell.org/Thunk) is a name for data that hasn't been
-evaluated yet. When `{-# UNPACK #-}` pragma is used, data becomes part of
-parent structure:
+evaluated yet. When the `{-# UNPACK #-}` pragma is used, data becomes part
+of parent structure:
 
 ![Unboxed data in Haskell](/tutorials/haskell/image-processing/unboxed-data.png)
 
-To do something with `Int`s inside we don't need to de-reference pointer and
-that makes things faster. Of course in this case we cannot retain high level
-of granularity with respect to lazy evaluation and we have to make unboxed
-data strict. Interestingly, GHC won't let you use `{-# UNPACK #-}` without
-strictness annotation saying that it's a parse error.
+To do something with the `Int`s inside, we don't need to de-reference the
+pointers, which makes things faster. Of course in this case we cannot retain
+high level of granularity with respect to lazy evaluation and we have to
+make unboxed data strict. Interestingly, GHC won't let you use `{-# UNPACK
+#-}` without strictness annotation saying that it's a parse error.
 
-I explained this in details because `imageData` is `Vector` of pixels and
+I explained this in detail because `imageData` is a `Vector` of pixels and
 this vector is unboxed and thus it's not possible to use
 [`Eval`](http://chimera.labs.oreilly.com/books/1230000000929/ch02.html) or
 [`Par`](http://chimera.labs.oreilly.com/books/1230000000929/ch04.html) to
@@ -169,8 +170,8 @@ the data because normal Haskell's mechanisms for sharing data work well only
 with boxed data. We will return to this when we start talking about Repa and
 will see how the problem is solved there.
 
-To give the programmer single image type that represents “just” an image,
-abstracted from its representation, `Image` is put into `DynamicImage`
+To give the programmer a single image type that represents “just” an image,
+abstracted from its representation, `Image` is put into the `DynamicImage`
 wrapper:
 
 ```haskell
@@ -203,11 +204,11 @@ data DynamicImage =
      | ImageCMYK16 (Image PixelCMYK16)
 ```
 
-Its data constructors are enumeration of images that correspond to supported
-pixel types. The result is that we can use `DynamicImage` type without
-caring much about concrete underlying representation.
+Its data constructors are an enumeration of images that correspond to
+supported pixel types. The result is that we can use the `DynamicImage` type
+without caring much about the concrete underlying representation.
 
-Pixels in turn are just collection of numeric components, for example:
+Pixels in turn are just a collection of numeric components, for example:
 
 ```haskell
 data PixelRGB8 = PixelRGB8 {-# UNPACK #-} !Word8 -- Red
@@ -233,11 +234,12 @@ time to use this straightforward API for real work.
 ### Format conversion program
 
 We can put together an utility for image format conversion right now! Let's
-write a console program that takes format of resulting image as first
-argument and path to source image as second argument. When the program is
-run, it converts image and saves it changing its extension appropriately.
+write a console program that takes the format of resulting image as the
+first argument and the path to source image as second argument. When the
+program is run, it converts image and saves it changing its extension
+appropriately.
 
-Try to do it yourself first, here are the imports and language extensions
+Try to do it yourself first. Here are the imports and language extensions
 you will need:
 
 ```haskell
@@ -306,7 +308,7 @@ options if we wish to edit or generate an image?
 
 ### Image rotation
 
-For processing of existing images the `pixelMap` function can be used:
+For processing existing images the `pixelMap` function can be used:
 
 ```haskell
 pixelMap :: (Pixel a, Pixel b) => (a -> b) -> Image a -> Image b
@@ -316,14 +318,15 @@ With this function you can do something funny with colors, but let it be an
 exercise for the reader. How about operations that require random access to
 image's data? An example of such an operation is rotation.
 
-Since type at the base of `Image` is storable `Vector` (immutable, unboxed
-vector) and standard technique for efficient vector generation is via use of
+Since type at the base of `Image` is a storable `Vector` (immutable, unboxed
+vector) and the standard technique for efficient vector generation is using
 its mutable variant, it's no surprise that `JuicyPixels` provides
 `MutableImage` type.
 
-Basic workflow is the same as with vectors:
+The basic workflow is the same as with vectors:
 
-1. Allocate memory for new mutable image (or create it from immutable one).
+1. Allocate memory for a new mutable image (or create it from an immutable
+   one).
 
 2. Populate it with right values using mutability.
 
@@ -348,7 +351,7 @@ thawImage :: (Storable (PixelBaseComponent px), PrimMonad m)
 
 Reading and writing are done via `readPixel` and `writePixel` (they have
 unsafe companions but we won't touch them here). `freezeImage` helps with
-freezing. Let put it all together:
+freezing. Let's put it all together:
 
 ```haskell
 main :: IO ()
@@ -378,7 +381,7 @@ As simple as that, we have rotated an image upside down:
 ![Before rotation](/tutorials/haskell/image-processing/before-rotation.png)
 ![After rotation](/tutorials/haskell/image-processing/after-rotation.png)
 
-Here is how our program performs (`image-processing` is name of compiled
+Here is how our program performs (`image-processing` is the name of compiled
 executable):
 
 ```
@@ -416,18 +419,18 @@ withImage :: (Pixel a, PrimMonad m)
   -> m (Image a)
 ```
 
-If your image can be expressed as function from coordinates to pixels,
+If your image can be expressed as a function from coordinates to pixels,
 `generateImage` looks super-simple and straightforward. `generateFoldImage`
 allows to pass around an accumulator (i.e. you can have some sort of state).
-`withImage` is more interesting: it allows to use funtion that returns
+`withImage` is more interesting: it allows to use function that returns
 values inside instances of `PrimMonad`. `PrimMonad` is outside of scope of
 this tutorial, but if you are interested you can read about it
 [here](https://www.schoolofhaskell.com/user/commercial/content/primitive-haskell).
 Basically, `PrimMonad` means `IO` or `ST` and monad stacks with one of these
 monads at the bottom.
 
-Let generate an image using `generateImage` function and save it as a PNG
-file. Here is my attempt:
+Let's generate an image using the `generateImage` function and save it as a
+PNG file. Here is my attempt:
 
 ```haskell
 main :: IO ()
@@ -456,48 +459,48 @@ $ image-processing my-image.png +RTS -s
 …
 ```
 
-Generation of image is not parallel, the library just repeatedly calls
-provided function and builds resulting image from returned results. The
+Generation of image is not parallel, the library just repeatedly calls the
+provided function and builds the resulting image from returned results. The
 performance is not bad at all, but can we do better using multiple cores?
 
 ## Repa
 
 Here's where Repa comes into play. Operations on arrays performed in Repa
 are parallel by default if you compile your program with multi-thread
-support `-threaded` and run it with `+RTS -N`.
+support (the `-threaded` flag enables that) and run it with `+RTS -N`.
 
 Do you remember the problem with large unboxed arrays? We certainly cannot
-afford creation of new big immutable array after each operation, so how can
-we avoid producing intermediate results?
+afford the creation of a new big immutable array after each operation, so
+how can we avoid producing intermediate results?
 
-Well, the answer is rather simple. Following the same approach with function
-that takes coordinates as argument and returns a pixel, we can just make
-that single function more complex with help of primitives from functional
-programming like `map` but specialized for our purposes. Then we can call it
-to build the final result never creating intermediate ones.
+Well, the answer is rather simple. Following the same approach with a
+function that takes coordinates as argument and returns a pixel, we can just
+make that single function more complex with help of primitives from
+functional programming like `map` but specialized for our purposes. Then we
+can call it to build the final result never creating intermediate ones.
 
 The final “real” array is called “manifest array” in Repa's terminology,
-while function that can be used to generate such real array is called
+while the function that can be used to generate such real array is called
 “delayed array”. The trick of never building intermediate results is called
-“fusion”. This is a popular technique that is also used in `friday` package
-and in more mundane `text`.
+“fusion”. This is a popular technique that is also used in the `friday`
+package and in the more mundane `text`.
 
 ### Repa Arrays
 
 Before we can start hacking with Repa, there is one more concept that needs
-to be explained: `Array` type and its shape. `Array r sh e` type is
+to be explained: the `Array` type and its shape. `Array r sh e` type is
 parametrized over:
 
-* representation `r`, there are
+* Representation `r`: there are
   [a few options](https://hackage.haskell.org/package/repa-3.4.0.2/docs/Data-Array-Repa.html)
   available for that, but in this tutorial we will work only with `U`
   (unboxed vector, manifest array), and `D` (delayed array, function from
-  indices to elements);
+  indices to elements).
 
-* shape `sh`, this describes how many dimensions your array has and sizes of
-  these dimensions, below I show how to work with shapes;
+* Shape `sh`: this describes how many dimensions your array has and sizes of
+  these dimensions. Below I show how to work with shapes.
 
-* element type `e`, in our case it will be `(Pixel8, Pixel8, Pixel8)` where
+* Element type `e`: in our case it will be `(Pixel8, Pixel8, Pixel8)` where
   `Pixel8` is just a synonym for `Word8`, i.e. a byte.
 
 Shapes are constructed like this: you append dimensions to `Z`
@@ -537,7 +540,7 @@ for more information.
 ### Bridge from Juicy Pixels to Repa
 
 I will use two simple functions to convert between Juicy Pixels
-representation of pixels and Repa arrays, here they are:
+representation of pixels and Repa arrays:
 
 ```haskell
 type RGB8 = (Pixel8, Pixel8, Pixel8)
@@ -561,15 +564,15 @@ toImage a = generateImage gen width height
       in PixelRGB8 r g b
 ```
 
-The `extent` function returns shape of given array. We represent images as
-two-dimentional matrix of three-tuples holding components of pixel's color:
-`Array D DIM2 RGB8` and `Array U DIM2 RGB8` where `DIM2` is just built-in
-alias for `Z :. Int :. Int`.
+The `extent` function returns the shape of given array. We represent images
+as two-dimensional matrix of three-tuples holding components of pixel's
+color: `Array D DIM2 RGB8` and `Array U DIM2 RGB8` where `DIM2` is just
+built-in alias for `Z :. Int :. Int`.
 
 ## Image rotation revisited
 
-Let's re-write code that rotates an image with Repa and see if it's worth
-it. To use Repa we need to compile our code with the following flags:
+Let's re-write the code that rotates an image with Repa and see if it's
+worth it. To use Repa we need to compile our code with the following flags:
 
 * `-Odph`
 * `-rtsopts`
@@ -614,8 +617,8 @@ rotateImgRepa g = R.backpermute e remap g
     {-# INLINE remap #-}
 ```
 
-`computeUnboxedP` builds manifest unboxed array in parallel. It's a
-type-specialized version of more general `computeP` function:
+`computeUnboxedP` builds manifest unboxed arrays in parallel. It's a
+type-specialized version of the more general `computeP` function:
 
 ```haskell
 computeP :: (Load r1 sh e, Target r2 e, Source r2 e, Monad m)
@@ -623,17 +626,17 @@ computeP :: (Load r1 sh e, Target r2 e, Source r2 e, Monad m)
   -> m (Array r2 sh e) -- ^ Manifest array — result
 ```
 
-An interesting thing here is that `computeP` wants to live in monad, *any
-monad*, why is that? The reason is that `computeP` can use array that is
+An interesting thing here is that `computeP` wants to live in a monad, *any
+monad*, why is that? The reason is that `computeP` can use an array that is
 produced with another `computeP` but only when it's already evaluated or
-else you get run-time warning and slow code. If you keep all `computeP` and
-`computeUnboxedP` functions in the same monad you are safe. So the type just
-helps avoid writing incorrect code (although it's still possible to use
+else you get a run-time warning and slow code. If you keep all `computeP`
+and `computeUnboxedP` functions in the same monad, you are safe. So the type
+just helps avoid writing incorrect code (although it's still possible to use
 something like `runIdentity . computeP`). For sequential evaluation we have
-`computeS`, it may be a better choice for relatively small data-sets.
+`computeS`, which may be a better choice for relatively small data-sets.
 
 `backpermute` is “backwards permutation of an array's elements” and it's
-just right tool for the job. Let's see what we get:
+just the right tool for the job. Let's see what we get:
 
 ```
 $ image-processing -- before-rotation.png after-rotation.png +RTS -s -N2
@@ -642,9 +645,9 @@ $ image-processing -- before-rotation.png after-rotation.png +RTS -s -N2
 …
 ```
 
-This seems to perform a bit better, although both Juicy Pixel's solution and
-Repa solution have varying time of execution every time you run them. We
-could use a larger picture but then loading, saving, and transformation to
+This seems to perform a bit better, although both Juicy Pixel's and Repa's
+solutions have varying time of execution every time you run them. We could
+use a larger picture but then loading, saving, and transformation to
 JuicyPixels' representation would dominate processing time. We can use more
 cores though:
 
@@ -698,12 +701,12 @@ $ image-processing my-image.png +RTS -s -N4
 
 ### Conclusion
 
-Repa is great but watch out where is your bottleneck. If you're doing a lot
-of IO in popular formats like JPEG or PNG, you will need Juicy Pixels and it
-may be worth it just to do the whole thing with Juicy Pixels. Repa has
-[`repa-io`](https://hackage.haskell.org/package/repa-io) which can save in
-BMP (if that works for you), but for me it performed considerably worse than
-our `toImage` function in combination with `JuicyPixels`. There is also
+Repa is great but watch out for where your bottleneck is. If you're doing a
+lot of IO in popular formats like JPEG or PNG, you will need Juicy Pixels
+and it may be worth it just to do the whole thing with Juicy Pixels. Repa
+has [`repa-io`](https://hackage.haskell.org/package/repa-io) which can save
+in BMP (if that works for you), but for me it performed considerably worse
+than our `toImage` function in combination with `JuicyPixels`. There is also
 [`JuicyPixels-repa`](https://hackage.haskell.org/package/JuicyPixels-repa),
 but I got segfaults with it, no idea why.
 
