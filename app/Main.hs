@@ -15,8 +15,6 @@ import Data.Monoid ((<>))
 import Data.List (isSuffixOf)
 import System.Environment
 import Data.Maybe (fromMaybe)
-import Data.Char (toUpper)
-import Text.Read (readMaybe)
 
 -- filepath
 import System.FilePath
@@ -38,11 +36,14 @@ main =
 --
 --
 
+sitePort :: Int
+sitePort = 4000
+
 configuration :: Configuration
 configuration =
   defaultConfiguration
     { ignoreFile  = ignoreFile'
-    , previewPort = 4000
+    , previewPort = sitePort
     }
   where
     ignoreFile' path =
@@ -157,14 +158,15 @@ feedConfiguration =
 --
 --
 
-data EnvType = Staging | Production deriving (Show, Read)
-
 commonContext :: [(String, String)] -> Context String
 commonContext env =
   let
-    host = fromMaybe "" $ lookup "SITE_ROOT_URL" env
+    readEnv d key = fromMaybe d $ lookup key env
+    host = readEnv ("//localhost:" ++ show sitePort) "SITE_ROOT_URL"
+    protocol = readEnv "http:" "SITE_PROTOCOL"
   in
     constField "host" host
+      <> constField "protocol" protocol
       <> defaultContext
 
 tutorialContext :: [(String, String)] -> Context String

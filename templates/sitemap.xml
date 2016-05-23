@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 $for(entries)$
     <url>
-        <loc>$host$$url$</loc>
+        <loc>$protocol$$host$$url$</loc>
         <changefreq>monthly</changefreq>
         $if(lastmod)$<lastmod>$lastmod$</lastmod>$endif$
         <priority>0.8</priority>
