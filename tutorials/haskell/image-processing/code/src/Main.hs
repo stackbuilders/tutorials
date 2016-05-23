@@ -4,12 +4,13 @@
 module Main (main) where
 
 import Codec.Picture
-import Codec.Picture.Types (newMutableImage, freezeImage)
 import Control.Monad
+import Control.Monad.ST
 import Data.Array.Repa (Array, DIM1, DIM2, U, D, Z (..), (:.)(..), (!))
 import System.Environment (getArgs)
 import System.FilePath (replaceExtension)
-import qualified Data.Array.Repa as R -- for Repa
+import qualified Codec.Picture.Types as M
+import qualified Data.Array.Repa     as R -- for Repa
 
 -- Image format conversion with Juicy Pixels
 
@@ -63,17 +64,23 @@ main1 = do
   eimg <- readImage path
   case eimg of
     Left err -> putStrLn ("Could not read image: " ++ err)
-    Right (ImageRGB8 img) -> do
-      img' <- rotateImg img
-      savePngImage path' (ImageRGB8 img')
+    Right (ImageRGB8 img) ->
+      (savePngImage path' . ImageRGB8 . rotateImg) img
     Right _ -> putStrLn "Unexpected pixel format"
 
-rotateImg :: Image PixelRGB8 -> IO (Image PixelRGB8)
-rotateImg img@Image {..} = do
-  mimg <- newMutableImage imageWidth imageHeight
-  forM_ [(x,y) | x <- [0..imageWidth-1], y <- [0..imageHeight-1]] $ \(x,y) ->
-    writePixel mimg (imageWidth - x - 1) (imageHeight - y - 1) (pixelAt img x y)
-  freezeImage mimg
+rotateImg :: Image PixelRGB8 -> Image PixelRGB8
+rotateImg img@Image {..} = runST $ do
+  mimg <- M.newMutableImage imageWidth imageHeight
+  let go x y
+        | x >= imageWidth  = go 0 (y + 1)
+        | y >= imageHeight = M.unsafeFreezeImage mimg
+        | otherwise = do
+            writePixel mimg
+              (imageWidth - x - 1)
+              (imageHeight - y - 1)
+              (pixelAt img x y)
+            go (x + 1) y
+  go 0 0
 
 -- Image generation with Juicy Pixels
 
@@ -151,4 +158,4 @@ originalFnc' (Z :. x :. y) =
   in (s q, s r, s (q + r + 30))
 
 main :: IO ()
-main = main4
+main = main0

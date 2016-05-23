@@ -249,12 +249,13 @@ you will need:
 module Main (main) where
 
 import Codec.Picture
-import Codec.Picture.Types (newMutableImage, freezeImage)
 import Control.Monad
+import Control.Monad.ST
 import Data.Array.Repa (Array, DIM1, DIM2, U, D, Z (..), (:.)(..), (!))
 import System.Environment (getArgs)
 import System.FilePath (replaceExtension)
-import qualified Data.Array.Repa as R -- for Repa
+import qualified Codec.Picture.Types as M
+import qualified Data.Array.Repa     as R -- for Repa
 ```
 
 OK, now we can compare our code:
@@ -360,21 +361,35 @@ main = do
   eimg <- readImage path
   case eimg of
     Left err -> putStrLn ("Could not read image: " ++ err)
-    Right (ImageRGB8 img) -> do
-      img' <- rotateImg img
-      savePngImage path' (ImageRGB8 img')
+    Right (ImageRGB8 img) ->
+      (savePngImage path' . ImageRGB8 . rotateImg) img
     Right _ -> putStrLn "Unexpected pixel format"
 
-rotateImg :: Image PixelRGB8 -> IO (Image PixelRGB8)
-rotateImg img@Image {..} = do
-  mimg <- newMutableImage imageWidth imageHeight
-  forM_ [(x,y) | x <- [0..imageWidth-1], y <- [0..imageHeight-1]] $ \(x,y) ->
-    writePixel mimg
-      (imageWidth - x - 1)
-      (imageHeight - y - 1)
-      (pixelAt img x y)
-  freezeImage mimg
+rotateImg :: Image PixelRGB8 -> Image PixelRGB8
+rotateImg img@Image {..} = runST $ do
+  mimg <- M.newMutableImage imageWidth imageHeight
+  let go x y
+        | x >= imageWidth  = go 0 (y + 1)
+        | y >= imageHeight = M.unsafeFreezeImage mimg
+        | otherwise = do
+            writePixel mimg
+              (imageWidth - x - 1)
+              (imageHeight - y - 1)
+              (pixelAt img x y)
+            go (x + 1) y
+  go 0 0
 ```
+
+In `rotateImg`, we run a stateful computation inside the `ST` monad. You can
+think about `ST` monad as an “escapable” `IO`. References to mutable data
+cannot escape the `ST` monad, but pure data can. The `ST` monad is often
+used to write functions that manipulate mutable values as long as the result
+is referentially transparent.
+
+We use `unsafeFreezeImage` instead of `freezeImage` to avoid unnecessary
+copying of data: `unsafeFreezeImage` re-uses memory occupied by its
+argument. Since after “freezing” we don't modify `mimg`, it's a safe thing
+to do.
 
 As simple as that, we have rotated an image upside down:
 
@@ -387,7 +402,7 @@ executable):
 ```
 $ image-processing before-rotation.png after-rotation.png +RTS -s
 …
-  Total   time    0.251s  (  0.170s elapsed)
+  Total   time    0.238s  (  0.142s elapsed)
 …
 ```
 
@@ -645,7 +660,7 @@ $ image-processing -- before-rotation.png after-rotation.png +RTS -s -N2
 …
 ```
 
-This seems to perform a bit better, although both Juicy Pixel's and Repa's
+This seems to perform a bit worse, although both Juicy Pixel's and Repa's
 solutions have varying time of execution every time you run them. We could
 use a larger picture but then loading, saving, and transformation to
 JuicyPixels' representation would dominate processing time. We can use more
