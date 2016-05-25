@@ -171,7 +171,6 @@ commonContext env =
 
 tutorialContext :: [(String, String)] -> Context String
 tutorialContext env = libs
-  <> dateField "updated" "%B %e, %Y"
   <> dateField "published" "%B %e, %Y"
   <> commonContext env
   where

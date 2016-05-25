@@ -5,7 +5,11 @@
     </h2>
 
     <p>
-      First published: $published$<br/>
+      First published: $published$
+      $if(updated)$
+        (Last updated: $updated$)
+      $endif$
+      <br/>
       by $author-name$
     </p>
 
