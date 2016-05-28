@@ -6,10 +6,14 @@ At Stack Builders, we consider it our mission not only to develop robust and rel
 
 ## Contributing
 
-<!--
-[![Issue Stats](http://issuestats.com/github/stackbuilders/tutorials/badge/pr?style=flat)](http://issuestats.com/github/stackbuilders/tutorials) [![Issue Stats](http://issuestats.com/github/stackbuilders/tutorials/badge/issue?style=flat)](http://issuestats.com/github/stackbuilders/tutorials)
--->
 We welcome any help, so if you have good knowledge of Haskell just fork and submit a pull request with your tutorial. Be sure to read our [contribution guidelines](.github/CONTRIBUTING.md) first.
+
+## Report a problem
+
+Found a typo? Please let us know! If you find an error, please report
+it by [opening an issue][tutorials-issues-new].
+
+[tutorials-issues-new]: https://github.com/stackbuilders/tutorials/issues/new
 
 ## License
 
