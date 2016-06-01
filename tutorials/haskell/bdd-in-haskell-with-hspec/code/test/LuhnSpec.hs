@@ -2,7 +2,6 @@ module LuhnSpec (main, spec) where
 
 import Test.Hspec
 import Test.QuickCheck
-import Numeric.Natural
 
 import Luhn
 import Luhn.Internal
@@ -18,12 +17,12 @@ spec = do
       toDigits 2468 `shouldBe` [2,4,6,8]
     context "for natural numbers" $
       it "holds on: x == fromDigits(toDigits x)" $
-        property $ \x -> let x' = toInteger (x :: Natural) in
-          x' == (fromDigits . toDigits) x'
+        property $ \x ->
+          x >= 0 ==> x == (fromDigits . toDigits) x
     context "for negative numbers" $
       it "holds on: fromDigits(toDigits x) == 0" $
-        property $ \x -> let x' = (negate . toInteger) (x :: Natural) in
-          (fromDigits . toDigits) x' == 0
+        property $ \x ->
+          x < 0 ==> (fromDigits . toDigits) x == 0
   describe "doubleEveryOther" $
     it "doubles every other number starting from the right" $ do
       doubleEveryOther [1..5] `shouldBe` [1,4,3,8,5]
