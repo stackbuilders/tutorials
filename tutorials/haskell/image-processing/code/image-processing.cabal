@@ -1,0 +1,31 @@
+name:                 image-processing
+version:              0.1.0
+cabal-version:        >= 1.10
+license:              BSD3
+license-file:         LICENSE.md
+author:               Mark Karpov <markkarpov@openmailbox.org>
+maintainer:           Mark Karpov <markkarpov@openmailbox.org>
+homepage:             https://github.com/stackbuilders/tutorials
+bug-reports:          https://github.com/stackbuilders/tutorials/issues
+category:             Graphics
+synopsis:             The tutorial teaches how to process images in Haskell
+build-type:           Simple
+description:          The tutorial teaches how to process images in Haskell.
+extra-source-files:   README.md
+
+source-repository head
+  type:               git
+  location:           https://github.com/stackbuilders/tutorials.git
+
+executable image-processing
+  main-is:            Main.hs
+  hs-source-dirs:     src
+  build-depends:      base             >= 4.8 && < 5
+                    , JuicyPixels      >= 3.2.7
+                    , filepath         >= 1.3
+                    , repa             >= 3.4.0.2
+                    , vector           >= 0.9
+  default-extensions: RecordWildCards
+                    , TupleSections
+  ghc-options:      -O2 -Wall -Odph -rtsopts -threaded -fno-liberate-case -funfolding-use-threshold1000 -funfolding-keeness-factor1000 -fllvm -optlo-O3
+  default-language:   Haskell2010
