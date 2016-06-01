@@ -1,7 +1,7 @@
 ---
 title: Image processing with Juicy Pixels and Repa
-published: 2016-05-17
-updated: 2016-05-30
+published: 2016-06-06
+updated: 2016-06-06
 ghc: 7.10.3
 lts: 5.16
 libraries: JuicyPixels-3.2.7 repa-3.4.0.2
@@ -76,16 +76,16 @@ image files, and `repa` for efficient processing of numeric data.
 `JuicyPixels` is useful on its own if your task does not require parallel
 computations. Simple things like badge or identicon generation can be done
 sequentially (the overhead of scheduling parallel execution for small
-amounts of data can even make sequential execution preferable) and
+amounts of data can even make sequential execution preferable) and the
 `JuicyPixels` API makes them ridiculously simple.
 
 ### Types and data structures used in Juicy Pixels
 
 If we quickly glance through the
-[`Codec.Picture`](https://hackage.haskell.org/package/JuicyPixels/docs/Codec-Picture.html)
+[`Codec.Picture`](https://hackage.haskell.org/package/JuicyPixels-3.2.7/docs/Codec-Picture.html)
 module, its types and functions look really straightforward. The basic type
 in the module is
-[`Image`](https://hackage.haskell.org/package/JuicyPixels/docs/Codec-Picture.html#t:Image),
+[`Image`](https://hackage.haskell.org/package/JuicyPixels-3.2.7/docs/Codec-Picture.html#t:Image),
 which is parametrized by pixel type:
 
 ```haskell
@@ -529,7 +529,7 @@ and `:.` live on both type level and term (value) level. For example:
 
 Positions are numbered from 0, and so `Z :. 2 :. 2` is bottom right corner
 of such matrix. In reality, all elements are stored in a flat,
-one-dimentional vector and shapes just help access right elements. In fact
+one-dimensional vector and shapes just help access right elements. In fact
 we can re-shape a Repa array without modifying array itself:
 
 ```haskell
