@@ -1,7 +1,6 @@
 ---
 title: Image processing with Juicy Pixels and Repa
-published: 2016-06-06
-updated: 2016-06-06
+published: 2016-06-07
 ghc: 7.10.3
 lts: 5.16
 libraries: JuicyPixels-3.2.7 repa-3.4.0.2
