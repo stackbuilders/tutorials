@@ -5,34 +5,18 @@ import Control.Monad.IO.Class
 import Data.IORef
 import Graphics.UI.Gtk hiding (Action, backspace)
 
-data Value = Value String (Maybe Action)
+----------------------------------------------------------------------------
+-- The main function
 
-data Action
-  = Addition       String
-  | Subtraction    String
-  | Multiplication String
-  | Division       String
-
-mapAction :: (String -> String) -> Action -> Action
-mapAction f (Addition       x) = Addition       (f x)
-mapAction f (Subtraction    x) = Subtraction    (f x)
-mapAction f (Multiplication x) = Multiplication (f x)
-mapAction f (Division       x) = Division       (f x)
-
-getSndArg :: Action -> String
-getSndArg (Addition       x) = x
-getSndArg (Subtraction    x) = x
-getSndArg (Multiplication x) = x
-getSndArg (Division       x) = x
-
+-- | The program's entry point.
 main :: IO ()
 main = do
-  st <- newIORef (Nothing :: Maybe Value)
+  st <- newIORef (Value "" Nothing)
   void initGUI
   window <- windowNew
   set window [ windowTitle         := "Calculator"
              , windowResizable     := False
-             , windowDefaultWidth  := 250
+             , windowDefaultWidth  := 230
              , windowDefaultHeight := 250 ]
   display <- entryNew
   set display [ entryEditable := False
@@ -72,92 +56,142 @@ main = do
   mkBtn "."   enterDot >>= attach 2 6 1 1
   mkBtn "+"   (operator Addition) >>= attach 3 6 1 1
   containerAdd window grid
-  window `on` deleteEvent $ liftIO mainQuit >> return False
+  window `on` deleteEvent $ do
+    liftIO mainQuit
+    return False
   widgetShowAll window
   mainGUI
 
-enterDot :: (Maybe Value -> Maybe Value)
-enterDot value =
-  case value of
-    Nothing -> Just (Value "0." Nothing)
-    Just (Value x action) ->
+----------------------------------------------------------------------------
+-- Calucaltor's state
+
+-- | 'Value' holds textual representation of first argument reversed and
+-- 'Action' to apply to it, which see.
+data Value = Value String (Maybe Action)
+
+-- | Action to apply to first argument and textual representation of second
+-- argument reversed (if relevant).
+data Action
+  = Addition       String
+  | Subtraction    String
+  | Multiplication String
+  | Division       String
+
+-- | Change second argument inside of 'Action'.
+mapAction :: (String -> String) -> Action -> Action
+mapAction f (Addition       x) = Addition       (f x)
+mapAction f (Subtraction    x) = Subtraction    (f x)
+mapAction f (Multiplication x) = Multiplication (f x)
+mapAction f (Division       x) = Division       (f x)
+
+-- | Get second argument from 'Action'.
+getSndArg :: Action -> String
+getSndArg (Addition       x) = x
+getSndArg (Subtraction    x) = x
+getSndArg (Multiplication x) = x
+getSndArg (Division       x) = x
+
+-- | Render given 'Value'.
+renderValue :: Value -> String
+renderValue (Value x action) =
+  g x ++ f a ++ (if null y then "" else g y)
+  where
+    (a, y) =
       case action of
-        Nothing -> Just (Value ('.':x) Nothing)
-        Just  a -> Just (Value x (Just $ mapAction ('.':) a))
+        Nothing                   -> ("", "")
+        Just (Addition       arg) -> ("+", arg)
+        Just (Subtraction    arg) -> ("–", arg)
+        Just (Multiplication arg) -> ("*", arg)
+        Just (Division       arg) -> ("÷", arg)
+    f "" = ""
+    f l  = " " ++ l ++ " "
+    g "" = "0"
+    g xs = reverse xs
 
-enterDigit :: Char -> (Maybe Value -> Maybe Value)
-enterDigit ch value =
-  case value of
-    Nothing -> Just (Value [ch] Nothing)
-    Just (Value x action) -> Just $
-      case action of
-        Nothing -> Value (ch:x) Nothing
-        Just  a -> Value x (Just $ mapAction (ch:) a)
+----------------------------------------------------------------------------
+-- Calculator's operations
 
-backspace :: Maybe Value -> Maybe Value
-backspace value =
-  case value of
-    Nothing -> Nothing
-    Just (Value x action) -> Just $
-      case action of
-        Nothing -> Value (drop 1 x) Nothing
-        Just  a -> Value x (Just $ mapAction (drop 1) a)
+-- | Change state as if a dot is entered.
+enterDot :: Value -> Value
+enterDot (Value x action) =
+  let f xs = if '.' `elem` xs then xs else '.' : xs
+  in case action of
+       Nothing -> Value (f x) Nothing
+       Just  a -> Value x (Just $ mapAction f a)
 
-clearEntry :: Maybe Value -> Maybe Value
-clearEntry value =
-  case value of
-    Nothing -> Nothing
-    Just (Value x action) ->
-      case action of
-        Nothing -> Nothing
-        Just  a ->
-          if null (getSndArg a)
-            then Nothing
-            else Just $ Value x (Just $ mapAction (const "") a)
+-- | Change state as if specific char (digit) is entered.
+enterDigit :: Char -> Value -> Value
+enterDigit ch (Value x action) =
+  case action of
+    Nothing -> Value (ch:x) Nothing
+    Just  a -> Value x (Just $ mapAction (ch:) a)
 
-clearAll :: Maybe Value -> Maybe Value
-clearAll = const Nothing
+-- | Change state as if last character of current argument is removed.
+backspace :: Value -> Value
+backspace (Value x action) =
+  case action of
+    Nothing -> Value (drop 1 x) Nothing
+    Just  a -> Value x (Just $ mapAction (drop 1) a)
 
-equals :: Maybe Value -> Maybe Value
-equals value =
-  case value of
-    Nothing -> Nothing
-    Just (Value x action) ->
-      case action of
-        Nothing -> Just (Value x Nothing)
-        Just  a ->
-          if null (getSndArg a)
-            then Just (Value x action)
-            else Just (Value result Nothing)
-              where
-                g  :: String -> Double
-                g ""       = 0
-                g ('.':xs) = g ('0':'.':xs)
-                g xs       = read (reverse xs)
-                x' = g x
-                y' = g (getSndArg a)
-                result = reverse . show $
-                  case a of
-                    Addition       _ -> x' + y'
-                    Subtraction    _ -> x' - y'
-                    Multiplication _ -> x' * y'
-                    Division       _ -> x' / y'
+-- | Apply given operator to current state. If some action is already fully
+-- constructed, evaluate it first.
+operator :: (String -> Action) -> Value -> Value
+operator op value =
+  let (Value x action) = equals value
+  in Value x $ Just $
+    case action of
+      Nothing -> op ""
+      Just  a -> op (getSndArg a)
 
-operator :: (String -> Action) -> Maybe Value -> Maybe Value
-operator op value = Just $
-  case equals value of
-    Nothing -> Value "" (Just $ op "")
-    Just (Value x action) -> Value x $ Just $
-      case action of
-        Nothing -> op ""
-        Just  a -> op (getSndArg a)
+-- | Change state as if current argument is removed.
+clearEntry :: Value -> Value
+clearEntry (Value x action) =
+  case action of
+    Nothing -> Value "" Nothing
+    Just  a ->
+      if null (getSndArg a)
+        then Value "" Nothing
+        else Value x (Just $ mapAction (const "") a)
 
+-- | Change state returning it to the default value.
+clearAll :: Value -> Value
+clearAll = const (Value "" Nothing)
+
+-- | Evaluate current calculator's state putting result in place of first
+-- argument.
+equals :: Value -> Value
+equals (Value x action) =
+  case action of
+    Nothing -> Value x Nothing
+    Just  a ->
+      if null (getSndArg a)
+        then Value x action
+        else Value result Nothing
+          where
+            g  :: String -> Double
+            g ""       = 0
+            g ('.':xs) = g ('0':'.':xs)
+            g xs       = read (reverse xs)
+            x' = g x
+            y' = g (getSndArg a)
+            result = reverse . show $
+              case a of
+                Addition       _ -> x' + y'
+                Subtraction    _ -> x' - y'
+                Multiplication _ -> x' * y'
+                Division       _ -> x' / y'
+
+----------------------------------------------------------------------------
+-- Helpers
+
+-- | Create a button and attach handler to it that mutates calculator's
+-- state with given function.
 mkButton
-  :: IORef (Maybe Value)          -- ^ 'IORef' to calculator state
-  -> Entry                        -- ^ Our display to update
-  -> String                       -- ^ Button label
-  -> (Maybe Value -> Maybe Value) -- ^ How this button affects calculator state
-  -> IO Button                    -- ^ Resulting button object
+  :: IORef Value       -- ^ 'IORef' to calculator state
+  -> Entry             -- ^ Our display to update
+  -> String            -- ^ Button label
+  -> (Value -> Value)  -- ^ How this button affects calculator state
+  -> IO Button         -- ^ Resulting button object
 mkButton st display label mutateState = do
   btn <- buttonNew
   set btn [ buttonLabel := label ]
@@ -166,28 +200,7 @@ mkButton st display label mutateState = do
     updateDisplay display value
   return btn
 
-updateDisplay :: Entry -> Maybe Value -> IO ()
+-- | Make calculator's display show given 'Value'.
+updateDisplay :: Entry -> Value -> IO ()
 updateDisplay display value =
   set display [ entryText := renderValue value ]
-
-renderValue :: Maybe Value -> String
-renderValue value =
-  case value of
-    Nothing -> "0"
-    Just (Value x action) ->
-      if null x
-        then "0"
-        else reverse x ++ f a ++ reverse y
-      where
-        (a, y) =
-          case action of
-            Nothing                   -> ("", "")
-            Just (Addition       arg) -> ("+ ", arg)
-            Just (Subtraction    arg) -> ("– ", arg)
-            Just (Multiplication arg) -> ("* ", arg)
-            Just (Division       arg) -> ("÷ ", arg)
-        f "" = ""
-        f l  = " " ++ l ++ " "
-
--- TODO comments
--- TODO go though
