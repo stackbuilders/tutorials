@@ -27,19 +27,19 @@ your tasks.
 The tutorial does not assume any knowledge of Haskell except for very basic
 understanding of how to work with `IO` monad. The GTK+ binding is very
 straightforward and imperative in its nature. This may be seen as a
-downside, but I think it may make things easier for newcomers to Haskell
-programming with imperative background.
+downside, but I think it also may make things easier for newcomers to
+Haskell programming with imperative background.
 
 ## Available libraries
 
-Before we start with GTK bindings, it's reasonable to ask whether there is a
-better/alternative solution. Indeed, several libraries available to create
-GUI in Haskell:
+Before we start with GTK+ bindings, it's reasonable to ask whether there is
+a better/alternative solution. Indeed, several libraries are available to
+create GUI in Haskell:
 
 * [`wx`](https://hackage.haskell.org/package/wx) is bindings to
   [wxWidgets](https://wxwidgets.org/). A couple of things about this package
-  I find suspicious: 1) it had delays in development when a couple of years
-  no new version was released 2) it's still not present on Stackage.
+  I find suspicious: 1) it had delays in development when for a couple of
+  years no new version was released 2) it's still not present on Stackage.
   Practical conclusion from the point 2 is that it's not very popular
   nowadays, or at least not many Haskellers start writing any application
   with it otherwise it would be added already.
@@ -89,17 +89,13 @@ The calculator application has been chosen because its logic is very
 straightforward and we can focus on working with GTK+ framework without much
 distraction while keeping the tutorial reasonably practical.
 
-Let's start by enabling the `OverloadedStrings` extension and importing some
-modules:
+Let's start by importing some modules:
 
 ```haskell
-{-# LANGUAGE OverloadedStrings #-}
-
 import Control.Monad
 import Control.Monad.IO.Class
 import Data.IORef
-import Data.Text (Text)
-import Graphics.UI.Gtk hiding (Action)
+import Graphics.UI.Gtk hiding (Action, backspace)
 ```
 
 As I said, GTK+ bindings are very imperative. All binding code lives in `IO`
@@ -116,14 +112,15 @@ main = do
 ```
 
 1. The first thing we need to do in any program that uses GTK+ is to call
-   the `initGUI` function. This function looks up command line arguments
-   that are relevant to GTK+, parses them, and returns all non-parsed
-   arguments. For our purposes, we don't need the command line arguments, so
-   let's wrap it into the `void`.
+   the `initGUI` function. This function allocates some resources and
+   prepares GTK+ for work, it also looks up command line arguments that are
+   relevant to GTK+, parses them, and returns all non-parsed arguments. For
+   our purposes, we don't need the command line arguments, so let's wrap it
+   with the `void`.
 
 2. Next, we need a window to build interface of our calculator inside it. To
    create a new top-level window we use the `newWindow` action. It returns
-   opaque `Window` value.
+   opaque `Window` value that can be used to manipulate the window.
 
 3. After creation of a new window we typically want to change some
    parameters and then render it. For now we just render the window “as is”,
@@ -139,8 +136,8 @@ main = do
 
 A note about threads. Make sure that all GTK actions happen on the same OS
 thread (note, this is different from lightweight Haskell threads). This only
-important when you compile with multithreaded runtime, but who knows, maybe
-the need with concurrent execution will arise later, so my advice to keep
+important when you compile with multi-threaded runtime, but who knows, maybe
+the need for concurrent execution will arise later, so my advice is to keep
 all GTK-related code in one thread and simplest way to do it is to keep
 everything is the main thread. For more information about multi-threaded
 GUIs with GTK+ see [here](http://dmwit.com/gtk2hs/).
@@ -151,8 +148,9 @@ If we compile and run the program we will see the following:
 
 Nothing fancy. One nasty detail is that when we close the window the program
 continues to run. This is because the default handler for click on the
-“close” button of window makes it invisible, but the main loop `mainGUI`
-continues to run. We will see how to handle this situation properly soon.
+“close” button of window just makes it invisible, and the main loop
+`mainGUI` continues to run. We will see how to handle this situation
+properly soon.
 
 ## Attributes
 
@@ -186,7 +184,7 @@ main :: IO ()
 main = do
   void initGUI
   window <- windowNew
-  set window [ windowTitle         := ("Calculator" :: Text)
+  set window [ windowTitle         := "Calculator"
              , windowResizeable    := False
              , windowDefaultWidth  := 230
              , windowDefaultHeight := 250 ]
@@ -201,12 +199,12 @@ Looks like it works:
 ## Containers
 
 Still, even non-resizable window with title is boring. What we would like to
-do is to put something *inside* of that window. This brings us to the GTK+
-notion of *container*. Container is a widget that can contian another
-widgets inside. There are two types of contianers:
+do is to *put something inside* that window. This brings us to the GTK+
+notion of *container*. Container is a widget that can contain another
+widgets inside. There are two types of containers:
 
-* those that serve purely decorative purpose and can contain only one widget
-  inside;
+* those that serve purely decorative purpose and can contain only one
+  widget;
 
 * those that help organize forms and can contain several widgets.
 
@@ -217,12 +215,12 @@ Most important actions that you will want to perform on containers are:
 
 * `containerAdd parent child` to add `child` widget to `parent` widget
 
-* `contianerRemove parent child` to remove `child` widget from `parent`
+* `containerRemove parent child` to remove `child` widget from `parent`
   widget
 
 * `containerGetChildren` to get all children of a container widget
 
-* `containerForeach` to perform an action of all children of a container
+* `containerForeach` to perform an action on all children of a container
 
 For now we will need a non-editable text area where we will show the number
 that is being entered and result of computations:
@@ -234,7 +232,7 @@ main = do
   display <- entryNew
   set display [ entryEditable := False
               , entryXalign   := 1 -- makes contents right-aligned
-              , entryText     := ("0" :: Text) ]
+              , entryText     := "0" ]
   …
 ```
 
@@ -242,10 +240,10 @@ We use the `Entry` widget to display numbers, but it's not editable and
 right-aligned. We don't hurry to insert it into our `window` because we need
 some sort of “grid” to make the form look like a real calculator.
 
-Indeed there is `Grid` widget in the `Graphics.UI.Gtk.Layout.Grid` module.
-This is an example of a more complex container that has its own interface
-for better control of layout. We will be using the following functions from
-its API:
+Indeed, there is the `Grid` widget in the `Graphics.UI.Gtk.Layout.Grid`
+module. This is an example of a more complex container that has its own
+interface for better control of layout. We will be using the following
+functions from its API:
 
 ```haskell
 -- | Creates a 'Grid'.
@@ -254,15 +252,15 @@ gridNew :: IO Grid
 -- | Sets whether all rows of grid will have the same height.
 gridSetRowHomogeneous :: GridClass self
   => self              -- ^ The grid
-  -> Bool              -- ^ True to make rows homogeneous
+  -> Bool              -- ^ 'True' to make rows homogeneous
   -> IO ()
 
 -- | Adds a widget to the grid. The position of child is determined by left
 -- and top. The number of “cells” that child will occupy is determined by
 -- width and height.
 gridAttach :: (GridClass self, WidgetClass child)
-  => self              -- ^ The grid
-  -> child             -- ^ The widget to add
+  => self    -- ^ The grid
+  -> child   -- ^ The widget to add
   -> Int     -- ^ The column number of to attach the left side of child to
   -> Int     -- ^ The row number to attach the top side of child to
   -> Int     -- ^ Width — the number of columns that child will span
@@ -315,16 +313,16 @@ main = do
   …
 ```
 
-1. `gridNew` creates new grid.
+1. `gridNew` creates a new grid.
 
-2. `gridSetRowHomogeneous grid True` make every row have equal height.
+2. `gridSetRowHomogeneous grid True` makes every row have equal height.
 
 3. Here we define the `attach` helper function. It attaches given widget to
    our `grid`. The argument order of this function helps to use it with
    `(>>=)`.
 
 4. We attach `display` we created previously to the `grid`. It will occupy
-   all the top row.
+   the entire top row.
 
 5. Here we use combination of `mkBtn` helper and `attach` to quickly create
    buttons and place them on the grid. I'll show `mkBtn` is a moment.
@@ -335,15 +333,15 @@ main = do
 `mkBtn` is a helper for button creation, right now it's very simple:
 
 ```haskell
-mkBtn :: Text -> IO Button
+mkBtn :: String -> IO Button
 mkBtn label = do
   btn <- buttonNew
   set btn [ buttonLabel := label ]
   return btn
 ```
 
-We create new button, set its attributes (just label in our case) and
-return.
+We create new button, set its attributes (just label in our case) and return
+the button.
 
 ![Our calculator looks like a real calculator](/tutorials/haskell/gui-application/calc-2.png)
 
@@ -369,18 +367,19 @@ types of objects). This is the identifier of signal handler and its sole
 purpose to give you a way to disconnect a signal handler if you ever need
 it. You can use the `disconnect` from `System.Glib.Signals` to do that.
 
-Every signal dictates type that `callback` function should have. The
-following options are most frequent:
+Every signal dictates type that `callback` function will have. The following
+cases are most frequent:
 
 * Just `IO ()`, no information is given to the handler it is not expected to
   return anything. Example of such signal is `showSignal`.
 
 * Handlers that are given arguments: `a -> IO Bool`. Example of such signal
-  is `focus` whose handlers have type `DirectionType -> IO Bool`. Another
-  interesting thing here is returned value of the type `Bool`. This is a
-  convention in GTK+ allowing to disable default handling of some signals.
-  If we return `True`, default handling will be disabled, while `False` will
-  keep it active executing our handler *and* default handler as well.
+  is `focus` whose handlers have the type `DirectionType -> IO Bool`.
+  Another interesting thing here is returned value of the type `Bool`. This
+  is a convention in GTK+ allowing to disable default handling of some
+  signals. If we return `True`, default handling will be disabled, while
+  `False` will keep it active executing our handler *and* default handler as
+  well.
 
 There is one more way to get some information from within signal's handler.
 Some signals dictate that handler should live in special monad called
@@ -426,12 +425,12 @@ Looking at the “signals” section in `Graphics.UI.Gtk.Buttons.Button`,
 buttonActivated :: ButtonClass self => Signal self (IO ())
 ```
 
-Just for a test let's re-write `mkBtn` to attach a handler that will update
+Just for a test, let's re-write `mkBtn` to attach a handler that will update
 the display with name of pressed button (we still don't know the whole lot
 to make a working calculator):
 
 ```haskell
-mkBtn :: Text -> Entry -> IO Button
+mkBtn :: String -> Entry -> IO Button
 mkBtn label display = do
   btn <- buttonNew
   set btn [ buttonLabel := label ]
@@ -475,12 +474,14 @@ In our case we just want to close it, so:
 ```haskell
   …
   containerAdd window grid
-  window `on` deleteEvent $ liftIO mainQuit >> return False -- ←
+  window `on` deleteEvent $ do -- handler to run on window destruction
+    liftIO mainQuit
+    return False
   widgetShowAll window
   mainGUI
 ```
 
-Note that `deleteEvent` parametrizes `EventM` type by `EAny` type level tag.
+Note that `deleteEvent` parametrizes `EventM` type by `EAny` type-level tag.
 Its description:
 
 ```haskell
@@ -509,7 +510,7 @@ as we already know is just `ReaderT (Ptr t) IO`. We cannot return anything
 non-standard from handlers, so the only way to communicate with outside
 world is via mutable references.
 
-There are two most obvious options (at least):
+There are two most obvious options:
 
 * `IORef`s — mutable references inside `IO` monad.
 
