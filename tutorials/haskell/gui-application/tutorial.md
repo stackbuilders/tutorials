@@ -747,23 +747,62 @@ UI designer for GTK+ called [Glade](https://glade.gnome.org/).
 
 Glade is straightforward to install and use. Open the application, you will
 see panels with various widgets: top-level objects (such as window),
-containers, and controls (such as buttons). Select window button on the
-topmost palette and the window will appear on the working area.
+containers, and controls (such as buttons).
 
-To replicate our window with Glade, enter “Calculator” in the title field.
+Short plan how to re-create our calculator form with Glade:
 
-Don't forget to fill out the “ID” attribute, this is how you will access
-widgets on your form in the Haskell code.
+1. Select window button on the topmost palette and the window will appear on
+   the working area.
 
-Create grid with id `grid`. When asked about number of rows and columns,
-choose 7 × 5. Select the “Homogeneous” check box under the “Rows” title. Now
-insert buttons to match our existing design.
+2. Enter “Calculator” in the title field.
 
-TODO Write it out normally
+3. Don't forget to fill out the “ID” attribute of every widget, this is how
+   you will access widgets on your form in the Haskell code.
+
+4. Create grid with id `grid`. When asked about number of rows and columns,
+   choose 7 × 5. Select the “Homogeneous” check box under the “Rows” title.
+
+5. Insert entry, use “Drag and resize widgets in the workspace” button on
+   the top tool bar to make it occupy the entire top row.
+
+6. Insert buttons to match our existing design.
 
 ![Building the calculator form in Glade](/tutorials/haskell/gui-application/calc-3-mini.png)
 
-[Bigger image](/tutorials/haskell/gui-application/calc-3.png).
+(Here is a [bigger image](/tutorials/haskell/gui-application/calc-3.png).)
+
+*Hint: complete glade form of our calculator is available under the Stack
+Builders tutorial repository.*
+
+To use the form in Haskell code we need `Builder`, which lives in
+`Graphics.UI.Gtk.Builder` module. The `Builder` object helps with creating
+UI from XML files on the fly.
+
+Here is how we could use it in our program:
+
+```haskell
+  …
+  builder <- builderNew                                 -- (1)
+  builderAddFromFile builder "calc.glade"               -- (2)
+  btn0 <- builderGetObject builder castToButton "btn_0" -- (3)
+  …
+```
+
+1. We need to create a new builder.
+
+2. Load our form into it from a file. There are other options such as
+   loading form text (`String`, `Text`) and so forth, consult the docs for
+   more information.
+
+3. Now the interesting part is that we can get actual button object knowing
+   its identifier. For example here I'm retrieving button that inputs zeros,
+   it has the `"btn_0"` identifier on my form. `castToButton` casts abstract
+   representatin of an object to its typed form. There are many
+   `castToSomething` functions, one per widget (for example we have
+   `castToWindow` for windows).
+
+Having the actual object like that button or main window itself, it's easy
+to proceed just like with manually constructed form to start the main loop.
 
 ## See also
 
