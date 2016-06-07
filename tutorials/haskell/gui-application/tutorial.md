@@ -804,6 +804,16 @@ Here is how we could use it in our program:
 Having the actual object like that button or main window itself, it's easy
 to proceed just like with manually constructed form to start the main loop.
 
+## Conclusion
+
+GTK+ Haskell binding certainly can be used to create professional-looking
+user interfaces. As I hopefully showed you in this tutorial, using the
+bindings is very straightforward and doesn't require any special knowledge.
+For small forms Glade probably doesn't make much sense, but if you write
+something big, it may save you some tiresome work. Better yet, one don't
+have to be a Haskell programmer to design UI with Glade, this fact makes it
+easier to divide work between people.
+
 ## See also
 
 * [`gtk3` on Hackage](https://hackage.haskell.org/package/gtk3)
