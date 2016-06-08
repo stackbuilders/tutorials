@@ -15,6 +15,7 @@ import Data.Monoid ((<>))
 import Data.List (isSuffixOf)
 import System.Environment
 import Data.Maybe (fromMaybe)
+import Text.Pandoc
 
 -- filepath
 import System.FilePath
@@ -118,7 +119,7 @@ rules env = do
         where p = toFilePath i
     route (customRoute tutorialRoute)
     compile $
-      pandocCompiler
+      tutorialsCompiler
         >>= loadAndApplyTemplate "templates/tutorial.html" tutorialCtx
         >>= loadAndApplyTemplate "templates/default.html" tutorialCtx
         >>= relativizeUrls
@@ -178,3 +179,11 @@ tutorialContext env = libs
       libraries <- getMetadataField' (itemIdentifier item) "libraries"
       mapM makeItem (words libraries)
     libraryContext = field "lib" (return . itemBody)
+
+tutorialsCompiler :: Compiler (Item String)
+tutorialsCompiler = pandocCompilerWith defaultTutorialsReaderOptions defaultHakyllWriterOptions
+
+defaultTutorialsReaderOptions :: ReaderOptions
+defaultTutorialsReaderOptions = defaultHakyllReaderOptions
+    { readerSmart = False
+    }
