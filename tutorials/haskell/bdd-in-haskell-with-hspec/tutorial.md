@@ -21,9 +21,9 @@ but the behavior a piece of code should show to an outside observer. It provides
 semantics shifted towards specification rather than testing.
 
 Haskell offers a strong type system that guarantees code correctness. So, why
-would your ever bother to use BDD in your Haskell projects? Well, Haskell
-helps us with this a long way, but when it comes to ensure the code does what it
-was expected to do, you're the only one responsible and BDD comes in handy.
+would your ever bother to use BDD in your Haskell projects? Although Haskell
+does help us with this, when it comes to ensure that the code does what's
+expected, you're the only one responsible and BDD comes in handy.
 Common uses of BDD are preventing division by zero cases, or ensuring your own
 instances of monoids, functors, monads, etc., follow the expected rules.
 
@@ -32,25 +32,25 @@ instances of monoids, functors, monads, etc., follow the expected rules.
 language (EDSL) for defining BDD specs. A spec is organized in a tree structure
 defined in terms of `describe` and `it`.
 
-The `describe` clause shows the name of the function or feature, which behavior
+The `describe` clause shows the name of the function or feature which behavior
 we are going to specify.
 
-This clause can contain multiple `it` clauses, which shows a textual description
+This clause can contain multiple `it` clauses that show a textual description
 of the expected behavior.
 
 And inside the `it` clauses, we place the expectations. Expectations are
-implementations of the expectance of a certain behavior, and commonly
+implementations of the expectancy of a certain behavior, and commonly
 use the word `should`. Examples of this expectation functions are `shouldBe`,
 `shouldSatisfy`, etc.
 
 ### The Luhn algorithm
 
 While trying to choose the "perfect" sample for a BDD tutorial, I got suddenly
-inspired by one of the first exercises I saw in the [CIS-194][cis-194] course,
-which personally, I consider a great Haskell introduction material.
+inspired by one of the first exercises I saw in the [CIS-194][cis-194] course.
+Personally, I consider it a great Haskell introduction material.
 
 Luhn is an algorithm used to validate credit card numbers. The algorithm is
-very simple in its conception, and thus can make a great option to watch BDD
+very simple in its conception, thus, can make a great option to watch BDD
 in action.
 
 Given an integer number, the Luhn algorithm follows these steps:
@@ -94,30 +94,30 @@ test-suite luhn-test
 
 * A `src` folder with a sample module `Data.String.Strip`.
 * A `test` folder with an `Spec.hs` test driver file, containing configuration
-options that allows Hspec to find your specs without the need to include
+options that allow Hspec to find your specs without the need to include
 them manually. You shouldn't change this file:
 
 ```haskell
 {-# OPTIONS_GHC -F -pgmF hspec-discover #-}
 ```
 
-The project has all it needs to run the specs, out of the box. So why don't you
+The project has all it needs to run the specs, out of the box. So, why don't you
 try the following command and see what happens:
 
 ```
 $ stack build --test
 ```
 
-Hspec output will give you some useful information like, the number of specs,
-the described features and what is expected from them in color coded text
+Hspec output will give you some useful information like the number of specs,
+the described features and what it is expected from them in color coded text
 (green for passing specs and red for failing ones), and a small summary.
 
-You can take a look at the project structure and sample code if you want. But for the
+You can take a look at the project structure and sample code if you want. For the
 purpose of this tutorial there are some files we don't need anymore, so we'll start by
 removing the `src/Data/` and `test/Data` folders completely.
 
-This tutorial relies only on Hspec tests and thus, we are not going to create an executable
-application, so we can also remove the `app` folder.
+This tutorial relies only on Hspec tests. We are not going to create an executable
+application so we can also remove the `app` folder.
 
 At the `luhn.cabal` file:
 
@@ -143,13 +143,12 @@ $ mkdir src/Luhn
 $ echo "module Luhn.Internal where" > src/Luhn/Internal.hs
 ```
 
-Run the specs again and everything should be green, but we should
-have 0 examples now.
+Run the specs again and everything should be green. We should have 0 examples now.
 
 ### Building the foundation
 
 When programming the BDD way, you start writing the specs first. This is not only
-a good practice, but also helps reason about your code, as a series of individual
+a good practice, it also helps to reason about your code, as a series of individual
 decoupled units.
 
 For the Luhn algorithm, we'll need a `validate :: Integer -> Bool` function
@@ -164,7 +163,7 @@ starting from the right.
 digits sum its own digits
 first.
 
-As a good practice some developers split their code into two source files.
+As good practice, some developers split their code into two source files.
 One of the modules will contain the function we want exposed publicly to the
 whole project. The other one (commonly suffixed as `.Internal`) will hold
 the helper functions.
@@ -188,7 +187,7 @@ validate :: Integer -> Bool
 validate = undefined
 ```
 
-Then we edit our `src/Luhn/Internal.hs` module file, and insert the following code:
+Then, we edit our `src/Luhn/Internal.hs` module file and insert the following code:
 
 ```haskell
 module Luhn.Internal
@@ -223,7 +222,7 @@ name has to match the file name.
 3. Each spec file has to export a top-level binding “spec” with type
 `Spec`.
 
-Now let's add a little bit of boilerplate code, starting with our imports:
+Now, let's add a little bit of boilerplate code, starting with our imports:
 
 ```haskell
 module LuhnSpec (main, spec) where
@@ -237,7 +236,7 @@ import Luhn.Internal
 
 We import our spec targets `Luhn` and `Luhn.Internal`.
 
-Now we create our `main` function that simply calls `hspec` sending an `Spec`
+Now, we create our `main` function that simply calls `hspec` sending an `Spec`
 value as parameter:
 
 ```haskell
@@ -245,7 +244,7 @@ main :: IO ()
 main = hspec spec
 ```
 
-Finally we create our `Spec` object with the first spec. We need to
+Finally, we create our `Spec` object with the first spec. We need to
 ensure `toDigits` behaves as expected:
 
 ```haskell
@@ -269,10 +268,10 @@ operands to be equal. We'll use a couple more later.
 The current structure lets us read our spec as "toDigits, converts a number to
 a list of digits". This is, at least, the behavior we expect to see.
 
-If we run the spec now, it should fail with an uncaught exception, because
+If we run the spec now, it should fail with an uncaught exception because
 `toDigits` is not yet implemented.
 
-So let's add the minimal implementation needed for the spec to pass.
+Let's add the minimal implementation needed for the spec to pass.
 We'll do this in the `Luhn.Internal` module:
 
 ```haskell
@@ -280,7 +279,7 @@ toDigits :: Integer -> [Integer]
 toDigits _ = [1,2,3,4,5,6,7]
 ```
 
-Run the spec again and voilà! The spec passed. Now let's add another expectation to
+Run the spec again and voilà! The spec passed. Now, let's add another expectation to
 be sure. Add this code just below our previous expectation and run the spec again:
 
 ```haskell
@@ -288,14 +287,14 @@ be sure. Add this code just below our previous expectation and run the spec agai
 ```
 
 It fails! Easy enough, we could modify the function to return the reversed list this
-time. But that will make the first expectation to fail. As naive as this game seems, it
-illustrates what happens in real live, once you have written larger amounts of code.
+time. That will make the first expectation to fail. As naive as this game seems, it
+illustrates what happens in real life, once you have written larger amounts of code.
 
-You can have the task to add new features to your application, so you start refactoring
-your code, to make your new feature work, but then you unknowingly break some other feature
-you wrote days or even months ago. Without specs you'll be lucky if you catch this error
-before they hit production. But with the right specs, you would have been warned
-about this in a very early stage.
+You can have the task to add new features to your application. So, you start refactoring
+your code to make your new feature work but then you unknowingly break some other feature
+you wrote days or even months ago. Without specs, you'll be lucky if you catch this error
+before they hit production. You would have been warned about this in a very early stage,
+with the right specs.
 
 Let's implement this function, in a way it makes more sense, to make both expectations
 pass:
@@ -344,31 +343,31 @@ This time it's your turn. Give it a try and create an implementation for this fu
 Remember not to start with a fancy solution right away. Just write what it's needed
 for the spec to pass.
 
-Now we'll add another expectation to reassure our code behaves:
+Now, we'll add another expectation to reassure our code behaves:
 
 ```haskell
       doubleEveryOther [1,2,3,4,5,6] `shouldBe` [2,2,6,4,10,6]
 ```
 
-Specs fail again of course. As a hint, having even and odd number of elements
+Specs fail again, of course. As a hint, having even and odd number of elements
 in the list might complicate our algorithm. The use of functions like
 `reverse` might help. Improve your code in small steps until specs are
 green one more time.
 
 You can always take a look at the sample project accompanying this tutorial and
-compare your results. Code doesn't need to match. As far as you get the right
-results and specs pass, it's all right. And, remember to run your specs after
+compare your results. Code doesn't need to match. As long as you get the right
+results and specs pass, it's alright. And, remember to run your specs after
 each step to gain immediate feedback.
 
 ### Contexts
 Sometimes you need to write specs for a single function or feature, when used
-in just a couple of different environments. You could definitely use `it` clauses
-describing the input properties every time, or you could use a `context`.
+in just a couple of different environments. You could use `it` clauses
+describing the input properties every time. Or, you could use a `context`.
 A `context` groups one or many `it` clauses that share the same kind of input or
 environment.
 
 In particular, we want to test `sumDigits` behavior when all of the
-digit numbers are less than ten. And also test the same function when some
+digit numbers are less than ten. Also, test the same function when some
 of the numbers are greater or equal to ten.
 
 We start by creating the context and expectations for the first case:
@@ -380,7 +379,7 @@ We start by creating the context and expectations for the first case:
         sumDigits [1,2,3,4,5,6] `shouldBe` sum [1,2,3,4,5,6]
 ```
 
-So why don't you give it a try and implement `sumDigits`. Again, you can look
+Why don't you give it a try and implement `sumDigits`? Again, you can look
 at the source code to compare your results.
 
 After you implement `sumDigits`, let's add another context to describe the behavior
@@ -399,16 +398,16 @@ once more.
 
 ### QuickCheck
 [QuickCheck][quickcheck] is a Haskell library that allows testing for properties
-rather than expectations. This means that if you have some piece of code,
+rather than expectations. This means that if you have some piece of code
 which must hold on a property that should always be true, you can use
 QuickCheck to feed that property, with as much arbitrary inputs
-as possible, to check it really holds.
+as possible, to check if it really holds.
 
 For educative purposes we'll add a `fromDigits` function. This function should
 do the opposite of what `toDigits` does. It should take a list of digits and
 convert it to a number.
 
-Let's start with some code as if we don't have QuickCheck around.
+Let's begin with some code as if we don't have QuickCheck around.
 We can start by adding this code to the `describe "toDigits"` section
 in the `LuhnSpec` file:
 
@@ -425,7 +424,7 @@ fromDigits :: [Integer] -> Integer
 fromDigits _ = 12345
 ```
 
-Spec passes and everyone is happy. Now let's replace the spec we just
+Spec passes and everyone is happy. Now, let's replace the spec we just
 wrote with a QuickCheck property instead:
 
 ```haskell
@@ -434,11 +433,11 @@ wrote with a QuickCheck property instead:
 ```
 
 Here we are creating a property. The property receives a function that will receive
-arbitrary values of the inferred type, and must return a `Bool`. In this case, `x` is
+arbitrary values of the inferred type and must return a `Bool`. In this case, `x` is
 going to be of type `Integer` and we use it to assert the property.
 
 Under the hood QuickCheck will feed the property function with many
-arbitrary values, and the property checks if and only if, for all cases,
+arbitrary values, and the property checks if, and only if, for all cases,
 the function returns `True`.
 
 After running specs and checking the property doesn't hold, we add a suitable
@@ -458,7 +457,7 @@ test/LuhnSpec.hs:22:
        -1
 ```
 
-Aha! The property doesn't hold for negative numbers, and that's all right,
+Aha! The property doesn't hold for negative numbers. That's alright,
 after all, this was the expected behavior. The `toDigits` function returns an
 empty list for numbers lower or equal to zero. So we cannot recover the same
 number back with the `fromDigits` function.
@@ -468,7 +467,7 @@ QuickCheck (==>) operator offers a way to specify arbitrary prerequisites
 for your properties.
 
 We just place the conditions you want the arbitrary values to comply, to the
-left of the operator, and your property check to the right. With this in mind,
+left of the operator and your property check to the right. With this in mind,
 we can rewrite our spec once more:
 
 ```haskell
@@ -480,7 +479,7 @@ We are forcing the `x` values to be greater or equal to zero. This time around,
 it works like a charm.
 
 ### Validating the Luhn algorithm
-So we have implemented all helper functions but the main `validate` function
+So, we've implemented all helper functions. However, the main `validate` function
 is still missing. The spec should look like this:
 
 ```haskell
@@ -492,7 +491,7 @@ is still missing. The spec should look like this:
 
 Wait a minute. We are using different expectation functions, `shouldSatisfy` and
 `shouldNotSatisfy` to be more precise. These functions receive a predicate function
-of type `Show a => a -> Bool`, as its second parameter. So basically, this
+of type `Show a => a -> Bool` as its second parameter. So basically, this
 predicate must receive a parameter of any showable type and return a `Bool` value.
 And given our `validate` function receives an `Integer` and returns a `Bool`,
 it fits perfectly.
@@ -506,14 +505,14 @@ validate = (== 0) . (`mod` 10) . sumDigits . doubleEveryOther . toDigits
 ```
 
 ... which is simply a composition of all of our previous helper functions. Just
-run the specs one final time, and if everything is green, let's consider it done.
+run the specs one final time and, if everything is green, let's consider it done.
 
 ### Wrapping it up
-In this tutorial, we reviewed some concepts like TDD and BDD. We also gave you
-a small taste at, what it is, and what it feels like, writing specs the TDD/BDD way.
-We also used a bunch of expectation functions and QuickCheck properties.
+In this tutorial we reviewed some concepts like TDD and BDD. We also gave you
+a small taste of, what it is, and what it feels like writing specs the TDD/BDD way.
+Additionally, we used a bunch of expectation functions and QuickCheck properties.
 
-But there is more to BDD than what we've learned here, and here are some other
+There is more to BDD than what we've learned in this tutorial. Here, some other
 follow-up resources you can check:
 
 * [Behavior-Driven Development in Haskell][bdd-simon] - Simon Hengel (Author of Hspec)
