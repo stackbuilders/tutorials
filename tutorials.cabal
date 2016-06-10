@@ -27,7 +27,8 @@ executable tutorials
       base
     , tutorials
     , filepath
-    , hakyll >= 4.7 && < 4.8
+    , hakyll >= 4.7  && < 4.8
+    , pandoc >= 1.14 && < 1.18
   ghc-options:
     -Wall
   default-language:
