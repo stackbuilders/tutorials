@@ -1,6 +1,6 @@
 ---
-title: How to do BDD in Haskell with Hspec
-published: 2016-06-13
+title: Behavior-driven development (BDD) in Haskell with Hspec
+published: 2016-06-14
 ghc: 7.10.3
 lts: 5.18
 libraries: hspec-2.2.3 QuickCheck-2.8.1
@@ -11,6 +11,7 @@ author-name: Juan Carlos Pazmiño
 > “Do the simplest thing that could possibly work” - Kent Beck
 
 ### But why BDD?
+
 Test Driven Development (TDD) is an iterative approach of software development that
 promotes a very simple idea: test before you code. It encourages developers
 to write tests first, and then write the minimum necessary amount of code for the
@@ -21,22 +22,21 @@ but the behavior a piece of code should show to an outside observer. It provides
 semantics shifted towards specification rather than testing.
 
 Haskell offers a strong type system that guarantees code correctness. So, why
-would your ever bother to use BDD in your Haskell projects? Although Haskell
+would you ever bother to use BDD in your Haskell projects? Although Haskell
 does help us with this, when it comes to ensure that the code does what's
 expected, you're the only one responsible and BDD comes in handy.
-Common uses of BDD are preventing division by zero cases, or ensuring your own
+Common uses of BDD include preventing division by zero cases, or ensuring your own
 instances of monoids, functors, monads, etc., follow the expected rules.
 
 ### Hspec
+
 [Hspec][hspec] is a Haskell library that provides an embedded domain specific
 language (EDSL) for defining BDD specs. A spec is organized in a tree structure
 defined in terms of `describe` and `it`.
 
-The `describe` clause shows the name of the function or feature which behavior
-we are going to specify.
-
-This clause can contain multiple `it` clauses that show a textual description
-of the expected behavior.
+The `describe` clause shows the name of the function or feature whose
+behavior we are going to specify. This clause can contain multiple
+`it` clauses that show a textual description of the expected behavior.
 
 And inside the `it` clauses, we place the expectations. Expectations are
 implementations of the expectancy of a certain behavior, and commonly
@@ -46,11 +46,11 @@ use the word `should`. Examples of this expectation functions are `shouldBe`,
 ### The Luhn algorithm
 
 While trying to choose the "perfect" sample for a BDD tutorial, I got suddenly
-inspired by one of the first exercises I saw in the [CIS-194][cis-194] course.
+inspired by one of the first exercises I saw in the [CIS 194][cis-194] course.
 Personally, I consider it a great Haskell introduction material.
 
 Luhn is an algorithm used to validate credit card numbers. The algorithm is
-very simple in its conception, thus, can make a great option to watch BDD
+very simple in its conception. Thus, it's a great option to watch BDD
 in action.
 
 Given an integer number, the Luhn algorithm follows these steps:
@@ -64,8 +64,9 @@ original number. For example, `[2,3,16,6]` becomes `2+3+1+6+6 = 18`.
 the remainder would be 8. If the result equals 0, then the number is valid.
 
 ### OK, let's do this
-The fastest way to start an Hspec enabled project is by creating a new
-[stack][stack] project using the hspec template:
+
+The fastest way to start an Hspec-enabled project is by creating a new
+[Stack][stack] project using the hspec template:
 
 ```
 $ stack new luhn hspec
@@ -108,8 +109,8 @@ try the following command and see what happens:
 $ stack build --test
 ```
 
-Hspec output will give you some useful information like the number of specs,
-the described features and what it is expected from them in color coded text
+Hspec's output will give you some useful information like the number of specs,
+the described features and what is expected from them in color coded text
 (green for passing specs and red for failing ones), and a small summary.
 
 You can take a look at the project structure and sample code if you want. For the
@@ -148,7 +149,7 @@ Run the specs again and everything should be green. We should have 0 examples no
 ### Building the foundation
 
 When programming the BDD way, you start writing the specs first. This is not only
-a good practice, it also helps to reason about your code, as a series of individual
+a good practice, it also helps to reason about your code as a series of individual
 decoupled units.
 
 For the Luhn algorithm, we'll need a `validate :: Integer -> Bool` function
@@ -207,7 +208,7 @@ sumDigits :: [Integer] -> Integer
 sumDigits = undefined
 ```
 
-Even if we should start with the spec first, having these undefined definitions at
+Even if we're supposed to start with the spec, having these undefined definitions at
 hand will help us compile the spec and run them.
 
 ### Our first spec
@@ -217,7 +218,7 @@ you should follow certain rules:
 
 1. Spec files have to be placed into the same directory as the test
 driver `Spec.hs` file, or into a subdirectory.
-2. The name of a spec file has to end in Spec.hs; the module
+2. The name of a spec file has to end in `Spec.hs`; the module
 name has to match the file name.
 3. Each spec file has to export a top-level binding “spec” with type
 `Spec`.
@@ -236,7 +237,7 @@ import Luhn.Internal
 
 We import our spec targets `Luhn` and `Luhn.Internal`.
 
-Now, we create our `main` function that simply calls `hspec` sending an `Spec`
+Now, we create our `main` function that simply calls `hspec` sending a `Spec`
 value as parameter:
 
 ```haskell
@@ -260,7 +261,7 @@ We'll destructure this code a bit:
 * Our `spec` contains one or many `describe` clauses.
 * Each `describe` clause receives a `String` with the name of the function or
 feature we are going to specify. This clause can contain one or more `it` clauses.
-* Each `it` clause receives a `String` describing what is the expected behavior
+* Each `it` clause receives a `String` describing the expected behavior
 for the function or feature. This clause can contain one or more expectations.
 * We are using the basic `shouldBe` expectation here, which simply expects its two
 operands to be equal. We'll use a couple more later.
@@ -287,7 +288,7 @@ be sure. Add this code just below our previous expectation and run the spec agai
 ```
 
 It fails! Easy enough, we could modify the function to return the reversed list this
-time. That will make the first expectation to fail. As naive as this game seems, it
+time. That will make the first expectation fail. As naive as this game seems, it
 illustrates what happens in real life, once you have written larger amounts of code.
 
 You can have the task to add new features to your application. So, you start refactoring
@@ -296,7 +297,7 @@ you wrote days or even months ago. Without specs, you'll be lucky if you catch t
 before they hit production. You would have been warned about this in a very early stage,
 with the right specs.
 
-Let's implement this function, in a way it makes more sense, to make both expectations
+Let's implement this function, in a way that makes more sense, to make both expectations
 pass:
 
 ```haskell
@@ -307,7 +308,7 @@ toDigits n
 ```
 
 Feeling proud about our achievements, we save the file, hit the console, run 'em specs
-and ... still didn't pass. Not to worry. Hspec feedback can help
+and ... still didn't pass. Not to worry. Hspec's feedback can help
 us out. Just look at the output Hspec displays.
 You should see something like this:
 
@@ -337,7 +338,7 @@ Let's move on to the `doubleEveryOther` function. Think about it. What do we exp
       doubleEveryOther [1,2,3,4,5] `shouldBe` [1,4,3,8,5]
 ```
 
-Specs shouldn't pass due to an uncaught exception again.
+The specs shouldn't pass due to an uncaught exception again.
 
 This time it's your turn. Give it a try and create an implementation for this function.
 Remember not to start with a fancy solution right away. Just write what it's needed
@@ -351,7 +352,7 @@ Now, we'll add another expectation to reassure our code behaves:
 
 Specs fail again, of course. As a hint, having even and odd number of elements
 in the list might complicate our algorithm. The use of functions like
-`reverse` might help. Improve your code in small steps until specs are
+`reverse` might help. Improve your code in small steps until the specs are
 green one more time.
 
 You can always take a look at the sample project accompanying this tutorial and
@@ -393,11 +394,11 @@ This numbers should first sum their digits prior to summing the list itself:
         sumDigits [2,12,4,14,6,8] `shouldBe` 28
 ```
 
-Let's modify the `sumDigits` implementation to match the new requirements
-once more.
+Can you modify the `sumDigits` implementation to match the new
+requirements?
 
 ### QuickCheck
-[QuickCheck][quickcheck] is a Haskell library that allows testing for properties
+[QuickCheck][quickcheck] is a Haskell library that allows testing properties
 rather than expectations. This means that if you have some piece of code
 which must hold on a property that should always be true, you can use
 QuickCheck to feed that property, with as much arbitrary inputs
@@ -440,8 +441,8 @@ Under the hood QuickCheck will feed the property function with many
 arbitrary values, and the property checks if, and only if, for all cases,
 the function returns `True`.
 
-After running specs and checking the property doesn't hold, we add a suitable
-implementation:
+After running the specs and checking that the property doesn't hold,
+we add a suitable implementation:
 
 ```haskell
 fromDigits :: [Integer] -> Integer
@@ -463,7 +464,7 @@ empty list for numbers lower or equal to zero. So we cannot recover the same
 number back with the `fromDigits` function.
 
 The solution is to prevent QuickCheck from feeding negative numbers.
-QuickCheck (==>) operator offers a way to specify arbitrary prerequisites
+QuickCheck's `(==>)` operator offers a way to specify arbitrary prerequisites
 for your properties.
 
 We just place the conditions you want the arbitrary values to comply, to the
@@ -512,7 +513,7 @@ In this tutorial we reviewed some concepts like TDD and BDD. We also gave you
 a small taste of, what it is, and what it feels like writing specs the TDD/BDD way.
 Additionally, we used a bunch of expectation functions and QuickCheck properties.
 
-There is more to BDD than what we've learned in this tutorial. Here, some other
+There is more to BDD than what we've learned in this tutorial. Here are some other
 follow-up resources you can check:
 
 * [Behavior-Driven Development in Haskell][bdd-simon] - Simon Hengel (Author of Hspec)
