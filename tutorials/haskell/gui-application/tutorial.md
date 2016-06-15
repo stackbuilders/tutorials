@@ -10,25 +10,25 @@ author: Mark
 author-name: Mark Karpov
 ---
 
-This tutorial shows how to build a GUI application in Haskell using bindings
-to GTK+. While working on a calculator program we'll cover he following
-topics:
+This tutorial shows how to build a graphical user interface (GUI)
+application in Haskell using bindings to GTK+. While working on a calculator
+program we'll cover the following topics:
 
 * GTK+ terminology
 * Writing handlers that process user's actions (button click, etc.)
 * Introducing global state
 * Manual creation of forms and creation of forms using Glade
 
-Once you finish with the tutorial you will have solid understanding how to
-move on, read the documentation of the
-[`gtk3`](https://hackage.haskell.org/package/gtk3) package and accomplish
+Once you finish with the tutorial you will have a solid understanding of how
+to move on, read the documentation of the
+[`gtk3`](https://hackage.haskell.org/package/gtk3) package, and accomplish
 your tasks.
 
-The tutorial does not assume any knowledge of Haskell except for very basic
-understanding of how to work with `IO` monad. The GTK+ binding is very
-straightforward and imperative in its nature. This may be seen as a
+The tutorial does not assume any knowledge of Haskell except for a very
+basic understanding of how to work with the `IO` monad. The GTK+ binding is
+very straightforward and imperative in its nature. This may be seen as a
 downside, but I think it also may make things easier for newcomers to
-Haskell programming with imperative background.
+Haskell programming with an imperative background.
 
 ## Available libraries
 
@@ -36,18 +36,18 @@ Before we start with GTK+ bindings, it's reasonable to ask whether there is
 a better/alternative solution. Indeed, several libraries are available to
 create GUI in Haskell:
 
-* [`wx`](https://hackage.haskell.org/package/wx) is bindings to
+* [`wx`](https://hackage.haskell.org/package/wx) — bindings to
   [wxWidgets](https://wxwidgets.org/). A couple of things about this package
   I find suspicious: 1) it had delays in development when for a couple of
-  years no new version was released 2) it's still not present on Stackage.
-  Practical conclusion from the point 2 is that it's not very popular
+  years no new version was released, 2) it's still not present on Stackage.
+  A practical conclusion from the point 2 is that it's not very popular
   nowadays, or at least not many Haskellers start writing any application
   with it otherwise it would be added already.
 
 * [`X11`](https://hackage.haskell.org/package/X11) — *direct translation of
   the C binding to X11 graphics library* (quote taken from the package
   description). “Direct translation” means that you pass around pointers.
-  Yes, in Haskell code. For documentation authors suggest look
+  Yes, in Haskell code. For documentation authors suggest to look
   [here](https://tronche.com/gui/x/xlib/) (although Haddocks are not blank
   either). Last release was in May 2014.
 
@@ -69,8 +69,8 @@ As to GTK+, it seems to be:
 
 It's worth mentioning that Haskell has developed much stronger ecosystem
 with respect to web-development than GUI and desktop development in general.
-For further reference about state of standalone GUI applications in Haskell,
-refer to:
+For further reference about the state of standalone GUI applications in
+Haskell, refer to:
 
 * The section in Gabriel Gonzalez's
   [State of Haskell Ecosystem](https://github.com/Gabriel439/post-rfc/blob/master/sotu.md#standalone-gui-applications)
@@ -86,8 +86,8 @@ FreeBSD.
 ## First steps
 
 The calculator application has been chosen because its logic is very
-straightforward and we can focus on working with GTK+ framework without much
-distraction while keeping the tutorial reasonably practical.
+straightforward and we can focus on working with the GTK+ framework without
+much distraction while keeping the tutorial reasonably practical.
 
 Let's start by importing some modules:
 
@@ -118,9 +118,10 @@ main = do
    our purposes, we don't need the command line arguments, so let's wrap it
    with the `void`.
 
-2. Next, we need a window to build interface of our calculator inside it. To
-   create a new top-level window we use the `newWindow` action. It returns
-   opaque `Window` value that can be used to manipulate the window.
+2. Next, we need a window to build the interface of our calculator inside
+   it. To create a new top-level window we use the `newWindow` action. It
+   returns an opaque `Window` value that can be used to manipulate the
+   window.
 
 3. After creation of a new window we typically want to change some
    parameters and then render it. For now we just render the window “as is”,
@@ -135,12 +136,12 @@ main = do
    click and mouse pointer movement and let appropriate handlers run.
 
 A note about threads. Make sure that all GTK actions happen on the same OS
-thread (note, this is different from lightweight Haskell threads). This only
-important when you compile with multi-threaded runtime, but who knows, maybe
-the need for concurrent execution will arise later, so my advice is to keep
-all GTK-related code in one thread and simplest way to do it is to keep
-everything is the main thread. For more information about multi-threaded
-GUIs with GTK+ see [here](http://dmwit.com/gtk2hs/).
+thread (note, this is different from lightweight Haskell threads). This is
+only important when you compile with multi-threaded runtime, but who knows,
+maybe the need for concurrent execution will arise later, so my advice is to
+keep all GTK-related code in one thread and the simplest way to do it is to
+keep everything is the main thread. For more information about
+multi-threaded GUIs with GTK+ see [here](http://dmwit.com/gtk2hs/).
 
 If we compile and run the program we will see the following:
 
@@ -200,7 +201,7 @@ Looks like it works:
 
 Still, even non-resizable window with title is boring. What we would like to
 do is to *put something inside* that window. This brings us to the GTK+
-notion of *container*. Container is a widget that can contain another
+notion of *container*. A container is a widget that can contain another
 widgets inside. There are two types of containers:
 
 * those that serve purely decorative purpose and can contain only one
@@ -261,7 +262,7 @@ gridSetRowHomogeneous :: GridClass self
 gridAttach :: (GridClass self, WidgetClass child)
   => self    -- ^ The grid
   -> child   -- ^ The widget to add
-  -> Int     -- ^ The column number of to attach the left side of child to
+  -> Int     -- ^ The column number to attach the left side of child to
   -> Int     -- ^ The row number to attach the top side of child to
   -> Int     -- ^ Width — the number of columns that child will span
   -> Int     -- ^ Height — the number of rows that child will span
@@ -321,14 +322,15 @@ main = do
    our `grid`. The argument order of this function helps to use it with
    `(>>=)`.
 
-4. We attach `display` we created previously to the `grid`. It will occupy
-   the entire top row.
+4. We attach the `display` we created previously to the `grid`. It will
+   occupy the entire top row.
 
-5. Here we use combination of `mkBtn` helper and `attach` to quickly create
-   buttons and place them on the grid. I'll show `mkBtn` is a moment.
+5. Here we use combination of the `mkBtn` helper and `attach` to quickly
+   create buttons and place them on the grid. I'll show what `mkBtn` is in a
+   moment.
 
 6. Now the grid itself needs to be inserted into `window` to be visible.
-   This is done with help of above-mentioned `containerAdd` function.
+   This is done with help of the above-mentioned `containerAdd` function.
 
 `mkBtn` is a helper for button creation, right now it's very simple:
 
@@ -340,8 +342,8 @@ mkBtn label = do
   return btn
 ```
 
-We create new button, set its attributes (just label in our case) and return
-the button.
+We create a new button, set its attributes (just label in our case) and
+return the button.
 
 ![Our calculator looks like a real calculator](/tutorials/haskell/gui-application/calc-2.png)
 
@@ -364,14 +366,15 @@ Here `object` is the widget of interest, `callback` is the action that we
 want to perform. The `on` function returns `ConnectId` parametrized over the
 `object` type (so we cannot mix up connection identifiers for different
 types of objects). This is the identifier of signal handler and its sole
-purpose to give you a way to disconnect a signal handler if you ever need
-it. You can use the `disconnect` from `System.Glib.Signals` to do that.
+purpose is to give you a way to disconnect a signal handler if you ever need
+it. You can use the `disconnect` function from `System.Glib.Signals` to do
+that.
 
-Every signal dictates type that `callback` function will have. The following
-cases are most frequent:
+Every signal dictates the type that `callback` function will have. The
+following cases are the most frequent:
 
-* Just `IO ()`, no information is given to the handler it is not expected to
-  return anything. Example of such signal is `showSignal`.
+* Just `IO ()`: no information is given to the handler and it is not
+  expected to return anything. Example of such signal is `showSignal`.
 
 * Handlers that are given arguments: `a -> IO Bool`. Example of such signal
   is `focus` whose handlers have the type `DirectionType -> IO Bool`.
@@ -381,10 +384,10 @@ cases are most frequent:
   `False` will keep it active executing our handler *and* default handler as
   well.
 
-There is one more way to get some information from within signal's handler.
-Some signals dictate that handler should live in special monad called
-`EventM` instead of plain `IO`. Signals that like their handlers to be in
-`EventM` are called events.
+There is one more way to get some information from within a signal's
+handler. Some signals dictate that handler should live in a special monad
+called `EventM` instead of plain `IO`. Signals that like their handlers to
+be in `EventM` are called events.
 
 What is the `EventM` monad? Actually it's a type synonym for a simple monad
 stack with `IO` at the bottom:
@@ -393,19 +396,19 @@ stack with `IO` at the bottom:
 type EventM t = ReaderT (Ptr t) IO
 ```
 
-This is just a reader monad transformer on top of `IO`. `t` specifies type
-of information we can extract and which helper function we can use inside
-the `EventM` monad. These are different for every event. For example
+This is just a reader monad transformer on top of `IO`. `t` specifies the
+type of information we can extract and which helper function we can use
+inside the `EventM` monad. These are different for every event. For example,
 `configureEvent` allows to extract information about window size, while
-`keyPressEvent` event provides information about key that has been pressed,
-which modifier key was held at that time and so forth. The type system does
-not allow to try to extract information that particular event does not
-provide.
+`keyPressEvent` event provides information about the key that has been
+pressed, which modifier key was held at that time and so forth. The type
+system does not allow to try to extract information that particular event
+does not provide.
 
-I would like to quote the docs to accent importance of returned Boolean
+I would like to quote the docs to accent the importance of returned Boolean
 value:
 
-> Note that an event handler must always returns `True` if the event was
+> Note that an event handler must always return `True` if the event was
 > handled or `False` if the event should be dealt with by another event
 > handler. For instance, a handler for a key press should return `False` if
 > the pressed key is not one of those that the widget reacts to. In this
@@ -418,7 +421,7 @@ value:
 
 Knowing all that, we can write a simple handler to run on button activation.
 Looking at the “signals” section in `Graphics.UI.Gtk.Buttons.Button`,
-`buttonActivated` looks like our frined here:
+`buttonActivated` looks like our friend here:
 
 ```haskell
 -- | Emitted when the button has been activated (pressed and released).
@@ -426,8 +429,8 @@ buttonActivated :: ButtonClass self => Signal self (IO ())
 ```
 
 Just for a test, let's re-write `mkBtn` to attach a handler that will update
-the display with name of pressed button (we still don't know the whole lot
-to make a working calculator):
+the display with the name of the pressed button (we still don't know a whole
+lot to make a working calculator):
 
 ```haskell
 mkBtn :: String -> Entry -> IO Button
@@ -456,9 +459,9 @@ application. For this we need a way to call the `mainQuit` function:
 mainQuit :: IO ()
 ```
 
-As you may have guessed by now, convenient place to put the `mainQuit`
-function is on closing of `window`. Event that we're looking for is called
-`deleteEvent`:
+As you may have guessed by now, a convenient place to put the `mainQuit`
+function is on closing of `window`. The event that we're looking for is
+called `deleteEvent`:
 
 ```haskell
 -- | The deleteEvent signal is emitted if a user requests that a toplevel
@@ -495,8 +498,8 @@ event fired (`eventTime`). See full list of helpers in the “Accessor
 functions for event information” section of the `Graphics.UI.Gtk.Gdk.EventM`
 module.
 
-I encourage you compile and run the application to see that it responds to
-button activation and closes properly.
+I encourage you to compile and run the application to see that it responds
+to button activation and closes properly.
 
 ## Using `IORef`s for application state
 
@@ -505,8 +508,8 @@ our calculator actually useful. For this (as with most other applications),
 we need some sort of state.
 
 The creators of GTK+ binding didn't give us too many options here because
-type of handler monad is fixed: it's either plain `IO` or `EventM`, which is
-as we already know is just `ReaderT (Ptr t) IO`. We cannot return anything
+type of handler monad is fixed: it's either plain `IO` or `EventM`, which,
+as we already know, is just `ReaderT (Ptr t) IO`. We cannot return anything
 non-standard from handlers, so the only way to communicate with outside
 world is via mutable references.
 
@@ -518,7 +521,7 @@ There are two most obvious options:
 
 `TVar`s are probably overkill unless you do complex concurrent work. What is
 good about using `TVar`s is that we can update them atomically. This may be
-not very important for some applications, but I recommend build with
+not very important for some applications, but I recommend to build with
 concurrency in mind from the very beginning. But `IORef`s can be changed
 atomically as well with help of `atomicModifyIORef`.
 
@@ -740,16 +743,16 @@ left as an exercise for the reader.
 
 ## Using Glade to design forms
 
-You probably have noticed that manual creation of forms introduces quite a
-bit of boilerplate in our code. This can become even worse as your forms get
-more complex. Because of this, I think it's time to try our hand on a modern
-UI designer for GTK+ called [Glade](https://glade.gnome.org/).
+You may have probably noticed that manual creation of forms introduces quite
+a bit of boilerplate in our code. This can become even worse as your forms
+get more complex. Because of this, I think it's time to try our hand on a
+modern UI designer for GTK+ called [Glade](https://glade.gnome.org/).
 
 Glade is straightforward to install and use. Open the application, you will
 see panels with various widgets: top-level objects (such as window),
 containers, and controls (such as buttons).
 
-Short plan how to re-create our calculator form with Glade:
+Here is the plan how to re-create our calculator form with Glade:
 
 1. Select window button on the topmost palette and the window will appear on
    the working area.
@@ -771,8 +774,8 @@ Short plan how to re-create our calculator form with Glade:
 
 (Here is a [bigger image](/tutorials/haskell/gui-application/calc-3.png).)
 
-*Hint: complete glade form of our calculator is available under the Stack
-Builders tutorial repository.*
+*Hint: the complete Glade form of our calculator is available under the
+Stack Builders tutorial repository.*
 
 To use the form in Haskell code we need `Builder`, which lives in
 `Graphics.UI.Gtk.Builder` module. The `Builder` object helps with creating
@@ -791,7 +794,7 @@ Here is how we could use it in our program:
 1. We need to create a new builder.
 
 2. Load our form into it from a file. There are other options such as
-   loading form text (`String`, `Text`) and so forth, consult the docs for
+   loading form text (`String`, `Text`) and so forth. Consult the docs for
    more information.
 
 3. Now the interesting part is that we can get actual button object knowing
@@ -801,8 +804,9 @@ Here is how we could use it in our program:
    `castToSomething` functions, one per widget (for example we have
    `castToWindow` for windows).
 
-Having the actual object like that button or main window itself, it's easy
-to proceed just like with manually constructed form to start the main loop.
+Having the actual object like that button or the main window itself, it's
+easy to proceed just like with the manually constructed form to start the
+main loop.
 
 ## Conclusion
 
@@ -810,8 +814,8 @@ GTK+ Haskell binding certainly can be used to create professional-looking
 user interfaces. As I hopefully showed you in this tutorial, using the
 bindings is very straightforward and doesn't require any special knowledge.
 For small forms Glade probably doesn't make much sense, but if you write
-something big, it may save you some tiresome work. Better yet, one don't
-have to be a Haskell programmer to design UI with Glade, this fact makes it
+something big, it may save you some tiresome work. Better yet, one doesn't
+have to be a Haskell programmer to design UI with Glade — this fact makes it
 easier to divide work between people.
 
 ## See also
