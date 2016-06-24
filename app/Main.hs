@@ -11,6 +11,7 @@ module Main
   where
 
 -- base
+import Data.Char (toLower)
 import Data.Monoid ((<>))
 import Data.List (isSuffixOf)
 import System.Environment
@@ -72,7 +73,7 @@ cleanIndex url
 
 rules :: [(String, String)] -> Rules ()
 rules env = do
-  let commonCtx = commonContext env
+  let commonCtx = commonContext Blog env
   let tutorialCtx = tutorialContext env
 
   create ["archive.html"] $ do
@@ -154,13 +155,19 @@ feedConfiguration =
     , feedTitle = ""
     }
 
+data Hero
+  = Blog
+  | Post
+  deriving Show
+
 
 -- |
 --
 --
 
-commonContext :: [(String, String)] -> Context String
-commonContext env =
+
+commonContext :: Hero -> [(String, String)] -> Context String
+commonContext hero env =
   let
     readEnv d key = fromMaybe d $ lookup key env
     host = readEnv ("//localhost:" ++ show sitePort) "SITE_ROOT_URL"
@@ -168,12 +175,13 @@ commonContext env =
   in
     constField "host" host
       <> constField "protocol" protocol
+      <> constField "hero" (map toLower (show hero))
       <> defaultContext
 
 tutorialContext :: [(String, String)] -> Context String
 tutorialContext env = libs
   <> dateField "published" "%B %e, %Y"
-  <> commonContext env
+  <> commonContext Post env
   where
     libs = listFieldWith "libs" libraryContext $ \item -> do
       libraries <- getMetadataField' (itemIdentifier item) "libraries"
