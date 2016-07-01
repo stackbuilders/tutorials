@@ -6,6 +6,7 @@ lts: 5.15
 libraries: cassava-0.4.5.0
 language: haskell
 author-name: Juan Pedro Villa Isaza
+description: Description.
 ---
 
 > “Is that right? Or is it left?”

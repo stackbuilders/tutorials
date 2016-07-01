@@ -7,6 +7,7 @@ libraries: JuicyPixels-3.2.7 repa-3.4.0.2
 language: haskell
 author: Mark
 author-name: Mark Karpov
+description: Description.
 ---
 
 In this tutorial we will learn how to efficiently generate, transform, and

@@ -6,6 +6,7 @@ lts: 5.18
 libraries: hspec-2.2.3 QuickCheck-2.8.1
 language: haskell
 author-name: Juan Carlos Pazmiño
+description: Description.
 ---
 
 > “Do the simplest thing that could possibly work” - Kent Beck

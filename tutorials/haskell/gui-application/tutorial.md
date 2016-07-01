@@ -7,6 +7,7 @@ libraries: gtk3-0.14.4 glib-0.13.2.2
 language: haskell
 author: Mark
 author-name: Mark Karpov
+description: Description.
 ---
 
 This tutorial shows how to build a graphical user interface (GUI)
