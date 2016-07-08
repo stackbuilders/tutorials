@@ -10,11 +10,24 @@
         tutorials repository on GitHub</a>.
     </p>
   </div>
-  <div class="index row">
+  <div class="news container">
     $for(tutorials)$
-    <ul itemscope itemtype="http://schema.org/TechArticle">
-      $published$ <a href="$url$">$title$</a>
-    </ul>
+    <div itemscope itemtype="http://schema.org/TechArticle">
+      <div class="index row">
+        <div class="blog-content">
+          <a class="blog-link-from-index" href="$url$" itemprop="url">
+            <h1 class="blog-title" itemprop="headline">$title$</h1>
+          </a>
+          <div class="blog-info tutorial-info">
+            <span itemprop="datePublished">$published$</span>
+          </div>
+          <br>
+          <div class="synopsis">
+            <span itemprop="description">$description$</span>
+          </div>
+        </div>
+      </div>
+    </div>
     $endfor$
   </div>
 </div>
