@@ -14,8 +14,12 @@
   padding-top: 2em;
 }
 
+.tutorials img{
+  max-width: 100%
+}
+
 @media (max-width: 991px) {
-  .tutorial-content, .tutorials .row {
+  .tutorial-content, .tutorials .row{
     max-width: 100%;
   }
 }
