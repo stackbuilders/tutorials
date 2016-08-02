@@ -23,23 +23,21 @@ Libraries supporting working with Mustache templates are available for many
 languages, including Haskell (there are several of them, actually). In this
 tutorial we will be using the
 [`stache`](https://hackage.haskell.org/package/stache) package developed by
-Stack Builders. We will show why this package seems to be clearer and easier
-to use than the others.
+Stack Builders and show why this package is clearer and easy to use.
 
 The tutorial should be comprehensible for Haskell beginners and does not
 assume knowledge of any advanced Haskell-concepts.
 
 ## Available libraries
 
-Let's list the libraries available to work with Mustache templates:
+Let's see which libraries are available to work with Mustache templates:
 
 * [`hastache`](https://hackage.haskell.org/package/hastache) is the oldest
   (first released in 2011) and now deprecated library in this list. Those
   who used the library will probably agree that it has not the clearest API
-  where a lot of wrapping is necessary and even dictionaries are represented
-  as wrapped functions. Generics can be used to alleviate the situation,
-  using yet another wrapper called `mkGenericContext`. The library produces
-  `ByteString`s.
+  where a lot of wrapping is necessary and dictionaries are represented as
+  wrapped functions. Generics can be used to alleviate the situation, using
+  yet another wrapper called `mkGenericContext`.
 
 * [`mustache`](https://hackage.haskell.org/package/mustache) is the official
   successor of `hastache`, but it again makes simple things complex using
@@ -47,21 +45,16 @@ Let's list the libraries available to work with Mustache templates:
   type (with conflicting names of constructors and naturally not so numerous
   instances). Source code is filled with Unicode symbols (using packages
   like `base-unicode-symbols`, etc.), so it's not easy to edit it if you
-  want to contribute to the package. Here and there we could see things like
-  `escapeXMLText = T.pack . escapeXML . T.unpack`, `escapeXML :: String ->
-  String`, missing package version bounds for dependencies, and generally
-  hard-to-read code.
+  want to contribute to the package.
 
 * [`stache`](https://hackage.haskell.org/package/stache) is an alternative
   implementation that conforms to official Mustache spec and passes the
-  official test suite. Its API consist of only 4 functions (3 to compile
+  official test suite. Its API consists of only 4 functions (3 to compile
   templates and one to render them using any instance of `ToJSON` as source
   of data to interpolate), plus Template Haskell helpers to compile/validate
-  templates at compile time. `stache` is a bit slower then `mustache`, but
-  instead [its source code](https://github.com/stackbuilders/stache) is more
-  readable, which seems to be more important than marginal performance
-  improvements. Parser is written with Megaparsec 5. The package uses
-  `Data.Text.Lazy.Builder` under the hood and produces lazy `Text`.
+  templates at compile time. Parser is written with Megaparsec 5. The
+  package uses `Data.Text.Lazy.Builder` under the hood and produces lazy
+  `Text`.
 
 The main motivation for developing `stache` was the desire to expose more
 minimal API and use Aeson's instances directly for value interpolation, as
@@ -69,6 +62,11 @@ well as the desire to use Megaparsec instead of Parsec for parsing.
 Initially we wanted to contribute to the existing `mustache` library, but
 then realized that changes we want to implement are too cardinal and we are
 better off writing our own package.
+
+One feature that is not supported by `stache` is lambdas. The feature is
+marked as optional in the spec and can be emulated via processing of parsed
+template representation. The decision to drop lambdas is intentional, for
+the sake of simplicity and better integration with Aeson.
 
 ## Compiling templates
 
@@ -80,7 +78,7 @@ the rest of the tutorial:
   are inserted into actual template you're rendering. `PName` is a wrapper
   around `Text` and defined to make it harder to mix it up with other
   textual values. If you enable the `OverloadedStrings` extension, you can
-  write `PName`s just as normal strings.
+  write `PName`s just as normal `String`s.
 
 * `Node` is a piece of template. The whole template body is represented as
   `[Node]` and that's all you need to know unless you plan to manipulate
@@ -89,8 +87,8 @@ the rest of the tutorial:
 
 ### Three ways to compile a template
 
-A `Template` is actually a collection of templates with one of them
-selected:
+A `Template` is actually a collection of templates (partials) with one of
+them selected:
 
 ```haskell
 -- | Mustache template as name of “top-level” template and a collection of
@@ -126,23 +124,27 @@ Thus there are three different ways to get a `Template`:
 
 3. From a directory with `compileMustacheDir`. This function reads all
    templates (files ending with `.mustache` extension) and puts them into
-   cache, selecting one of them as main (you specify which). The resulting
-   `Template` can use partials that were present in that directory.
+   the cache, selecting one of them as main (you specify which). The
+   resulting `Template` can use partials that were present in that
+   directory.
 
-So to use partials we need to use `compileMustacheDir` *or* combine several
-templates into one using `(<>)` method of `Semigroup` typeclass. `Template`
-is a `Semigroup`, which means you can always to two `Template`s and get
-their combination which will also be a `Template`. This is incredible
-property, one of numerous examples how Haskell keeps systems “flat”.
+So to use partials, we need to use `compileMustacheDir` *or* combine several
+templates into one using `(<>)` method of `Semigroup` type class. Being an
+instance of the `Semigroup` type class means that you can always to two
+`Template`s and get their combination which will also be a `Template`. This
+is an incredible property, one of numerous examples how Haskell keeps
+systems “flat”.
 
-Let's start build practical stuff to see how things play together. As a
-practical example, we will be generating a
+Let's start to build practical stuff to see how things play together. As an
+example of a task that could involve Mustache templates, we will be
+generating a
 [CUE sheet](https://en.wikipedia.org/wiki/Cue_sheet_(computing)). First of
-all we need some imports:
+all, we're going to need some imports:
 
 ```haskell
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 module Main (main) where
 
@@ -151,10 +153,12 @@ import Data.Semigroup ((<>))
 import Data.Text (Text)
 import GHC.Generics
 import Text.Mustache
+import qualified Text.Mustache.Compile.TH as TH
+import qualified Data.Text.Lazy.IO as TIO
 ```
 
 Then we will need to represent data somehow, for that let's define the
-following:
+following data records:
 
 ```haskell
 data Release = Release
@@ -181,8 +185,13 @@ instance ToJSON File
 ```
 
 Here we have defined two records with various fields, just like we would do
-for many other problem domains. We also have used *generics* to quickly
-define `ToJSON` instance for the data types. (**About deriving…**)
+for other domains. We also have used
+[*generics*](https://wiki.haskell.org/GHC.Generics) to quickly define
+`ToJSON` instance for the data types. You can read more about generics, but
+the technique in a nutshell is simple: compiler can derive `Generic`
+instance for your datatype (with `DeriveGeneric` extension enabled) which
+describes “structure” of your data, and then you can use that information to
+(again automatically) derive instance of `ToJSON` type class.
 
 Now we can experiment with template compilation. We will have two templates:
 `main.mustache` and `file.mustache` (we could do with just one, but then I
@@ -202,8 +211,8 @@ TITLE "{{& reTitle }}"
 {{/ reFiles }}
 ```
 
-↑ Here we have typical header of a CUE file. The `{{> file }}` part inserts
-a partial which we can write this way (`file.mustache` file):
+Here we have layout of a typical header of a CUE file. The `{{> file }}`
+part inserts a partial which we can write this way (`file.mustache` file):
 
 ```mustache
 FILE "{{& fiFileName }}" WAVE
@@ -252,9 +261,9 @@ your application), you may like Template Haskell (TH) helpers that compile
 Mustache templates at compile time and ensure that your templates are valid.
 If some template is not valid, your program just won't compile.
 
-The TH helpers live in the `Text.Mustache.Compile.TH` correspond precisely
-to the three normal functions we already know. Let's play with a template
-Haskell helper right in your editing environment.
+The TH helpers live in the `Text.Mustache.Compile.TH` module and correspond
+precisely to the three normal functions we already know. Let's play with a
+template Haskell helper right in your editing environment.
 
 ```haskell
 main :: IO ()
@@ -268,9 +277,9 @@ if you have “on the fly” compilation and highlighting, you will be able to
 observe error messages any time your input is not a valid Mustache template.
 Invalid templates just won't compile!
 
-For your purposes let's use TH version of `compileMustacheDir`, now if
-nay template in that dir is malformed, the program won't compile telling us
-about the error.
+For our purposes it's better yet to use the TH version of
+`compileMustacheDir`. Now if any template in that directory is malformed,
+the program won't compile telling us about the error and where it occured.
 
 ```haskell
 main :: IO ()
@@ -279,11 +288,11 @@ main = do
   print template
 ```
 
-Note that the TH helpers only work with GHC 8 for now. (**More here…**)
+*Note that the TH helpers only work with GHC 8 for now.*
 
 ## Rendering
 
-There is just one function that you need to know to render your template —
+There is just one function that you need to render your template —
 `renderMustache`. Its type signature looks like this:
 
 ```haskell
@@ -319,8 +328,13 @@ release = Release
       , fiIndex = 1
       , fiTitle = "The Dance #1"
       , fiPerformer = "Laraaji"
-      , fiIndex00 = "00:00:00"
-      }
+      , fiIndex00 = "00:00:00" }
+    , File
+      { fiFileName = "02 - The Dance #2.wav"
+      , fiIndex = 2
+      , fiTitle = "The Dance #2"
+      , fiPerformer = "Laraaji"
+      , fiIndex00 = "09:06:10" }
     ]
   }
 ```
@@ -335,7 +349,8 @@ main = do
   TIO.putStrLn $ renderMustache template (toJSON release)
 ```
 
-As simple as that, if you run the program, our CUE file looks good:
+As simple as that, if you run the program, you will see that our CUE file
+looks good:
 
 ```
 REM GENRE "Ambient"
@@ -349,15 +364,41 @@ FILE "01 - The Dance #1.wav" WAVE
     TITLE "The Dance #1"
     PERFORMER "Laraaji"
     INDEX 00 00:00:00
+FILE "02 - The Dance #2.wav" WAVE
+  TRACK 2 AUDIO
+    TITLE "The Dance #2"
+    PERFORMER "Laraaji"
+    INDEX 00 09:06:10
 ```
 
-How does the magic work?
+How does the magic work? What to do if you want to construct `Value`
+manually? Simply put, `toJSON` does not do anything you can't do yourself.
+Records are transformed into JSON `Object`s, lists and vectors and turned
+into `Array`s, etc. Feeding the `renderMustache` without `toJSON` is just as
+easy, consult
+[Aeson documentation](https://hackage.haskell.org/package/aeson) for more
+information, but the most common thing you will want to do is to create a
+custom dictionary that will be your “context”, it's done with help of
+`object` and `(.=)` functions:
 
-But fear not dear reader.
+```haskell
+main :: IO ()
+main = do
+  let template = $(TH.compileMustacheDir "main" "data/")
+  TIO.putStrLn $ renderMustache template $ object
+    [ "reGenre"   .= "My Genre"
+    , "reDate"    .= "2016"
+    , "reDiscId"  .= "blahblah"
+    -- …
+    ]
+```
 
-Also: how to do it manually.
+It just couldn't be easier.
 
 ## Conclusion
 
-I would not use anything but `stache` to work with Mustache templates in
-Haskell even if they paid me.
+`stache` seems to do its job just fine so far. We migrated some code from
+`hastache` and were surprised just how simpler the code looked with
+`stache`. It's also nice to be able to check your templates at compile time,
+like Shakespearean templates do. So in the conclusion I have to say that I
+wouldn't use anything but `stache` to work with Mustache.

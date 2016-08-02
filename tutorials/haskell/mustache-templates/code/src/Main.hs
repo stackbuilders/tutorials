@@ -48,8 +48,13 @@ release = Release
       , fiIndex = 1
       , fiTitle = "The Dance #1"
       , fiPerformer = "Laraaji"
-      , fiIndex00 = "00:00:00"
-      }
+      , fiIndex00 = "00:00:00" }
+    , File
+      { fiFileName = "02 - The Dance #2.wav"
+      , fiIndex = 2
+      , fiTitle = "The Dance #2"
+      , fiPerformer = "Laraaji"
+      , fiIndex00 = "09:06:10" }
     ]
   }
 
