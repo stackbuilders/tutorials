@@ -23,7 +23,7 @@ Libraries supporting working with Mustache templates are available for many
 languages, including Haskell (there are several of them, actually). In this
 tutorial we will be using the
 [`stache`](https://hackage.haskell.org/package/stache) package developed by
-Stack Builders and show why this package is clearer and easy to use.
+Stack Builders and show why this package is clear and easy to use.
 
 The tutorial should be comprehensible for Haskell beginners and does not
 assume knowledge of any advanced Haskell-concepts.
@@ -52,16 +52,16 @@ Let's see which libraries are available to work with Mustache templates:
   official test suite. Its API consists of only 4 functions (3 to compile
   templates and one to render them using any instance of `ToJSON` as source
   of data to interpolate), plus Template Haskell helpers to compile/validate
-  templates at compile time. Parser is written with Megaparsec 5. The
+  templates at compile time. The parser is written with Megaparsec 5. The
   package uses `Data.Text.Lazy.Builder` under the hood and produces lazy
   `Text`.
 
-The main motivation for developing `stache` was the desire to expose more
+The main motivation for developing `stache` was the desire to expose a more
 minimal API and use Aeson's instances directly for value interpolation, as
 well as the desire to use Megaparsec instead of Parsec for parsing.
 Initially we wanted to contribute to the existing `mustache` library, but
-then realized that changes we want to implement are too cardinal and we are
-better off writing our own package.
+then realized that the changes we wanted to implement were too cardinal and
+we were better off writing our own package.
 
 One feature that is not supported by `stache` is lambdas. The feature is
 marked as optional in the spec and can be emulated via processing of parsed
@@ -75,10 +75,10 @@ But first, let's take a look at types that will show up here and there in
 the rest of the tutorial:
 
 * `PName` stands for “partial's name”. “Partials” are other templates that
-  are inserted into actual template you're rendering. `PName` is a wrapper
-  around `Text` and defined to make it harder to mix it up with other
-  textual values. If you enable the `OverloadedStrings` extension, you can
-  write `PName`s just as normal `String`s.
+  are inserted into the actual template you're rendering. `PName` is a
+  wrapper around `Text` and defined to make it harder to mix it up with
+  other textual values. If you enable the `OverloadedStrings` extension, you
+  can write `PName`s just as normal `String`s.
 
 * `Node` is a piece of template. The whole template body is represented as
   `[Node]` and that's all you need to know unless you plan to manipulate
@@ -109,18 +109,18 @@ data Template = Template
   } deriving (Eq, Ord, Show, Data, Typeable, Generic)
 ```
 
-When working with a `Template`, it's only possible to use partials  that are
+When working with a `Template`, it's only possible to use partials that are
 in `templateCache`, thus the main difference between compiling functions is
 where you get your template(s) and what you will have in `templateCache`.
-Thus there are three different ways to get a `Template`:
+So, there are three different ways to get a `Template`:
 
 1. From lazy `Text` with `compileMustacheText`. The function takes a `PName`
    and actual template source. The function returns `Either` parse error or
    `Template` with cache consisting of only one `Template`.
 
-2. From a single `File` with `compileMustacheFile`. This one only takes path
-   to Mustache file the resulting template won't be able to use partials
-   unless you combine several templates into one (see below).
+2. From a single `File` with `compileMustacheFile`. This one only takes the
+   path to Mustache file. Note that the resulting template won't be able to
+   use partials unless you combine several templates into one (see below).
 
 3. From a directory with `compileMustacheDir`. This function reads all
    templates (files ending with `.mustache` extension) and puts them into
@@ -128,14 +128,14 @@ Thus there are three different ways to get a `Template`:
    resulting `Template` can use partials that were present in that
    directory.
 
-So to use partials, we need to use `compileMustacheDir` *or* combine several
-templates into one using `(<>)` method of `Semigroup` type class. Being an
-instance of the `Semigroup` type class means that you can always to two
-`Template`s and get their combination which will also be a `Template`. This
-is an incredible property, one of numerous examples how Haskell keeps
-systems “flat”.
+So to have partials, we need to use `compileMustacheDir` **or** combine
+several templates into one using `(<>)` method of `Semigroup` type class.
+Being an instance of the `Semigroup` type class means that you can always
+combine two `Template`s and get their combination which will also be a
+`Template`. This is an incredible property, one of numerous examples how
+Haskell keeps systems “flat”.
 
-Let's start to build practical stuff to see how things play together. As an
+Let's start building practical stuff to see how things play together. As an
 example of a task that could involve Mustache templates, we will be
 generating a
 [CUE sheet](https://en.wikipedia.org/wiki/Cue_sheet_(computing)). First of
@@ -157,7 +157,7 @@ import qualified Text.Mustache.Compile.TH as TH
 import qualified Data.Text.Lazy.IO as TIO
 ```
 
-Then we will need to represent data somehow, for that let's define the
+Then we will need to represent data somehow. For that, let's define the
 following data records:
 
 ```haskell
@@ -188,14 +188,14 @@ Here we have defined two records with various fields, just like we would do
 for other domains. We also have used
 [*generics*](https://wiki.haskell.org/GHC.Generics) to quickly define
 `ToJSON` instance for the data types. You can read more about generics, but
-the technique in a nutshell is simple: compiler can derive `Generic`
+the technique in a nutshell is simple: the compiler can derive `Generic`
 instance for your datatype (with `DeriveGeneric` extension enabled) which
 describes “structure” of your data, and then you can use that information to
 (again automatically) derive instance of `ToJSON` type class.
 
 Now we can experiment with template compilation. We will have two templates:
 `main.mustache` and `file.mustache` (we could do with just one, but then I
-wouldn't have a good example how to work with partials).
+wouldn't have a good example of how to work with partials).
 
 The `main.mustache` looks like this:
 
@@ -211,8 +211,8 @@ TITLE "{{& reTitle }}"
 {{/ reFiles }}
 ```
 
-Here we have layout of a typical header of a CUE file. The `{{> file }}`
-part inserts a partial which we can write this way (`file.mustache` file):
+Here we have the typical layout of a CUE file header. The `{{> file }}` part
+inserts a partial which we can write this way (`file.mustache` file):
 
 ```mustache
 FILE "{{& fiFileName }}" WAVE
@@ -278,8 +278,9 @@ observe error messages any time your input is not a valid Mustache template.
 Invalid templates just won't compile!
 
 For our purposes it's better yet to use the TH version of
-`compileMustacheDir`. Now if any template in that directory is malformed,
-the program won't compile telling us about the error and where it occured.
+`compileMustacheDir`. Now if any template in the specified directory is
+malformed, the program won't compile telling us about the error and where it
+occurred.
 
 ```haskell
 main :: IO ()
@@ -288,7 +289,7 @@ main = do
   print template
 ```
 
-*Note that the TH helpers only work with GHC 8 for now.*
+Note that the TH helpers only work with GHC 8 for now.
 
 ## Rendering
 
@@ -371,14 +372,14 @@ FILE "02 - The Dance #2.wav" WAVE
     INDEX 00 09:06:10
 ```
 
-How does the magic work? What to do if you want to construct `Value`
+How does the magic work? What to do if you want to construct a `Value`
 manually? Simply put, `toJSON` does not do anything you can't do yourself.
 Records are transformed into JSON `Object`s, lists and vectors and turned
 into `Array`s, etc. Feeding the `renderMustache` without `toJSON` is just as
-easy, consult
+easy (consult
 [Aeson documentation](https://hackage.haskell.org/package/aeson) for more
-information, but the most common thing you will want to do is to create a
-custom dictionary that will be your “context”, it's done with help of
+information), but the most common thing you will want to do is to create a
+custom dictionary that will be your “context”. This is done with help of the
 `object` and `(.=)` functions:
 
 ```haskell
@@ -400,5 +401,5 @@ It just couldn't be easier.
 `stache` seems to do its job just fine so far. We migrated some code from
 `hastache` and were surprised just how simpler the code looked with
 `stache`. It's also nice to be able to check your templates at compile time,
-like Shakespearean templates do. So in the conclusion I have to say that I
+like Shakespearean templates do. So in conclusion I have to say that I
 wouldn't use anything but `stache` to work with Mustache.

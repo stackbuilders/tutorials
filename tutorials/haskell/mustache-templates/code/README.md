@@ -1,9 +1,9 @@
-# Image processing
+# Mustache templates in Haskell
 
-Code for the “image processing” tutorial.
+Code for the “Mustache templates in Haskell” tutorial.
 
 ## License
 
 Copyright © 2016 Stack Builders
 
-Distributed under BSD 3 clause license.
+Distributed under MIT license.
