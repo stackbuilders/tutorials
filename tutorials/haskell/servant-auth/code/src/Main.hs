@@ -36,8 +36,7 @@ import qualified Data.Text.Encoding as T
 
 -- | The handler monad, to work with cookies we need to have access to
 -- 'AuthCookieSettings', 'RandomSource', and 'ServerKey'. It's also a handy
--- place to put some values that will be useful for type-safe route
--- rendering.
+-- place to put some values that will be useful for route rendering.
 
 type App = ReaderT AppContext (ExceptT ServantErr IO)
 
