@@ -1,6 +1,6 @@
 ---
 title: Mustache templates in Haskell
-published: 2016-07-28
+published: 2016-08-17
 ghc: 7.10.3
 lts: 6.9
 libraries: stache-0.1.4
