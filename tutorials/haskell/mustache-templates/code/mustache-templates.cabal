@@ -1,0 +1,34 @@
+name:                 mustache-templates
+version:              0.1.0
+cabal-version:        >= 1.10
+license:              MIT
+license-file:         LICENSE.md
+author:               Mark Karpov <markkarpov@openmailbox.org>
+maintainer:           Mark Karpov <markkarpov@openmailbox.org>
+homepage:             https://github.com/stackbuilders/tutorials
+bug-reports:          https://github.com/stackbuilders/tutorials/issues
+category:             Graphics
+synopsis:             The tutorial teaches how to work with Mustache templates in Haskell
+build-type:           Simple
+description:          The tutorial teaches how to work with Mustache templates in Haskell.
+extra-doc-files:      README.md
+data-files:           data/*.mustache
+
+source-repository head
+  type:               git
+  location:           https://github.com/stackbuilders/tutorials.git
+
+executable mustache-templates
+  main-is:            Main.hs
+  hs-source-dirs:     src
+  build-depends:      aeson            >= 0.11 && < 0.12
+                    , base             >= 4.8  && < 5.0
+                    , megaparsec       >= 5.0  && < 6.0
+                    , stache           >= 0.1  && < 0.2
+                    , text             >= 1.2  && < 1.3
+
+  if !impl(ghc >= 8.0)
+    build-depends:    semigroups   == 0.18.*
+
+  ghc-options:        -O2 -Wall
+  default-language:   Haskell2010
