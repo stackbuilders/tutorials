@@ -1,8 +1,8 @@
 ---
 title: Mustache templates in Haskell
 published: 2016-08-17
-ghc: 7.10.3
-nightly: nightly-2016-08-15
+ghc: 8.0.1
+nightly: 2016-08-15
 libraries: stache-0.1.6
 language: haskell
 author: Mark Karpov
