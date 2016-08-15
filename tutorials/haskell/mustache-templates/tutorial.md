@@ -34,7 +34,7 @@ Let's see which libraries are available to work with Mustache templates:
 
 * [`hastache`](https://hackage.haskell.org/package/hastache) is the oldest
   (first released in 2011) and now deprecated library in this list. Those
-  who used the library will probably agree that it has not the clearest API
+  who used the library will probably agree that it doesn't have the clearest API
   where a lot of wrapping is necessary and dictionaries are represented as
   wrapped functions. Generics can be used to alleviate the situation, using
   yet another wrapper called `mkGenericContext`.
@@ -224,7 +224,7 @@ FILE "{{& fiFileName }}" WAVE
 
 Given that the template files are stored in `data/` directory, the following
 code will produce a `Template` with both of them stored in the cache (so we
-can use one from another, like we indend to do):
+can use one from another, like we intend to do):
 
 ```haskell
 main :: IO ()
