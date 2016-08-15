@@ -1,6 +1,6 @@
-resolver: nightly-2016-07-28 # lts-6.9
+resolver: nightly-2016-08-15 # lts-6.11
 packages:
 - '.'
 # extra-deps:
-# - stache-0.1.3
 # - megaparsec-5.0.1
+# - stache-0.1.6
