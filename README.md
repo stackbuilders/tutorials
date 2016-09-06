@@ -27,5 +27,5 @@ it by [opening an issue][tutorials-issues-new].
 <p align="center">
   <img  src="images/sb-logo.png" />
   </br>
-  <b>Lovingly encouraged by <a href="http://stackbuilders.com">Stack Builders</a></b>
+  <b>Lovingly built by <a href="http://stackbuilders.com">Stack Builders</a></b>
 </p>
