@@ -1,0 +1,39 @@
+name:                 servant-auth
+version:              0.1.0
+cabal-version:        >= 1.10
+license:              MIT
+license-file:         LICENSE.md
+author:               Mark Karpov <markkarpov@openmailbox.org>
+maintainer:           Mark Karpov <markkarpov@openmailbox.org>
+homepage:             https://github.com/stackbuilders/tutorials
+bug-reports:          https://github.com/stackbuilders/tutorials/issues
+category:             Web Servant
+synopsis:             Example application performing authentication in Servant with encrypted cookie
+build-type:           Simple
+description:          Example application performing authentication in Servant with encrypted cookie.
+extra-doc-files:      README.md
+
+source-repository head
+  type:               git
+  location:           https://github.com/stackbuilders/tutorials.git
+
+executable servant-auth
+  main-is:            Main.hs
+  hs-source-dirs:     src
+  build-depends:      base                >= 4.8 && < 5.0
+                    , bytestring          >= 0.10.4.1 && < 0.11
+                    , cereal              >= 0.5 && < 0.6
+                    , cryptonite          >= 0.15 && < 1.0
+                    , exceptions          >= 0.8 && < 0.9
+                    , lucid               >= 2.9 && < 3.0
+                    , mtl                 >= 2.2 && < 3.0
+                    , network-uri         >= 2.6 && < 2.7
+                    , servant             >= 0.7 && < 0.9
+                    , servant-auth-cookie >= 0.3 && < 0.4
+                    , servant-lucid       >= 0.7 && < 1.0
+                    , servant-server      >= 0.7 && < 0.9
+                    , text                >= 1.2 && < 2.0
+                    , wai                 >= 3.2 && < 4.0
+                    , warp                >= 3.2 && < 4.0
+  ghc-options:      -O2 -Wall -Odph -rtsopts -threaded
+  default-language:   Haskell2010

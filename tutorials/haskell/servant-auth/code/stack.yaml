@@ -1,0 +1,5 @@
+resolver: lts-6.10
+packages:
+- '.'
+extra-deps:
+- servant-auth-cookie-0.3.0.2
