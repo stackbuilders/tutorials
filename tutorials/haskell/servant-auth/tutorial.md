@@ -1,6 +1,6 @@
 ---
 title: Servant authentication and sessions via cookies
-published: 2016-08-05
+published: 2016-09-21
 ghc: 7.10.3
 lts: 6.10
 libraries: servant-auth-cookie-0.3.0.2 servant-0.8
