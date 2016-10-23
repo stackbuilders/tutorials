@@ -264,6 +264,131 @@ foo = bar (inline myFunction) baz
 
 Semantically, `inline` it just an identity function.
 
+Let's see an actual example of `INLINEABLE` in action. We have module `Goaf`
+(that stands for “GHC optimizations and fusion”, BTW) with this:
+
+```haskell
+module Goaf
+  ( inlining0 )
+where
+
+inlining0 :: Int -> Int
+inlining0 x =
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000]
+```
+
+Here I tried hard and convinced GHC that `inlining` doesn't look very
+inlinineable right now (well yeah, pretty dumb example, but it shows the
+point), if we compile with `-O2` (as we will do in every example from now
+on) and dump `Goaf.hi` interface file, we will see no unfolding of
+`inlining0`'s body (if you use different version of GHC you may be unable to
+reproduce exactly this output):
+
+```
+$ ghc --show-iface Goaf.hi
+
+…
+
+142c0e92c650162b33735c798cb20be3
+  $winlining0 :: Int# -> Int#
+  {- Arity: 1, HasNoCafRefs, Strictness: <S,U>, Inline: [0] -}
+e447f016aa264b71f156911b664944d0
+  inlining0 :: Int -> Int
+  {- Arity: 1, HasNoCafRefs, Strictness: <S(S),1*U(U)>m,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (1, True, False)
+                (\ (w :: Int) ->
+                 case w of ww { I# ww1 ->
+                 case $winlining0 ww1 of ww2 { DEFAULT -> I# ww2 } }) -}
+
+…
+```
+
+Here this `$winlining0` is actually compiled function that works on unboxed
+integers `Int#` and it is not inlineable. `inlining0` itself is a thin
+wrapper around it that turns result of type `Int#` into normal `Int` by
+wrapping it into `Int`'s constructor `I#`. I won't go into detailed
+explanations about unboxed data and primitives, but `Int#` is just your
+bare-metal, hard-working C `int`, while `Int` is our familiar boxed, lazy
+Haskell `Int` (there are links about primitive Haskell at the end of the
+tutorial, you can start form there if this looks interesting).
+
+We see two important things here:
+
+* `inlining0` itself is not dumped into the interface file, that means that
+  we have “lost” the ability to look inside it (in form of `$winlinig0`).
+
+* Still, hope dies last even for GHC, so it has turned `inlining0` function
+  into a wrapper which itself is inlineable as you can see. The idea is that
+  in the case if `inlining0` is called in arithmetic context with some other
+  operations on `Int`s, GHC might be able to optimize further and better
+  glue things working on `Int#`s (like `$winlining0`) together.
+
+Now let's use the `INLINEABLE` pragma:
+
+```haskell
+inlining1 :: Int -> Int
+inlining1 x =
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000]
+{-# INLINEABLE inlining1 #-}
+```
+
+…which results in:
+
+```
+…
+
+033f89de148ece86b9e431dfcd7dde8c
+  $winlining1 :: Int# -> Int#
+  {- Arity: 1, HasNoCafRefs, Strictness: <S,U>, Inline: INLINABLE[0],
+     Unfolding: <stable> (\ (ww :: Int#) ->
+
+       … a LOT of stuff…
+
+6a60cad1d71ad9dfde046c97c2b6f2e9
+  inlining1 :: Int -> Int
+  {- Arity: 1, HasNoCafRefs, Strictness: <S(S),1*U(U)>m,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (1, True, False)
+                (\ (w :: Int) ->
+                 case w of ww { I# ww1 ->
+                 case $winlining1 ww1 of ww2 { DEFAULT -> I# ww2 } }) -}
+```
+
+The result is almost the same, but now we have complete unfolding of
+`$winlinig0` in our interface file. It's unlikely that this will improve
+performance considerably, because our functions are rather slow, one-shot
+beasts and inlining really won't matter much here:
+
+```
+benchmarking inlining0
+time                 5.653 ms   (5.632 ms .. 5.673 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 5.614 ms   (5.601 ms .. 5.627 ms)
+std dev              39.86 μs   (33.20 μs .. 48.70 μs)
+
+benchmarking inlining1
+time                 5.455 ms   (5.442 ms .. 5.471 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 5.447 ms   (5.432 ms .. 5.458 ms)
+std dev              38.08 μs   (28.36 μs .. 58.38 μs)
+```
+
+As expected, this gives rather marginal improvement, but in other cases it
+may be more useful.
+
 It turns out that not only inlining requires access to original function
 body to work, some other optimizations do as well, so the **`INLINEABLE`
 pragma**, causing putting function's unfolding into interface file
