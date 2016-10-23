@@ -409,9 +409,41 @@ Inlining is always an option for compiler, unless you tell it that
 particular function should not be inlined, and sometimes you will want to be
 able to do that. Here the `NOINLINE` pragma may be helpful.
 
-Remember that GHC won't optimize body of an inlineable function? If you
-don't care if some function `myFunction` will be inlined or not, but you
-want its body to be optimized, you may solve the problem like this:
+Let's have an example from a real, practical package called
+`http-client-tls` which adds TLS (HTTPS) support to another package
+`http-client` for doing HTTP requests. The package has a notion of HTTP
+manager that stores information about open connections and stuff like that.
+The problem with it is that it's expensive to create and in general you
+should have only one such manager for maximal connection sharing. For that
+there is a thing called `globalManager` which you can get and set when
+you're in `IO` monad (uses `IORef`s under the hood). To get `IORef` of
+global manager the following code is used (well not exactly, this is
+simplified, but it may get into this form some day):
+
+```haskell
+globalManager :: IORef Manager
+globalManager =
+  unsafePerformIO (newManager tlsManagerSettings >>= newIORef)
+{-# NOINLINE globalManager #-}
+```
+
+Here we use `unsafePerformIO` which has type `IO a -> a` and is a dangerous
+thing to throw into your code, unless you know what you are doing. It
+basically just does its dirty `IO` thing in broad daylight but pretends that
+it's prudent and pure, not wanting to live in the `IO` cage. We want
+`IORef`, not `IO IORef` (the latter is just a recipe how to get `IORef` to
+one more such manager!) and we want it to be created just once. The
+expression inside `unsafePerformIO` is to be run and after that its result
+should be shared for all future use. Well, it will be shared all right,
+since the value is named and top-level, but one thing may impede our
+success: GHC may just inline it, causing re-creation that we wanted to avoid
+in the first place. To fix this we add the `NOINLINE` pragma, not stressing
+about consequences of unsafe attitude of `globalManager` anymore.
+
+Another use-case for `NOINLINE` is more obvious. Remember that GHC won't
+optimize body of an inlineable function? If you don't care if some function
+`myFunction` will be inlined or not, but you want its body to be optimized,
+you may solve the problem like this:
 
 ```haskell
 myFunction :: Int -> Int
