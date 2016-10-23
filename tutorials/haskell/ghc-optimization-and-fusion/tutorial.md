@@ -38,8 +38,8 @@ improvements without going to the C land (which sure may make things faster,
 but it also takes away the possibility of compiling your code with GHCJS for
 example).
 
-This tutorial would be normally considered as rather “advanced”, because it
-has to do with various GHC trickery, but I think it's quite approachable for
+This tutorial would be normally considered rather “advanced”, because it has
+to do with various GHC trickery, but I think it's quite approachable for
 intermediate-beginner level Haskellers, because things it describes are to
 some extent isolated from other topics and so they can be mastered by any
 motivated individual.
@@ -79,9 +79,9 @@ body and insert it at the place it would otherwise be called. Since
 functions to inline are usually short, duplication of code is minimal and we
 get considerable performance boost. Inlining is perhaps the simplest (well,
 for end user, not for compiler developers!) and yet very efficient way to
-improve performance of some functions. Furthermore, we will see shortly that
-inlining in GHC is not just about eliminating calls themselves, it's also a
-way to let other optimizations be applied.
+improve performance. Furthermore, we will see shortly that inlining in GHC
+is not just about eliminating calls themselves, it's also a way to let other
+optimizations be applied.
 
 #### How GHC does inlining by itself
 
@@ -134,7 +134,8 @@ GHC considers the following:
     …optimizes better than a similar call with `comp2`.
 
 * **How much code duplication inlining would cause?** Code bloat is bad as
-  it increases compilation time, size of program, and cache hit rates.
+  it increases compilation time, size of program, and lowers cache hit
+  rates.
 
 * **How much work duplication inlining would cause?** Consider the next two
   examples from the paper “Secrets of the Glasgow Haskell Compiler inliner”
@@ -180,10 +181,10 @@ is”. (Body of an inlineable function won't be optimized and inlining may not
 happen as well, so you may end up with a call to non-optimized function.
 Fear not, we will learn how to fix that latter in the tutorial.)
 
-One of simplest optimization techniques GHC can use is plain old
-beta-reduction. But beta-reduction, combined with inlining, is nothing short
-of compile-time evaluation of program. Which means that GHC should somehow
-ensure that it terminates.
+One of simplest optimization techniques GHC can use with inlining is plain
+old beta-reduction. But beta-reduction, combined with inlining, is nothing
+short of compile-time evaluation of program. Which means that GHC should
+somehow ensure that it terminates.
 
 This brings us to two edge cases:
 
@@ -293,11 +294,10 @@ myFunction = …
 {-# NOINLINE myFunction #-}
 ```
 
-It's rather rare to see this in source code though. Often times, you will
-want to **prevent inlining until some other optimization happens**. This is
-also done with `NOINLINE`, but to control order in which optimizations are
-applied, we will need to master more black magic than we know now, so let's
-move on to specializing.
+Often times, you will also want to **prevent inlining until some other
+optimization happens**. This is also done with `NOINLINE`, but to control
+order in which optimizations are applied, we will need to master more black
+magic than we know now, so let's move on to specializing.
 
 ### Specializing
 
@@ -401,14 +401,16 @@ instance (Eq a) => Eq (Foo a) where
   … usual stuff …
 ```
 
-It's also possible to inline specialized version of a function using the
-`SPECIALIZE INLINE` pragma. It may be surprising, but it will even work with
-self-recursive functions. The motivation here is the fact that a polymorphic
-function, unlike a function that works with concrete types, may actually use
-different instances when it's called in different contexts, so inlining
-specialized versions of the function does not necessarily diverges. An
-obvious consequence of this is that GHC can also go into an infinite loop,
-so be careful. `SPECIALIZE NOINLINE` variant is also available.
+It's also possible to inline specialized version of a function (vanilla
+specialization disables inlinig as will be demonstrated later in the
+tutorial) using the `SPECIALIZE INLINE` pragma. It may be surprising, but it
+will even work with self-recursive functions. The motivation here is the
+fact that a polymorphic function, unlike a function that works with concrete
+types, may actually use different instances when it's called in different
+contexts, so inlining specialized versions of the function does not
+necessarily diverges. An obvious consequence of this is that GHC can also go
+into an infinite loop, so be careful. `SPECIALIZE NOINLINE` variant is also
+available.
 
 Finally, it's worth noticing that explicit use of `SPECIASIZE` is not always
 necessary. For instance, it's common for GHC to specialize on its own if
@@ -572,6 +574,17 @@ rule nevertheless does not preserve meaning of expression it transforms.
 yielding any element, while infinite list `xs` can be consumed normally,
 given that it's never forced in its entirety.
 
+**GHC does not attempt to ensure that rules are terminating**. For example
+(example from GHC user guide):
+
+```haskell
+{-# RULES
+"loop" forall x y. f x y = f y x
+  #-}
+```
+
+…will cause the compiler to go into an infinite loop.
+
 To make things more interesting for programmer, not only every
 transformation must not introduce any differences in meaning, ability to
 terminate, etc., but also in complex combinations of functions, it is
@@ -604,18 +617,7 @@ The system is not confluent. An obvious fix would be to add this rule:
 
 …which makes the system confluent. **GHC does not attempt to check if your
 rules are confluent**, so take some time to check your rule set for
-confluence.
-
-**GHC does not attempt to ensure that rules are terminating**. For example
-(example from GHC user guide):
-
-```haskell
-{-# RULES
-"loop" forall x y. f x y = f y x
-  #-}
-```
-
-…will cause the compiler to go into an infinite loop.
+confluence too!
 
 Finally, **writing rules matching on methods of type classes is futile**
 because methods may be specialized (that is, replaced by specialized less
@@ -633,7 +635,7 @@ enough for us”. `CONLIKE` stands for “constructor-like”. In fact, GHC
 maintains invariant that every constructor application has arguments that
 can be duplicated at no cost: variables, literals, and type applications
 (you can find more about this in “Secrets of the GHC inliner”, see links for
-futher reading at the end of the tutorial), hence the name.
+further reading at the end of the tutorial), hence the name.
 
 #### Phase control
 
@@ -653,9 +655,9 @@ would like to be able to specify which optimization procedure depends on
 which, etc., instead we have only two options:
 
 1. Specify beginning from which phase given rewrite rule or
-   inline/specialize pragma should be allowed.
+   inline/specialize pragma should be enabled.
 
-2. Specify up to which phase (not including) some thing sholud be active.
+2. Specify up to which phase (not including) a rule should be enabled.
 
 The syntactic part boils down to adding `[n]` or `[~n]` after pragma name.
 GHC user tutorial has a really nice table that we absolutely must have here:
@@ -764,10 +766,10 @@ Enough of that hairy stuff! Take a deep breath, let's discuss something
 different now. This section will be about fusion, but before we start
 talking about it, we need to define what “fusion” is.
 
-For the purposes of this tutorial, fusion is a technique that allows to
-avoid constructing intermediate results (such as lists, vectors, arrays…)
+For the purposes of this tutorial, **fusion is a technique that allows to
+avoid constructing intermediate results** (such as lists, vectors, arrays…)
 when chaining operations (functions). Allocating intermediate results may
-really suck out power from your program, fusion can be a very nice
+really suck out power from your program, so fusion can be a very nice
 optimization technique.
 
 To demonstrate benefits of fusion it's enough to start with a simple
@@ -813,14 +815,14 @@ The point 2 can be (and has been) addressed differently:
    as building blocks in our programs) in such a way that they do not ever
    produce results immediately. So when such primitives are combined, they
    produce another (wrapped) function that does not produce result
-   immediately either. To get “real” result, we need another function that
-   can “run” (or “freeze”) the composite action we've constructed. This is
-   also fusion and this is how the `repa` package works for example.
+   immediately either. To get “real” result, we need yet another function
+   that can “run” the composite action we've constructed. This is also
+   fusion and this is how the `repa` package works for example.
 
 2. We want to have our cake and eat it too. We can expose familiar interface
    where every “primitive” produces result immediately, but we also can add
    rewrite rules that will (hopefully) make GHC rewrite things in such a way
-   (more on that below) that in the end compiler gets one tight look without
+   (more on that below) that in the end compiler gets one tight loop without
    intermediate allocations.
 
 I must say that I like the approach 1 more because it's more explicit and
