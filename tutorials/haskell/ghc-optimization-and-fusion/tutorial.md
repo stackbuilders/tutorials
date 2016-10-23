@@ -569,13 +569,198 @@ necessarily diverges. An obvious consequence of this is that GHC can also go
 into an infinite loop, so be careful. `SPECIALIZE NOINLINE` variant is also
 available.
 
-Finally, it's worth noticing that explicit use of `SPECIASIZE` is not always
-necessary. For instance, it's common for GHC to specialize on its own if
-some function is inilined into non-polymorhpic context. It just inlines it
-and subsequent passes of optimizer remove excessive polymorphism — one more
-example of how simple inlining can trigger a “chain reaction” significantly
-improving performance. As always, to make sure whether something works or
-not, benchmark and profile — that's the only way to find out!
+For a practical example let's try to start with this code:
+
+```haskell
+special0' :: (Num a, Enum a) => a -> a
+special0' x =
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000]
+
+special0 :: Int -> Int
+special0 x = special0' x `rem` 10
+```
+
+In the interface file we get:
+
+```
+…
+
+3d2b7aef38f4af3a87867079a7fb9d7d
+  $w$sspecial0' :: Int# -> Int#
+  {- Arity: 1, HasNoCafRefs, Strictness: <S,U>, Inline: [0] -}
+
+9aab4f68c56ea324d5b4f1ae96f44304
+  special0 :: Int -> Int
+  {- Arity: 1, HasNoCafRefs, Strictness: <S(S),1*U(U)>m,
+     Unfolding: InlineRule (1, True, False)
+                (\ (x :: Int) ->
+                 case special0_$sspecial0' x of wild2 { I# x1 ->
+                 I# (remInt# x1 10#) }) -}
+97c360215ea1cab7acdf5a4928d349e8
+  special0' :: (Num a, Enum a) => a -> a
+  {- Arity: 3, HasNoCafRefs,
+     Strictness: <S(C(C(S))LLLLLL),U(C(C1(U)),A,U,A,A,A,C(U))><L,U(A,A,A,A,A,A,C(C1(U)),A)><L,U> -}
+efc0709eeb0afdb2be8cdce06cc54623
+  special0_$sspecial0' :: Int -> Int
+  {- Arity: 1, HasNoCafRefs, Strictness: <S(S),1*U(U)>m,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (1, True, False)
+                (\ (w :: Int) ->
+                 case w of ww { I# ww1 ->
+                 case $w$sspecial0' ww1 of ww2 { DEFAULT -> I# ww2 } }) -}
+"SPEC special0' @ Int" [ALWAYS] forall ($dNum :: Num Int)
+                                       ($dEnum :: Enum Int)
+  special0' @ Int $dNum $dEnum = special0_$sspecial0'
+```
+
+What can I say, GHC is really good at specializing if polymorphic function
+defined and used in the same module, I could not really find a case where
+GHC 8.0.1 would fail to specialize on its own, bravo! The specialized
+version of `special0'` is called `$w$sspecial0'` here and it works on `Int#`
+for maximal speed.
+
+What else do we see? `special0'` is compiled, but not dumped into the
+interface file, this means that if we use it from another module we should
+get considerably worse performance compared to `special0`, let's try:
+
+```
+benchmarking special0
+time                 5.457 ms   (5.436 ms .. 5.477 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 5.481 ms   (5.470 ms .. 5.492 ms)
+std dev              35.69 μs   (29.94 μs .. 44.88 μs)
+
+benchmarking special0_alt   <---- defined in a separate module
+time                 5.462 ms   (5.436 ms .. 5.496 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 5.472 ms   (5.458 ms .. 5.485 ms)
+std dev              41.42 μs   (33.29 μs .. 55.02 μs)
+```
+
+Hmm? What's going on? `special0_alt` was able to take advantage on
+specialized function `$w$sspecial0'` as well! But if we remove export of
+`special0`, things change as `special0_alt` would not be able to find
+appropriate specialization anymore:
+
+```
+benchmarking special0_alt
+time                 912.0 ms   (866.2 ms .. 947.7 ms)
+                     1.000 R²   (NaN R² .. 1.000 R²)
+mean                 931.0 ms   (919.8 ms .. 939.9 ms)
+std dev              13.88 ms   (0.0 s .. 15.45 ms)
+```
+
+Oh hell, ×167 slowdown is not good. Let's try to fix it:
+
+```haskell
+special0' :: (Num a, Enum a) => a -> a
+special0' x =
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000]
+{-# SPECIALIZE special0' :: Int -> Int #-}
+```
+
+This brings our specialization back:
+
+```
+  special0'_$sspecial0' :: Int -> Int
+  {- Arity: 1, HasNoCafRefs, Strictness: <S(S),1*U(U)>m,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (1, True, False)
+                (\ (w :: Int) ->
+                 case w of ww { I# ww1 ->
+                 case $w$sspecial0' ww1 of ww2 { DEFAULT -> I# ww2 } }) -}
+"SPEC special0'" [ALWAYS] forall ($dNum :: Num Int)
+                                 ($dEnum :: Enum Int)
+  special0' @ Int $dNum $dEnum = special0'_$sspecial0'
+```
+
+…and it indeed returns `special0_alt` its ability to perform well:
+
+```
+benchmarking special0_alt
+time                 5.392 ms   (5.381 ms .. 5.403 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 5.399 ms   (5.392 ms .. 5.408 ms)
+std dev              25.12 μs   (16.60 μs .. 38.90 μs)
+```
+
+Let's conclude:
+
+* GHC has no problem specializing for you when polymorphic function is used
+  in the same module it's defined: it has its body and it knows what to do.
+
+* Lack of specialization kills your performance completely and very
+  reliably.
+
+* If you can guess which specializations to request from GHC when you write
+  your module, most of the time you're OK and you can get your speed back.
+
+What about the case when user of a library wants a specialization library's
+author hasn't thought about? Let's see. We first remove the `SPECIALIZE`
+pragma for `special0'`, so no specializations are generated on compilation
+of our “source” module. Then we try to specialize in the “consumer” module:
+
+```haskell
+special0_alt :: Int -> Int
+special0_alt x = special0' x `rem` 10
+{-# SPECIALIZE special0' :: Int -> Int #-}
+```
+
+…and GHC tells us in plain English:
+
+```
+You cannot SPECIALISE ‘special0'’
+  because its definition has no INLINE/INLINABLE pragma
+  (or its defining module ‘Goaf’ was compiled without -O)
+```
+
+Cool, but we know that already, don't we? Let's add `special0'`'s body to
+interface file with `INLINEABLE`:
+
+```haskell
+special0' :: (Num a, Enum a) => a -> a
+special0' x =
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000] +
+  product [x..1000000]
+{-# INLINEABLE special0' #-}
+```
+
+…and we win again:
+
+```
+benchmarking special0_alt
+time                 5.329 ms   (5.313 ms .. 5.348 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 5.340 ms   (5.326 ms .. 5.356 ms)
+std dev              45.16 μs   (36.56 μs .. 55.29 μs)
+```
+
+I've also had a different warning from GHC when I used the same combination
+of `INLINEABLE`/`SPECIALIZE`:
+
+```
+SPECIALIZE pragma probably won't fire on inlined function ‘foo’.
+```
+
+…and benchmarks showed that it didn't fire indeed. So well, yeah, take care
+and remember to benchmark every time you change somethnig!
 
 ### Rewrite rules
 
