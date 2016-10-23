@@ -32,7 +32,7 @@ the order you should attempt them):
 2. Use GHC pragmas (covered in the tutorial).
 3. Rewrite critical bits in C.
 
-As it turns out, we may be already using the best algorithm for the task in
+As it turns out, we may be already using the best algorithm for task in
 hand, so using GHC pragmas may be the only way to make considerable
 improvements without going to the C land (which sure may make things faster,
 but it also takes away the possibility of compiling your code with GHCJS for
@@ -321,8 +321,9 @@ tutorial, you can start form there if this looks interesting).
 
 We see two important things here:
 
-* `inlining0` itself is not dumped into the interface file, that means that
-  we have “lost” the ability to look inside it (in form of `$winlinig0`).
+* `inlining0` itself (in form of `$winlinig0`) is not dumped into the
+  interface file, that means that we have lost the ability to look inside
+  it.
 
 * Still, hope dies last even for GHC, so it has turned `inlining0` function
   into a wrapper which itself is inlineable as you can see. The idea is that
@@ -407,7 +408,7 @@ self-recursive).
 
 Inlining is always an option for compiler, unless you tell it that
 particular function should not be inlined, and sometimes you will want to be
-able to do that. Here the `NOINLINE` pragma may be helpful.
+able to do that. In these cases the `NOINLINE` pragma may be helpful.
 
 Let's have an example from a real, practical package called
 `http-client-tls` which adds TLS (HTTPS) support to another package
@@ -436,9 +437,10 @@ one more such manager!) and we want it to be created just once. The
 expression inside `unsafePerformIO` is to be run and after that its result
 should be shared for all future use. Well, it will be shared all right,
 since the value is named and top-level, but one thing may impede our
-success: GHC may just inline it, causing re-creation that we wanted to avoid
-in the first place. To fix this we add the `NOINLINE` pragma, not stressing
-about consequences of unsafe attitude of `globalManager` anymore.
+success: GHC can just inline it, causing re-creation and problems with
+connection sharing that we wanted to avoid in the first place. To fix this
+we add the `NOINLINE` pragma, not stressing about consequences of unsafe
+attitude of `globalManager` anymore.
 
 Another use-case for `NOINLINE` is more obvious. Remember that GHC won't
 optimize body of an inlineable function? If you don't care if some function
@@ -458,9 +460,9 @@ magic than we know now, so let's move on to specializing.
 
 ### Specializing
 
-To understand how specializing works (what it is, for that matter), we first
-need to review how ad-hoc polymorphism with type classes is implemented in
-GHC. When there is a constraint in signature of a function:
+To understand how specializing works (and what it is, for that matter), we
+first need to review how ad-hoc polymorphism with type classes is
+implemented in GHC. When there is a constraint in signature of a function:
 
 ```haskell
 foo :: Num a => a -> a
@@ -512,9 +514,6 @@ we run into them pretty often) when it cannot specialize:
   we just use it without specializing. The solution is to use `INLINEABLE`
   on the exported polymorphic function combined with `SPECIALIZE` in the
   module where we wish to specialize the function (see below).
-
-* Every time we specialize, we create a new function with about the same
-  size of the original (polymorphic) one. This leads to code bloat.
 
 So if you want to specialize, your tool is the `SPECIALIZE` pragma.
 Syntactically, a `SPECIALIZE` pragma can be put anywhere its type signature
@@ -857,16 +856,15 @@ have edited it a bit):
 
 This requirement of verbatim matching modulo alpha conversion in combination
 with the fact that a lot is going on during optimization process in GHC
-makes working with rules a bit tricky. That is, sometimes rule does not
-“fire”. Some cases of this are covered in the next section, called
-“Gotchas”.
+makes working with rules a bit tricky. That is, sometimes rules do not fire.
+Some cases of this are covered in the next section, called “Gotchas”.
 
 Another important thing to mention is that when several rules match at once,
 GHC will choose one arbitrarily to apply. You might be wondering “why not to
 choose the first one for example” — well, given that rules are much like
 instance declarations with respect to how they are imported, there is no
 order for them, and the only thing GHC can do when several rules match is to
-either apply none (probably it's worse than apply at least something) or
+either apply none (probably it's worse than applying at least something) or
 pick one randomly and apply that.
 
 Now before we start considering problems you may have with `RULES`, I
@@ -1111,45 +1109,91 @@ talking about it, we need to define what “fusion” is.
 For the purposes of this tutorial, **fusion is a technique that allows to
 avoid constructing intermediate results** (such as lists, vectors, arrays…)
 when chaining operations (functions). Allocating intermediate results may
-really suck out power from your program, so fusion can be a very nice
-optimization technique.
+really suck out power from your program, so fusion is a very nice
+optimization technique in certain cases.
 
 To demonstrate benefits of fusion it's enough to start with a simple
-composition of functions you may find yourself writing quite often:
+composition of functions you may find yourself writing quite often. The only
+difference is that we will use our own, homemade functions (functions from
+`Prelude` have rewrite rules we are yet to reinvent) implemented as you
+would expect:
 
 ```haskell
-TODO filter, map, other stuff, but defined manually, not from base
+map0 :: (a -> b) -> [a] -> [b]
+map0 _ []     = []
+map0 f (x:xs) = f x : map0 f xs
+
+foldr0 :: (a -> b -> b) -> b -> [a] -> b
+foldr0 _ b []     = b
+foldr0 f b (a:as) = foldr0 f (f a b) as
+
+nofusion0 :: [Int] -> Int
+nofusion0 = foldr0 (+) 0 . map0 sqr
+
+sqr :: Int -> Int
+sqr x = x * x
 ```
 
-With Criterion benchmarks I get the following results for that code:
+This all looks quite mundane — good ol' pipeline of functions with function
+composition, you probably write a lot of such code. Let's see how it
+performs:
 
 ```
-TODO benchmark and put results here
+benchmarking nofusion0
+time                 155.4 ms   (146.4 ms .. 162.4 ms)
+                     0.996 R²   (0.980 R² .. 1.000 R²)
+mean                 155.1 ms   (151.3 ms .. 159.0 ms)
+std dev              5.522 ms   (3.154 ms .. 7.537 ms)
 ```
 
-Now let's see if the situation improves if we avoid building intermediate
-lists:
+This is the result with `[0..1000000]` passed as argument to `nofusion0`.
+
+With `weigh` (a relatively new library that allows to find out memory
+consumption of your code) I'm getting the following:
+
+```
+Case                  Bytes  GCs  Check
+nofusion0       249,259,656  448  OK
+```
+
+In a lazy language like Haskell laziness just changes when parts of
+intermediate lists are allocated, but they still must be allocated because
+that's what next step in the “pipe” takes as input, and that's the overhead
+we want to reduce with fusion.
+
+Can we do better if we rewrite everything as a single function that sums and
+multiplies in one pass? Not so sexy, but let's give it a try to see what
+sort of power we missing with our “elegant” composition of list processing
+functions:
 
 ```haskell
-here use equivalent function that does “all at once”
+manuallyFused :: [Int] -> Int
+manuallyFused []     = 0
+manuallyFused (x:xs) = x * x + manuallyFused xs
 ```
 
 Let's benchmark it:
 
 ```
-TODO
+benchmarking manuallyFused
+time                 17.10 ms   (16.71 ms .. 17.54 ms)
+                     0.996 R²   (0.992 R² .. 0.998 R²)
+mean                 17.18 ms   (16.87 ms .. 17.62 ms)
+std dev              932.8 μs   (673.7 μs .. 1.453 ms)
+
+Case                 Bytes  GCs  Check
+manuallyFused   96,646,160  153  OK
 ```
 
-TODO A paragraph
-
-We just manually “fused” the two functions and produced code that runs
-faster, consumes less memory, and does the same thing. But how can we give
-up on composability and elegance of functional programming? No way!
+The improvement is dramatic. We just manually “fused” the two functions and
+produced code that runs faster, consumes less memory, and does the same
+thing. But how can we give up on composability and elegance — main merits of
+functional programming? No way!
 
 What we would like to achieve is the following:
 
 1. Ability to write beautiful, composable programs.
-2. Avoid allocating intermediate results because it sucks.
+2. Avoid allocating intermediate results where possible, because it sucks.
 
 The point 2 can be (and has been) addressed differently:
 
@@ -1168,13 +1212,285 @@ The point 2 can be (and has been) addressed differently:
    intermediate allocations.
 
 I must say that I like the approach 1 more because it's more explicit and
-reliable. Let's see it in action.
+reliable. Let's see it action.
 
-### Fusion without rewriting rules
+### Fusion without rewrite rules
 
-In that sense, fusion does not necessarily have to happen via “invisible”
-rewriting of your beautiful program by compiler, it can be quite explicit.
-An example of such explicit approach is the `repa` library.
+Returning to the example with `map` and `foldr`, we can re-write the
+functions differently using the principle we just discussed (avoiding
+generation of intermediate results). It's essential for fusion that we don't
+write our functions as transformations of whole lists (or whatever you
+have), because then we are back to the problem of creating those lists at
+some point.
+
+It's actually may be tricky to have several independent functions that
+conceptually work on linked lists without re-creating list structure is some
+form. So, we won't start with fusion that works on linked lists, let's start
+with a more obvious example instead: arrays.
+
+An array can be represented as a combination of its size and a function that
+takes index and returns a value at that index. We can write:
+
+```haskell
+data Array a = Array Int (Int -> a)
+
+rangea :: Int -> Array Int
+rangea n = Array n id
+
+mapa :: (a -> b) -> Array a -> Array b
+mapa f (Array size g) = Array size (f . g)
+
+foldra :: (a -> b -> b) -> b -> Array a -> b
+foldra f b (Array size g) = go 0 b
+  where
+    go n b' | n < size  = go (n + 1) (f (g n) b')
+            | otherwise = b'
+
+fuseda :: Int -> Int
+fuseda = foldra (+) 0 . mapa sqr . rangea
+```
+
+Here, we have what Repa calls “delayed arrays”. Note that the function
+`rangea` allows to create arrays which have elements filled with their
+indices. This is for simplicity, in a real library to work with arrays we
+would want to complement the delayed arrays with real ones that hold all the
+data in memory in adjoined addresses and allow for fast indexing, but for
+the demonstration of fusion we can do without “real” arrays.
+
+Now if you take a look at `mapa`, it doesn't really do anything but making
+the indexing function just a little bit more complex, so we don't create any
+intermediate results with it. `foldra` allows to traverse entire array and
+get some value computed from all its elements, it plays role of a consumer
+in our case. Finally, `fuseda 1000000` is the same as `manuallyFused
+[0..1000000]`, but runs much faster.
+
+Of course `fuseda` is not equivalent in power to `manuallyFused`, but the
+whole collection and functions shows that it's possible to have
+composability and speed at the same time. Note again, we get this by just
+changing indexing function without actually doing anything with real array
+(which of course can be “rendered” or built given an `Array`).
+
+Now let's try to do something like this with linked lists, although it's
+less obvious. We should start with the idea of not touching real list, but
+modifying a function that… what? Indexes list? What such a function should
+do to a list? If most basic function of array is to be indexed by position
+of its elements, then what is the most basic function of list? How linked
+list is consumed?
+
+If we have a list `[a]`, then the way it's usually consumed is via
+“unconsing”, that is, we take head of the list `a` and also we get the rest
+of it `[a]`. There is a function named `uncons` in `Data.List`, let's take a
+look at it:
+
+```haskell
+uncons :: [a] -> Maybe (a, [a])
+uncons []     = Nothing
+uncons (a:as) = Just (a, as)
+```
+
+So here we can get head of given list and the rest of it, but if the given
+list is empty, we can't get its head. This idea is expressed by `Maybe`.
+Let's try to represent a “delayed list” as a wrapper around `uncons`-like
+function:
+
+```haskell
+newtype List a = List ([a] -> Maybe (a, [a]))
+```
+
+How about `map` and `foldr`? It looks like they follow from that definition
+rather naturally:
+
+```haskell
+map1 :: (a -> b) -> List a -> List b
+map1 g (List f) = List h
+  where
+    h s' = case f s' of
+      Nothing       -> Nothing
+      Just (x, s'') -> Just (g x, s'')
+```
+
+Uh oh. This does not type check though:
+
+> Couldn't match type `a` with `b`
+
+What's the problem? Well, remember that we just want to make the inner
+function more complex, in this particular case it means that it should
+consume list of type `[a]` and produce list of type `[b]`, this means that
+the inner function should have type `[a] -> Maybe (b, [a])` (remember, we
+produce elements of `[b]` one at a time). Clearly, this type signature
+differs from the one we have so far, hence we should adjust it:
+
+```haskell
+newtype List a b = List ([a] -> Maybe (b, [a]))
+```
+
+So the type `List a b` means “produces list of elements of type `b` from
+list of elements of type `a`”. Not a very clear signature to have for a
+thing like list, but let's put up with this and go to the end to see if this
+at least performs better. Finally, `map1` compiles:
+
+```haskell
+map1 :: (a -> b) -> List s a -> List s b
+map1 g (List f) = List h
+  where
+    h s' = case f s' of
+      Nothing       -> Nothing
+      Just (x, s'') -> Just (g x, s'')
+```
+
+The signature literally says: “when you have a list that has `a` elements,
+no matter what you consume to get them (in our case this is something
+labelled `s`), I'll give you another list that produces `b` elements, still
+consuming the same thing `s`”.
+
+Let's go ahead and implement `foldr1` (this is not your `foldr1` from
+`Predule`, the numeric suffix just shows which example it belongs too, sorry
+for possible confusion). To implement `foldr1` we need something to consume,
+because we want to get one single value in the end, real value, not
+something “delayed”.
+
+We could pass source of values directly to `foldr1`, but it's not nice for
+two reasons:
+
+1. We want signature of `foldr1` stay as close to familiar signature of
+   `foldr` as possible.
+
+2. `foldr` is just one primitive that “forces” delayed list, what about
+   other ones? Should we add an extra argument to all of them? This is not
+   elegant, IMO.
+
+So what can we do here? Well, perhaps we could store the initial list
+together with the function we already have `[a] -> Maybe (b, [a])`:
+
+```haskell
+data List a b = List ([a] -> Maybe (b, [a])) [a]
+```
+
+We should remember though that we want to pass that list around but we
+should not touch it until we want to “force” our list:
+
+```haskell
+map1 :: (a -> b) -> List s a -> List s b
+map1 g (List f s) = List h s
+--             ^           ^
+--             |  “as is”  |
+--             +-----------+
+  where
+    h s' = case f s' of
+      Nothing       -> Nothing
+      Just (x, s'') -> Just (g x, s'')
+
+foldr1 :: (a -> b -> b) -> b -> List s a -> b
+foldr1 g b (List f s) = go b s
+  where
+    go b' s' = case f s' of
+      Nothing       -> b'
+      Just (x, s'') -> go (g x b') s''
+```
+
+Now that we store initial list in `List` itself, we can write a function
+that converts normal list to a delayed one:
+
+```haskell
+fromLinkedList :: [a] -> List a a
+fromLinkedList = List uncons
+```
+
+And just for the sake of completeness, here is how to get it back:
+
+```haskell
+toLinkedList :: List a b -> [b]
+toLinkedList (List f s) = unfoldr f s
+```
+
+Here is `unfoldr` from `Data.List`:
+
+```haskell
+unfoldr :: (s -> Maybe (a, s)) -> s -> [a]
+unfoldr f s = case f s of
+  Nothing      -> []
+  Just (x, s') -> x : unfoldr f s'
+```
+
+`unfoldr` takes initial state, passes it to given function and gets one
+element of final list and new state. It contitues till `Nothing` is
+returned.
+
+Finally, we can build `fused1` that solves the same problem of summing up a
+list of squared numbers:
+
+```haskell
+fused1 :: [Int] -> Int
+fused1 = foldr1 (+) 0 . map1 sqr . fromLinkedList
+```
+
+Elegance and composability: check. Let's benchmark it:
+
+```
+benchmarking fused1
+time                 3.422 ms   (3.412 ms .. 3.433 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 3.432 ms   (3.427 ms .. 3.440 ms)
+std dev              19.74 μs   (14.15 μs .. 29.65 μs)
+
+Case                 Bytes  GCs  Check
+fused1          80,000,016  153  OK
+```
+
+It's fastest implementation so far! What's wrong with our simple-minded
+`manuallyFused` BTW? Shouldn't it be the fastest? Well, it's not
+tail-recursive, we can rewrite it like this:
+
+```haskell
+manuallyFused' :: [Int] -> Int
+manuallyFused' = go 0
+  where
+    go !n []     = n
+    go !n (x:xs) = go (n + x * x) xs
+```
+
+And then it sure wins:
+
+```
+benchmarking manuallyFused'
+time                 3.206 ms   (3.202 ms .. 3.210 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 3.213 ms   (3.210 ms .. 3.217 ms)
+std dev              11.28 μs   (7.599 μs .. 17.46 μs)
+
+Case                  Bytes  GCs  Check
+manuallyFused'   80,000,016  153  OK
+```
+
+Returning to `List`, one thing we would like to do is to remove the type of
+elements it consumes. I mean, if you have list of `a` elements, shouldn't it
+be `List a`? Sure it should. Let's see definition of `List` again:
+
+```haskell
+data List a b = List ([a] -> Maybe (b, [a])) [a]
+```
+
+`a` here doesn't really ever change as per our idea of not touching it. We
+could just hide it then using existential quantification:
+
+```
+data List b = forall a. List ([a] -> Maybe (b, [a])) [a]
+≡ <via alpha reduction>
+data List a = forall s. List (s -> Maybe (a, s)) s
+```
+
+With this we get the following signatures (implementations stay the same):
+
+```haskell
+fromLinkedList :: [a] -> List a
+toLinkedList   :: List a -> [a]
+map1           :: (a -> b) -> List a -> List b
+foldr1         :: (a -> b -> b) -> b -> List a -> b
+```
+
+Much better! This section has demonstrated that fusion is doable and nice
+without rewrite rules, in the next section we will explore the notion of
+“fusion system”.
 
 ### `build`/`foldr` fusion system
 
