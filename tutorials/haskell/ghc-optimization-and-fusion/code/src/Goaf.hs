@@ -11,10 +11,12 @@ module Goaf
   , manuallyFused'
   , fuseda
   , fused1
+  , fused2
   )
 where
 
 import Data.List (unfoldr, uncons)
+import GHC.Exts (build)
 import Prelude hiding (foldr1)
 
 inlining0 :: Int -> Int
@@ -131,3 +133,37 @@ foldr1 g b (List f s) = go b s
 
 fused1 :: [Int] -> Int
 fused1 = foldr1 (+) 0 . map1 sqr . fromLinkedList
+
+----------------------------------------------------------------------------
+-- ‘build’/‘foldr’ fusion system in action
+
+map2 :: (a -> b) -> [a] -> [b]
+map2 _ []     = []
+map2 f (x:xs) = f x : map2 f xs
+{-# NOINLINE map2 #-}
+
+{-# RULES
+"map2"     [~1] forall f xs. map2 f xs               = build (\c n -> foldr2 (mapFB c f) n xs)
+"map2List" [1]  forall f.    foldr2 (mapFB (:) f) [] = map2 f
+"mapFB"    forall c f g.     mapFB (mapFB c f) g     = mapFB c (f . g)
+  #-}
+
+mapFB :: (b -> l -> l) -> (a -> b) -> a -> l -> l
+mapFB c f = \x ys -> c (f x) ys
+{-# INLINE [0] mapFB #-}
+
+foldr2 :: (a -> b -> b) -> b -> [a] -> b
+-- foldr2 _ b []     = b
+-- foldr2 f b (a:as) = foldr2 f (f a b) as
+foldr2 f z = go
+  where
+    go []     = z
+    go (y:ys) = y `f` go ys
+{-# INLINE [0] foldr2 #-}
+
+{-# RULES
+"build/foldr2" forall f z (g :: forall b. (a -> b -> b) -> b -> b). foldr2 f z (build g) = g f z
+  #-}
+
+fused2 :: [Int] -> Int
+fused2 = foldr2 (+) 0 . map2 sqr

@@ -1217,8 +1217,8 @@ reliable. Let's see it action.
 ### Fusion without rewrite rules
 
 Returning to the example with `map` and `foldr`, we can re-write the
-functions differently using the principle we just discussed (avoiding
-generation of intermediate results). It's essential for fusion that we don't
+functions differently using the principle we just discussed — avoiding
+generation of intermediate results. It's essential for fusion that we don't
 write our functions as transformations of whole lists (or whatever you
 have), because then we are back to the problem of creating those lists at
 some point.
@@ -1252,10 +1252,10 @@ fuseda = foldra (+) 0 . mapa sqr . rangea
 
 Here, we have what Repa calls “delayed arrays”. Note that the function
 `rangea` allows to create arrays which have elements filled with their
-indices. This is for simplicity, in a real library to work with arrays we
-would want to complement the delayed arrays with real ones that hold all the
-data in memory in adjoined addresses and allow for fast indexing, but for
-the demonstration of fusion we can do without “real” arrays.
+indices. This is for simplicity, in a real array library we would want to
+complement the delayed arrays with real ones that hold all the data in
+memory in adjoined addresses and allow for fast indexing, but for the
+demonstration of fusion we can do without “real” arrays.
 
 Now if you take a look at `mapa`, it doesn't really do anything but making
 the indexing function just a little bit more complex, so we don't create any
@@ -1309,7 +1309,7 @@ map1 g (List f) = List h
       Just (x, s'') -> Just (g x, s'')
 ```
 
-Uh oh. This does not type check though:
+Uh-oh. This does not type check though:
 
 > Couldn't match type `a` with `b`
 
@@ -1357,7 +1357,7 @@ two reasons:
 
 2. `foldr` is just one primitive that “forces” delayed list, what about
    other ones? Should we add an extra argument to all of them? This is not
-   elegant, IMO.
+   elegant.
 
 So what can we do here? Well, perhaps we could store the initial list
 together with the function we already have `[a] -> Maybe (b, [a])`:
@@ -1367,7 +1367,7 @@ data List a b = List ([a] -> Maybe (b, [a])) [a]
 ```
 
 We should remember though that we want to pass that list around but we
-should not touch it until we want to “force” our list:
+should not touch it until we want to “force” consumption of that list:
 
 ```haskell
 map1 :: (a -> b) -> List s a -> List s b
@@ -1439,7 +1439,7 @@ fused1          80,000,016  153  OK
 
 It's fastest implementation so far! What's wrong with our simple-minded
 `manuallyFused` BTW? Shouldn't it be the fastest? Well, it's not
-tail-recursive, we can rewrite it like this:
+tail-recursive, but we can rewrite it like this:
 
 ```haskell
 manuallyFused' :: [Int] -> Int
@@ -1470,8 +1470,10 @@ be `List a`? Sure it should. Let's see definition of `List` again:
 data List a b = List ([a] -> Maybe (b, [a])) [a]
 ```
 
-`a` here doesn't really ever change as per our idea of not touching it. We
-could just hide it then using existential quantification:
+`a` here doesn't really ever change as per our idea of not touching it. It
+just should be of the same type its companion `[a] -> Maybe (b, [a])`
+function consumes. We could just hide it then using existential
+quantification:
 
 ```
 data List b = forall a. List ([a] -> Maybe (b, [a])) [a]
@@ -1494,37 +1496,230 @@ without rewrite rules, in the next section we will explore the notion of
 
 ### `build`/`foldr` fusion system
 
-Motivation behind fusion “systems”.
+Another approach to avoiding intermediate results can be summarized as the
+following: “we can use functions that operate on normal lists, arrays,
+vectors, etc. and let GHC rewrite combinations of these functions in such a
+way that we still get one tight loop processing entire thing in one pass”.
 
-Mention `foldr/build` system and that it's used in base, but `foldl` and
-`zip` are problematic to represent in this system. Also, we will need
-familiarity with `unbuild`/`unfoldr` system to talk about stream fusion.
+So here's where rewrite rules come into play. There is one problem with this
+approach though: too many functions to account for. The standard dictionary
+of functional programmer includes the following list-specific functions:
+`map`, `filter`, `(++)`, `foldr`, `foldl`, `dropWhile`, etc. Let's say
+optimistically, we want to be able to work with 10 functions so they all
+play nicely together and get rewritten into high-performance code by GHC.
+Then we need to account for (at least!) 10 × 10 = 100 combinations of these
+functions. Now remember all the stuff about verifying that every
+transformation is correct, confluent, that there are no combinations that
+send GHC into an infinite loop, etc. Do you feel the pain already?
 
-Briefly describe the fusion system and how some function and represented in
-it Perhaps walk through a substitution process.
+Fusion with many different functions is hard. So instead we would like to do
+the following:
 
-…
+1. Rewrite given function as combination of very few selected and general
+   functions that form a **fusion system**.
 
-### What is stream fusion?
+2. Do transformations on these functions and simply their combinations
+   instead using (often) just one rewrite rule.
 
-Motivation behind this framework.
+In this section we will consider `build`/`foldr` fusion system that is used
+in the `base` package and powers all the functions on lists we take for
+granted.
 
-https://www.youtube.com/watch?v=jyaLZHiJJnE
+`foldr` is a familiar function, but what is `build`? It looks like this:
 
-### Implementing your own stream fusion framework
+```haskell
+build :: (forall b. (a -> b -> b) -> b -> b) -> [a]
+build g = g (:) []
+```
 
-…
+What does it do? Why do we need it? The purpose of `build` is to keep list
+in “delayed” form by abstracting over the `(:)` “cons” operation and empty
+list `[]` “null”. The argument of the function is another function that
+takes cons-like operation `(a -> b -> b)` and null-like “starting point” `b`
+and produces something of the same type `b`. Clearly, this is a
+generalization of function that produces list-like things.
+
+`build` just gives that general function specific `(:)` function for consing
+and `[]` as starting point and we get our list back. The following example
+is taken from Duncan Coutts' thesis called “Stream Fusion: Practical
+shortcut fusion for coinductive sequence types” (yeah, the title is hairy,
+but the text itself is easy to understand and quite interesting, I recommend
+reading the whole thing!):
+
+```haskell
+build l == [1,2,3]
+  where
+    l cons nil = 1 `cons` (2 `cons` (3 `cons` nil))
+```
+
+Now the fusion system with `build` and `foldr` has only one rule:
+
+```haskell
+foldr f z (build g) = g f z
+```
+
+How does it help to eliminate intermediate lists? Let's see, `build g`
+builds some list, while `foldr f z` goes through the list “replacing” `(:)`
+applications with `f` and empty list with `z`, in fact this is a popular
+explanation of what `foldr` does:
+
+```haskell
+foldr f z [1,2,3] = 1 `f` (2 `f` (3 `f` z))
+```
+
+With that in mind, `g` is perfectly prepared to receive `f` and `z` directly
+to deliver exactly the same result!
+
+Let's rewrite our example using `build`/`foldr` fusion system:
+
+```haskell
+map2 :: (a -> b) -> [a] -> [b]
+map2 _ []     = []
+map2 f (x:xs) = f x : map2 f xs
+{-# NOINLINE map2 #-}
+
+{-# RULES
+"map2"     [~1] forall f xs. map2 f xs               = build (\c n -> foldr2 (mapFB c f) n xs)
+"map2List" [1]  forall f.    foldr2 (mapFB (:) f) [] = map2 f
+"mapFB"    forall c f g.     mapFB (mapFB c f) g     = mapFB c (f . g)
+  #-}
+
+mapFB :: (b -> l -> l) -> (a -> b) -> a -> l -> l
+mapFB c f = \x ys -> c (f x) ys
+{-# INLINE [0] mapFB #-}
+
+foldr2 :: (a -> b -> b) -> b -> [a] -> b
+foldr2 _ b []     = b
+foldr2 f b (a:as) = foldr2 f (f a b) as
+
+{-# RULES
+"build/foldr2" forall f z (g :: forall b. (a -> b -> b) -> b -> b). foldr2 f z (build g) = g f z
+  #-}
+
+fused2 :: [Int] -> Int
+fused2 = foldr2 (+) 0 . map2 sqr
+```
+
+A few comments here:
+
+* We need `NOINLINE` on `map2` to silence warning that the `"map2"` may
+  never fire because `map2` may be inlined first. Of course `map2` won't be
+  ever inlined because it's self-recursive, but GHC can't figure that out
+  (yet).
+
+* `mapFB` is a helper function that takes consing function `c`, function we
+  want to apply to list `f` and lambda's head inside also binds `x` which is
+  an input value (`f` is applied to it) and `ys` which is the rest of the
+  list. The function's LHS has only two arguments to facilitate inlining in
+  our particular case (see fusion rules). Of course we want it to be
+  inlined, but only at the end because some rules match on it and they would
+  be broken if it were inlined too early.
+
+* Inlining is essential to all this stuff because it brings together
+  otherwise separate pieces of code and lets GHC manipulate them as a whole.
+
+* The `"map2"` and `"build/foldr2"` rewrite rules are familiar to us
+  already. `"mapFB"` is rather trivial. As I said previously, we have here
+  what is called “pair rules”, that is, the `"map2List"` rule rewrites
+  things back to simple `map2` if by the phase 1 fusion did not happen. This
+  is also why we have normal definition for `map2`, not `build (…)` one — if
+  fusion doesn't happen, `build`/`foldr` stuff actually makes things worse,
+  that's why it should be “a thing to try” for the compiler, not default
+  implementation.
+
+OK, let's see if it actually improves anything:
+
+```
+benchmarking fused2
+time                 107.5 ms   (103.8 ms .. 110.2 ms)
+                     0.998 R²   (0.995 R² .. 1.000 R²)
+mean                 107.3 ms   (104.6 ms .. 109.8 ms)
+std dev              3.768 ms   (2.519 ms .. 6.098 ms)
+
+Case                  Bytes  GCs  Check
+fused2          161,259,568  310  OK
+```
+
+Well, it's certainly better than the version without any fusion whatsoever,
+but still kinda sucks. What's the problem though?
+
+As I said inlining is essential in this sort of fusion business. Notice that
+`foldr2` won't be inlined and it won't be rewritten either (unlike `map2`).
+This is because `foldr` is recursive. Let's make it non-recursive and
+inline:
+
+```haskell
+foldr2 :: (a -> b -> b) -> b -> [a] -> b
+foldr2 f z = go
+  where
+    go []     = z
+    go (y:ys) = y `f` go ys
+{-# INLINE [0] foldr2 #-}
+```
+
+We specify phase 0 because we want GHC to inline it, but only after fusion
+has happened (remember that if we inlined it too early it would break our
+fusion rules and they wouldn't fire).
+
+Let's give it another shot:
+
+```
+benchmarking fused2
+time                 17.87 ms   (17.48 ms .. 18.33 ms)
+                     0.996 R²   (0.992 R² .. 0.998 R²)
+mean                 17.94 ms   (17.61 ms .. 18.42 ms)
+std dev              962.6 μs   (689.0 μs .. 1.401 ms)
+
+Case                  Bytes  GCs  Check
+fused2           96,646,160  153  OK
+```
+
+Nothing to be ashamed of, in fact, this is the same result we would get if
+we used `map` and `foldr` from `base` package.
+
+Duncan Coutts' thesis features step-by-step substitution process that GHC
+performs that we will omit here (or we will never finish with the tutorial
+indeed!), so again, look there if you want to see it.
+
+Indeed most functions can be re-written via `foldr` and `build`. Most, but
+not all. In particular `foldl` and `zip` cannot be fused efficiently when
+are written via `build` and `foldr`. Unfortunatelly, we don't have the space
+to cover all the details here, as already mentioned, Duncan Coutts' thesis
+is a wonderful read if you want to know more about the matter.
+
+### Stream fusion
+
+Start definition of stream fusion vs just fusion.
+
+Link to this: https://www.youtube.com/watch?v=jyaLZHiJJnE
+
+State that our `List` is already an example of stream fusion. Take the
+definition of `List` and rename some parts.
+
+Introduce rewrite rules and construct a framework for stream fusion (for
+lists).
+
+Introduce the problem of `filter` and terminology of stream fusion with skip
+vs stream fusion without skip. Quickly explain that stream without skip is
+not going to perform well.
+
+Add filter to what we already have in `fused1` in two ways: with skip and
+without skip, compare the results.
+
+Mention Duncan Coutts' thesis (it has more info) and how fusion is
+implemented in major packages like `text`, `bytestring`, and `vector`
+(pretty much the same as described in this section).
 
 ## Conclusion
 
-…
+We have learned how to make Haskell programs run faster with the magic of
+GHC pragmas and how to avoid creating intermediate results with various
+fusion systems. Now, understanding inner workings of packages like `base`
+(list functions with `build`/`foldr` fusion system), `text`, and `vector`
+shall pose no problem whatsoever to the educated reader.
 
-## TODO
-
-* Once the text is ready, I need to do a pass over entire text and add
-  examples, how they look compiled to core, how they perform before and
-  after optimization (benchmarks). In the first example I also should show
-  how to see which rules fire and show to see core.
+The next section provides the recommended collection of sources for those
+who want learn more.
 
 ## See also
 

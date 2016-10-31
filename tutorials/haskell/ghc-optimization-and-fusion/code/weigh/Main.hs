@@ -10,3 +10,4 @@ main = mainWith $ do
   func "manuallyFused'"  manuallyFused' [0..1000000]
   func "fuseda"         fuseda          1000000
   func "fused1"         fused1          [0..1000000]
+  func "fused2"         fused2          [0..1000000]
