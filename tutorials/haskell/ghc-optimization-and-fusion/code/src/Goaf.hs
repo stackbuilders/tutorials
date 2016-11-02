@@ -12,7 +12,8 @@ module Goaf
   , fuseda
   , fused1
   , fused2
-  )
+  , fused3
+  , fusedFilter )
 where
 
 import Data.List (unfoldr, uncons)
@@ -167,3 +168,88 @@ foldr2 f z = go
 
 fused2 :: [Int] -> Int
 fused2 = foldr2 (+) 0 . map2 sqr
+
+----------------------------------------------------------------------------
+-- Stream fusion
+
+data Stream a = forall s. Stream (s -> Step a s) s
+
+data Step a s
+  = Yield a s
+  -- | Skip s
+  | Done
+
+stream :: [a] -> Stream a
+stream = Stream f
+  where
+    f []     = Done
+    f (x:xs) = Yield x xs
+-- NOTE We inline this at simplifier phase 0 (last phase), because on one
+-- hand we want to inline it, on the other hand we can't inline it too early
+-- because rewrite rules won't work.
+{-# INLINE [0] stream #-}
+
+unstream :: Stream a -> [a]
+unstream (Stream f s) = go s
+  where
+    go s' = case f s' of
+      Done        -> []
+      -- Skip    s'' -> go s''
+      Yield x s'' -> x : go s''
+-- NOTE The same here.
+{-# INLINE [0] unstream #-}
+
+map3 :: (a -> b) -> [a] -> [b]
+map3 f = unstream . map3' f . stream
+-- NOTE We need to inline such “wrapper” functions so GHC can work with
+-- their internals. In this case 'map3' is very lightweight and would be
+-- inlined anyway, but in general it's better to be explicit.
+{-# INLINE map3 #-}
+
+map3' :: (a -> b) -> Stream a -> Stream b
+map3' g (Stream f s) = Stream h s
+  where
+    h s' = case f s' of
+      Done        -> Done
+      -- Skip    s'' -> Skip s''
+      Yield x s'' -> Yield (g x) s''
+-- NOTE In general we want to inline everything so GHC can do the best job
+-- optimizing “case-of-case” combos, etc.
+{-# INLINE map3' #-}
+
+foldr3 :: (a -> b -> b) -> b -> [a] -> b
+foldr3 f z = foldr3' f z . stream
+{-# INLINE foldr3 #-}
+
+foldr3' :: (a -> b -> b) -> b -> Stream a -> b
+foldr3' g b (Stream f s) = go b s
+  where
+    go b' s' = case f s' of
+      Done        -> b'
+      -- Skip    s'' -> go b' s''
+      Yield x s'' -> go (g x b') s''
+{-# INLINE foldr3' #-}
+
+{-# RULES
+"stream/unstream" forall (s :: Stream a). stream (unstream s) = s
+  #-}
+
+fused3 :: [Int] -> Int
+fused3 = foldr3 (+) 0 . map3 sqr
+
+filter3 :: (a -> Bool) -> [a] -> [a]
+filter3 f = unstream . filter3' f . stream
+
+filter3' :: (a -> Bool) -> Stream a -> Stream a
+filter3' p (Stream f s) = Stream g s
+  where
+    g s' = case f s' of
+      Done -> Done
+      -- Skip    s'' -> Skip s''
+      Yield x s'' ->
+        if p x
+          then Yield x s''
+          else g s'' -- Skip s''
+
+fusedFilter :: [Int] -> Int
+fusedFilter = foldr3 (+) 0 . filter3 even . map3 sqr

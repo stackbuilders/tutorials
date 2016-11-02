@@ -14,7 +14,9 @@ main = defaultMain
   , bench "manuallyFused'" (nf manuallyFused' [0..1000000])
   , bench "fuseda"         (nf fuseda 1000000)
   , bench "fused1"         (nf fused1 [0..1000000])
-  , bench "fused2"         (nf fused2 [0..1000000]) ]
+  , bench "fused2"         (nf fused2 [0..1000000])
+  , bench "fused3"         (nf fused3 [0..1000000])
+  , bench "fusedFilter"    (nf fusedFilter [0..1000000]) ]
 
 special0_alt :: Int -> Int
 special0_alt x = special0' x `rem` 10
