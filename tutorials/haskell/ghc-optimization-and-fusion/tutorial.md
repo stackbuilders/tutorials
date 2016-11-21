@@ -1,6 +1,6 @@
 ---
 title: GHC optimization and fusion
-published: 2016-10-03
+published: 2016-11-29
 ghc: 8.0.1
 lts: 7.4
 libraries: criterion-1.1.1.0 weigh-0.0.3
@@ -47,7 +47,7 @@ motivated individual.
 ## GHC pragmas
 
 Pragmas are sort of special hints to the compiler. You should be familiar
-with the `LANGUAGE` pragmas that enables language extensions in GHC, e.g.:
+with the `LANGUAGE` pragma that enables language extensions in GHC, e.g.:
 
 ```haskell
 {-# LANGUAGE OverloadedStrings #-}
@@ -75,7 +75,7 @@ executing the program. All these instructions are not free, and for a short
 function they may actually take longer than execution of the function's body
 itself.
 
-Here *inlining* comes into play. The idea is simple: just take function's
+Here *inlining* comes into play. The idea is simple: just take a function's
 body and insert it at the place it would otherwise be called. Since
 functions to inline are usually short, duplication of code is minimal and we
 get a considerable performance boost. Inlining is perhaps the simplest
@@ -109,7 +109,7 @@ GHC considers the following:
     Here, inlining `f` would produce `map (\x -> body) xs`, which is not any
     better than the original, so GHC does not inline it.
 
-    The case shown in the example can be generalized to he following rule:
+    The case shown in the example can be generalized to the following rule:
     **GHC only inlines functions that are applied to as many arguments as
     they have syntactically on the left-hand side (LHS) of function
     definition.** This makes sense because otherwise lambda-wrapping would
@@ -168,7 +168,8 @@ duplication of work because inlining often opens up new transformation
 opportunities at the inlining site. To state it clearer, **avoiding the call
 itself is not the only** (and actually not the main) **reason to do
 inlining**. Inlining puts together pieces of code that were previously
-separate thus allowing next passes of the optimizer do more wonderful work.
+separate thus allowing next passes of the optimizer to do more wonderful
+work.
 
 With this in mind, you shouldn't be too surprised to find out that the
 **body of an inlineable function** (or right-hand side, RHS) **is not
@@ -181,7 +182,7 @@ now remember that the bodies of functions that GHC sees as inlineable won't
 be optimized, they will be inserted “as is”. (The body of an inlineable
 function won't be optimized and inlining may not happen as well, so you may
 end up with a call to a non-optimized function. Fear not, we will learn how
-to fix that latter in the tutorial.)
+to fix that later in the tutorial.)
 
 One of the simplest optimization techniques GHC can use with inlining is
 plain old beta-reduction. But beta-reduction, combined with inlining, is
@@ -266,8 +267,8 @@ foo = bar (inline myFunction) baz
 
 Semantically, `inline` it just an identity function.
 
-Let's see an actual example of `INLINEABLE` in action. We have module `Goaf`
-(that stands for “GHC optimizations and fusion”, BTW) with this:
+Let's see an actual example of `INLINEABLE` in action. We have a module
+`Goaf` (that stands for “GHC optimizations and fusion”, BTW) with this:
 
 ```haskell
 module Goaf
@@ -289,8 +290,8 @@ Here I tried hard and convinced GHC that `inlining` doesn't look very
 inlineable right now (well yeah, pretty dumb example, but it demonstrates
 the point), if we compile with `-O2` (as we will do in every example from
 now on) and dump `Goaf.hi` interface file, we will see no unfolding of
-`inlining0`'s body (if you use different version of GHC you may be unable to
-reproduce exactly this output):
+`inlining0`'s body (if you use a different version of GHC you may be unable
+to reproduce exactly this output):
 
 ```
 $ ghc --show-iface Goaf.hi
@@ -329,10 +330,9 @@ We see two important things here:
 
 * Still, hope dies last even for GHC, so it has turned the `inlining0`
   function into a wrapper which itself is inlineable as you can see. The
-  idea is that in case if `inlining0` is called in an arithmetic context
-  with some other operations on `Int`s, GHC might be able to optimize
-  further and better glue things working on `Int#`s (like `$winlining0`)
-  together.
+  idea is that if `inlining0` is called in an arithmetic context with some
+  other operations on `Int`s, GHC might be able to optimize further and
+  better glue things working on `Int#`s (like `$winlining0`) together.
 
 Now let's use the `INLINEABLE` pragma (if you follow the experiments on your
 own don't forget to export the new function as well):
@@ -414,8 +414,9 @@ Inlining is always an option for the compiler, unless you tell it that a
 particular function should not be inlined, and sometimes you will want to be
 able to do that. In such cases the `NOINLINE` pragma may be helpful.
 
-Let's have an example from a real, practical package called
-(`http-client-tls`)[https://hackage.haskell.org/package/http-client-tls]
+Let's have an example from a real, practical package
+called
+[`http-client-tls`](https://hackage.haskell.org/package/http-client-tls)
 which adds TLS (HTTPS) support to another package (`http-client`) for doing
 HTTP requests. The package has a notion of HTTP manager that stores
 information about open connections and stuff like that. The problem with it
@@ -996,7 +997,7 @@ this should happen first, that should happen after. Well, there is a way.
 
 GHC has a concept of simplifier phases. The phases are numbered. The first
 phase that runs currently has number 4 (maybe there will be more of them in
-later versions of GHC), than goes number 3, 2, 1, and finally the last phase
+later versions of GHC), then goes number 3, 2, 1, and finally the last phase
 has number 0.
 
 Unfortunately, the phase separation does not give fine-grained control, but
@@ -1010,8 +1011,8 @@ which, etc., instead we have only two options:
 2. Specify up to which phase (not including) a rule should be enabled.
 
 The syntactic part boils down to adding `[n]` or `[~n]` after the pragma's
-name. GHC user tutorial has a really nice table that we absolutely must have
-here:
+name. The GHC user tutorial has a really nice table that we absolutely must
+have here:
 
 ```haskell
                          -- Before phase 2     Phase 2 and later
@@ -1211,8 +1212,8 @@ The point 2 can be (and has been) addressed differently:
    way that in the end the compiler gets one tight loop without intermediate
    allocations.
 
-I must say that I like the approach 1 more because it's more explicit and
-reliable. Let's see it in action.
+I must say that I like the first approach more because it's more explicit
+and reliable. Let's see it in action.
 
 ### Fusion without rewrite rules
 
@@ -1810,7 +1811,7 @@ now I'm seeing the following warning:
 
 I propose you copy the code we have so far for this stream fusion system and
 try yourself to add some pragmas to make it work. You can then compare it
-the with solution found in the source code of this tutorial
+with the solution found in the source code of this tutorial
 (see [our repo](https://github.com/stackbuilders/tutorials)). I have written
 some comments there to explain what I did and why.
 
@@ -1855,7 +1856,7 @@ fusedFilter = foldr3 (+) 0 . filter3 even . map3 sqr
 ```
 
 The problem here is that if we need to skip a value, the only thing we can
-do is to recursively call `g`, which is not good, as compiler can't
+do is to recursively call `g`, which is not good, as the compiler can't
 “flatten”, inline, and further optimize recursive functions.
 
 Benchmarking shows the following:
