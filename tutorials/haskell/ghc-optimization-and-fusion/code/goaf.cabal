@@ -1,0 +1,51 @@
+name:                 goaf
+version:              0.1.0
+cabal-version:        >= 1.10
+license:              MIT
+license-file:         LICENSE.md
+author:               Mark Karpov <markkarpov@openmailbox.org>
+maintainer:           Mark Karpov <markkarpov@openmailbox.org>
+homepage:             https://github.com/mrkkrp/goaf
+bug-reports:          https://github.com/mrkkrp/goaf/issues
+category:             GHC Performance
+synopsis:             Code for the GHC optimization and fusion tutorial
+build-type:           Simple
+description:          Code for the GHC optimization and fusion tutorial.
+extra-doc-files:      CHANGELOG.md
+                    , README.md
+
+source-repository head
+  type:               git
+  location:           https://github.com/stackbuilders/tutorials.git
+
+library
+  hs-source-dirs:     src
+  build-depends:      base             >= 4.7 && < 5.0
+  exposed-modules:    Goaf
+  ghc-options:        -O2 -Wall
+  default-language:   Haskell2010
+
+benchmark bench
+  main-is:            Main.hs
+  hs-source-dirs:     bench
+  type:               exitcode-stdio-1.0
+  build-depends:      base             >= 4.7 && < 5.0
+                    , criterion        >= 0.6.2.1 && < 1.2
+                    , deepseq          >= 1.4     && < 1.5
+                    , goaf             >= 0.1.0
+                    , weigh            >= 0.0.3
+  ghc-options:        -O2 -Wall
+  default-language:   Haskell2010
+
+benchmark weigh
+  main-is:            Main.hs
+  hs-source-dirs:     weigh
+  type:               exitcode-stdio-1.0
+  build-depends:      base             >= 4.7 && < 5.0
+                    , goaf             >= 0.1.0
+                    , weigh            >= 0.0.3
+  if flag(dev)
+    ghc-options:      -O2 -Wall -Werror
+  else
+    ghc-options:      -O2 -Wall
+  default-language:   Haskell2010
