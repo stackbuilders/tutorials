@@ -1,42 +1,18 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-----------------------------------------------------------------------
--- |
---
-----------------------------------------------------------------------
+module Main (main) where
 
-module Main
-  ( main
-  )
-  where
-
--- base
 import Data.Char (toLower)
-import Data.Monoid ((<>))
 import Data.List (isSuffixOf)
-import System.Environment
 import Data.Maybe (fromMaybe)
+import Data.Monoid ((<>))
+import Hakyll
+import System.Environment
+import System.FilePath
 import Text.Pandoc
 
--- filepath
-import System.FilePath
-
--- hakyll
-import Hakyll
-
-
--- |
---
---
-
 main :: IO ()
-main =
-  getEnvironment >>= (hakyllWith configuration . rules)
-
-
--- |
---
---
+main = getEnvironment >>= (hakyllWith configuration . rules)
 
 sitePort :: Int
 sitePort = 4000
@@ -56,9 +32,9 @@ cleanIndexUrls :: Item String -> Compiler (Item String)
 cleanIndexUrls = return . fmap (withUrls cleanIndex)
 
 cleanIndexHtmls :: Item String -> Compiler (Item String)
-cleanIndexHtmls = return . fmap (replaceAll pattern replacement)
+cleanIndexHtmls = return . fmap (replaceAll pattern' replacement)
     where
-      pattern = "/index.html"
+      pattern' = "/index.html"
       replacement = const "/"
 
 cleanIndex :: String -> String
@@ -67,14 +43,11 @@ cleanIndex url
     | otherwise            = url
   where idx = "index.html"
 
--- |
---
---
-
 rules :: [(String, String)] -> Rules ()
 rules env = do
-  let commonCtx = commonContext Blog env
-  let tutorialCtx = tutorialContext env
+  let commonCtx   = commonContext Blog env
+      datedCtx    = datedContext env
+      tutorialCtx = tutorialContext env
 
   create ["archive.html"] $ do
     route idRoute
@@ -137,34 +110,35 @@ rules env = do
       let allPosts = return posts
       let sitemapCtx = listField "entries" tutorialCtx allPosts
 
-      makeItem ""
+      makeItem ("" :: String)
        >>= loadAndApplyTemplate "templates/sitemap.xml" sitemapCtx
        >>= cleanIndexHtmls
 
--- |
---
---
+  let pumpFeedPosts =
+        fmap (take 10) . recentFirst =<< loadAll "tutorials/haskell/*/*.md"
+
+  create ["atom.xml"] $ do
+    route idRoute
+    compile (pumpFeedPosts >>= renderAtom feedConfiguration datedCtx)
+
+  create ["rss.xml"] $ do
+    route idRoute
+    compile (pumpFeedPosts >>= renderRss feedConfiguration datedCtx)
 
 feedConfiguration :: FeedConfiguration
 feedConfiguration =
   FeedConfiguration
-    { feedAuthorEmail = ""
-    , feedAuthorName = ""
-    , feedDescription = ""
-    , feedRoot = ""
-    , feedTitle = ""
+    { feedTitle       = "Stack Builders' Tutorials"
+    , feedDescription = "Tutorials about tech Stack Builders consider important to promote"
+    , feedAuthorName  = "Stack Builders"
+    , feedAuthorEmail = "info@stackbuilders.com"
+    , feedRoot        = "https://stackbuilders.com/tutorials"
     }
 
 data Hero
   = Blog
   | Post
   deriving Show
-
-
--- |
---
---
-
 
 commonContext :: Hero -> [(String, String)] -> Context String
 commonContext hero env =
@@ -178,10 +152,11 @@ commonContext hero env =
       <> constField "hero" (map toLower (show hero))
       <> defaultContext
 
+datedContext :: [(String, String)] -> Context String
+datedContext env = dateField "published" "%B %e, %Y" <> commonContext Post env
+
 tutorialContext :: [(String, String)] -> Context String
-tutorialContext env = libs
-  <> dateField "published" "%B %e, %Y"
-  <> commonContext Post env
+tutorialContext env = libs <> datedContext env
   where
     libs = listFieldWith "libs" libraryContext $ \item -> do
       libraries <- getMetadataField' (itemIdentifier item) "libraries"
