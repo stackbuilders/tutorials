@@ -117,11 +117,11 @@ rules env = do
   let pumpFeedPosts =
         fmap (take 10) . recentFirst =<< loadAll "tutorials/haskell/*/*.md"
 
-  create ["atom.xml"] $ do
+  create ["tutorials/atom.xml"] $ do
     route idRoute
     compile (pumpFeedPosts >>= renderAtom feedConfiguration datedCtx)
 
-  create ["rss.xml"] $ do
+  create ["tutorials/rss.xml"] $ do
     route idRoute
     compile (pumpFeedPosts >>= renderRss feedConfiguration datedCtx)
 
