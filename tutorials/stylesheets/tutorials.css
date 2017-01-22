@@ -44,7 +44,7 @@ td.sourceCode { padding-left: 5px; }
 .sourceCode span.fl { color: #40a070; }
 .sourceCode span.ch { color: #4070a0; }
 .sourceCode span.st { color: #4070a0; }
-.sourceCode span.co { color: #60a0b0; font-style: italic; }
+.sourceCode span.co { color: #60a0b0; }
 .sourceCode span.ot { color: #007020; }
 .sourceCode span.al { color: red; font-weight: bold; }
 .sourceCode span.fu { color: #06287e; }

@@ -1,0 +1,26 @@
+name:                 generics
+version:              0.1.0
+cabal-version:        >= 1.10
+license:              MIT
+license-file:         LICENSE.md
+author:               Mark Karpov <mkarpov@stackbuilders.com>
+maintainer:           Mark Karpov <mkarpov@stackbuilders.com>
+homepage:             https://github.com/stackbuilders/tutorials
+bug-reports:          https://github.com/stackbuilders/tutorials/issues
+category:             Generics
+synopsis:             Code for the Stack Builders Generics tutorial
+build-type:           Simple
+description:          Code for the Stack Builders Generics tutorial.
+extra-doc-files:      CHANGELOG.md
+                    , README.md
+
+source-repository head
+  type:               git
+  location:           https://github.com/stackbuilders/tutorials.git
+
+library
+  hs-source-dirs:     src
+  build-depends:      base             >= 4.7 && < 5.0
+  exposed-modules:    GenericsTutorial
+  ghc-options:        -O2 -Wall
+  default-language:   Haskell2010
