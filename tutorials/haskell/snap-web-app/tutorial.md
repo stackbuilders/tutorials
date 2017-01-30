@@ -5,6 +5,7 @@ ghc: 8.0.1
 lts: 7.18
 libraries: snap-core-1.0.1.0 snap-server-1.0.1.1 heist-1.0.1.0 HDBC-sqlite3-2.3.3.1    
 language: haskell
+description: In this tutorial we show you how to build a simple TODO web app using Snap framework
 author-name: Omar García
 ---
 
