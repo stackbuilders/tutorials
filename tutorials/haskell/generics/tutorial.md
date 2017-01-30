@@ -488,7 +488,7 @@ instance CountFields1 V1 where
   countFields1 _ = 0
 
 instance CountFields1 U1 where
-  countFields1 _ = 1
+  countFields1 _ = 0
 
 instance CountFields1 (K1 i c) where
   countFields1 _ = 1
