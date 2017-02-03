@@ -102,4 +102,7 @@ I shall thank Robert Klotzner for the awesome package he made.
 Purescript-bridge is incredible in the sense that it helps us extend the wonders of a strong type system across boundaries,
  such as different subsystems and languages. Definitely purescript-bridge it is worth every bit it costs.
 
-* TODO: Next steps, and where to read more
+More information:
+* purescript-bridge on Hackage: https://hackage.haskell.org/package/purescript-bridge
+* The code in this tutorial: TODO
+* purescript-bridge Github's repository: https://github.com/eskimor/purescript-bridge
