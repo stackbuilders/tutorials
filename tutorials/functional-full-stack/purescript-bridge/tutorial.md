@@ -1,4 +1,14 @@
-# Connecting a Haskell Backend to a Purescript frontend
+---
+title: Connecting a Haskell Backend to a Purescript Frontend
+published: not-yet
+ghc: 7.10.3
+lts: 5.18
+libraries: hspec-2.2.3 QuickCheck-2.8.1
+language: haskell purescript
+author-name: Javier Casas Velasco
+description: In this tutorial we will implement a way to extend the types in the Haskell backend to the Purescript frontend while maintaining consistency and simplifying communication.
+---
+# Connecting a Haskell Backend to a Purescript Frontend
 ## Introduction
 In Stackbuilders we are working on a full-stack app with a client using functional languages.
 We have a Haskell backend, based on Servant, that manipulates the database and offers some endpoints to a Purescript frontend,
@@ -29,7 +39,7 @@ If we can somehow automatically generate the Purescript code from the Haskell co
 we could prevent the problem of type difference. We would effectively extend the typesystem from the backend to the frontend.
 
 ### purescript-bridge to the rescue
-Turns out this idea is not new, and <purescript-bridge developer> has already done it for us, which is quite nice.
+Turns out this idea is not new, and Robert Klotzner has already done it for us, which is quite nice.
 From the docs, purescript-bridge tells us it will write Purescript code from Haskell types,
 as long as those types conform to some restrictions.
 But let's not talk about limitations. Instead, let's talk about awesomeness. But, before that, let's review the general architecture.
@@ -88,7 +98,7 @@ And finally, the most awesome of all is that the type system is automatically co
 We have successfully connected the two worlds; and, as a result, we have gained some extra safety and peace of mind.
 
 ## Conclusion
-I shall thank <purescript-bridge developer> for the awesome package he made.
+I shall thank Robert Klotzner for the awesome package he made.
 Purescript-bridge is incredible in the sense that it helps us extend the wonders of a strong type system across boundaries,
  such as different subsystems and languages. Definitely purescript-bridge it is worth every bit it costs.
 
