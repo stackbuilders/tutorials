@@ -55,34 +55,34 @@ We will use REST and JSON. That's it, the frontend will send HTTP requests full 
 and the backend will respond to those requests with more JSON full of data, to be shown to the user.
 
 ### WebApp idea
-* Describe the idea
+* TODO: Describe the idea
 
 ### Backend
-* Describe the Haskell backend and API endpoints
+* TODO: Describe the Haskell backend and API endpoints
 
 ### Frontend
-* Describe the Purescript frontend and how it uses the API endpoints
+* TODO: Describe the Purescript frontend and how it uses the API endpoints
 
 ### Changing the app
-* Implement a minor change on the backend that causes the frontend to fail on runtime
-* Fix the frontend
-* Show how clunky is having an app this way
+* TODO: Implement a minor change on the backend that causes the frontend to fail on runtime
+* TODO: Fix the frontend
+* TODO: Show how clunky is having an app this way
 
 
 ## Tutorial
 ### Connecting the types on the backend to the frontend
-* How to change the backend to enable it to use puescript-bridge
-* How to change the frontend to use purescript-bridge generated results
+* TODO: How to change the backend to enable it to use puescript-bridge
+* TODO: How to change the frontend to use purescript-bridge generated results
 
 ### Using generics to simplify communication
-* Changing backend endpoints to use generic fromJson/toJson
-* Changing frontend endpoints to use generic fromJson/toJson
+* TODO: Changing backend endpoints to use generic fromJson/toJson
+* TODO: Changing frontend endpoints to use generic fromJson/toJson
 
 ### Changing the app again
-* Implement another minor change on the backend
-* Run the new toolchain to auto-extend the change
-* The frontend doesn't typecheck. Fix it.
-* Everything works!
+* TODO: Implement another minor change on the backend
+* TODO: Run the new toolchain to auto-extend the change
+* TODO: The frontend doesn't typecheck. Fix it.
+* TODO: Everything works!
 
 ### Analysing the result
 Thanks to purescript-bridge, we have removed the mental tax on the shared types on the frontend.
@@ -102,4 +102,4 @@ I shall thank Robert Klotzner for the awesome package he made.
 Purescript-bridge is incredible in the sense that it helps us extend the wonders of a strong type system across boundaries,
  such as different subsystems and languages. Definitely purescript-bridge it is worth every bit it costs.
 
-* Next steps, and where to read more
+* TODO: Next steps, and where to read more
