@@ -7,7 +7,7 @@ dependencies:
   override:
     - stack setup
     - stack build --only-dependencies
-    - stack install hapistrano
+    - stack install hapistrano-0.2.1.2
 
   pre:
     - mkdir -p .stack-work/
