@@ -1,0 +1,54 @@
+name: dotenv-hs-example
+version: 0.1.0.0
+build-type: Simple
+cabal-version: >=1.10
+
+library
+  hs-source-dirs: src
+  exposed-modules:
+      Connection
+    , Config
+    , User
+  build-depends:
+      base >= 4.7 && < 5
+    , dotenv == 0.4.0.0
+    , base-compat >= 0.9.1
+    , postgresql-simple >= 0.5.2.1
+    , bytestring
+    , time
+  default-language: Haskell2010
+
+executable dotenv-st
+  hs-source-dirs: app-st
+  main-is: Main.hs
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base
+    , dotenv == 0.4.0.0
+    , dotenv-hs-example
+  default-language: Haskell2010
+
+executable dotenv-code
+  hs-source-dirs: app-code
+  main-is: Main.hs
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base
+    , dotenv == 0.4.0.0
+    , dotenv-hs-example
+  default-language: Haskell2010
+
+test-suite dotenv
+  hs-source-dirs: test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base
+    , base-compat >= 0.9.1
+    , dotenv-hs-example
+    , hspec
+    , time
+    , postgresql-simple >= 0.5.2.1
+  default-language: Haskell2010
+
