@@ -11,7 +11,7 @@ environment before the execution of an application.
 ---
 # Introduction
 ## What is dotenv?
-[Dotenv][dotenv] is a Haskell library and an Standalone tool that enables to set
+[Dotenv][dotenv] is a Haskell library and an standalone tool that enables to set
 up the configuration of an environment before the execution of an application.
 As it is suggested in [The Twelve Factor App](https://12factor.net/config)
 the configuration should be separated from the code. A good way to do that is
@@ -21,41 +21,35 @@ for that, because it loads all the needed env vars for an application to run.
 ## Why it is important?
 The configuration should be separated from the code for one simple reason: the
 code should be the same in every environment (development, testing, staging,
-quality assurance, production, etc.) and configuration is the opposite, it
+quality assurance, production, etc.) but configuration is the opposite, it
 changes in every environment.
 
 Loading env vars is a good way to set up the configuration of an application,
-because they can change easily everytime the environment changes and without
+because they can change easily every time the environment changes and without
 changing code.
 
 ## How it works?
 Dotenv reads the needed application's env vars defined in a *dotenv example file*
-(necesary env vars). If the necesary env vars are defined in *the environment*,
+(necessary env vars). If the required env vars are defined in *the environment*,
 they stay the same. If they are not there, then dotenv checks if they defined
-in a *dotenv file* and sets all the env vars that are there. Otherwise, it will
-fail, because the necesary env vars are missing. In this way, there is a certanty
-that the configuration of the application is set up before its execution.
+in a *dotenv file* and sets all the env vars that are there. The application will
+fail because we shouldn't allow an application to start with an invalid state.
+This strategy helps us to prevent runtime errors.
 
 # Examples
 The example will be a simple application that prints the content of a table in a
 database. Really simple, but it needs some configuration to run. The standalone
 tool will be used first, and after that, the dotenv library.
 
-[PostgreSQL][https://www.postgresql.org/download/] will be necesary to follow
+[PostgreSQL][https://www.postgresql.org/download/] will be necessary to follow
 this example. Download the next [example code][example] to follow step by step
 the rest of this tutorial.
 
 ## Dotenv as an Standalone tool
-First, install the dotenv standalone tool, `stack` or `cabal` can be used:
+First, install the dotenv standalone tool. Use `stack` to install it:
 
 ```shell
 $ stack install dotenv
-```
-
-or
-
-```shell
-$ cabal install dotenv
 ```
 
 Once installed, check the help from the tool using the following command
@@ -74,30 +68,23 @@ Available options:
   -h,--help                Show this help text
   -e,--dotenv DOTENV       File with the env variables (default: ".env")
   -x,--dotenv-example DOTENV_EXAMPLE
-                           File with all the necesary env
+                           File with all the necessary env
                            variables (default: ".env.example")
   -o,--override            Override existing variables
 ```
 
-The minimum necesary is a **PROGRAM** to run. The paths for the *dotenv file*
+The minimum necessary is a **PROGRAM** to run. The paths for the *dotenv file*
 and the *dotenv example file* can be set with the short flags `-e` and `-x`,
-respectivelly. The default values are *.env* and *.env.example*, respectivelly.
+respectively. The default values are *.env* and *.env.example*, respectivelly.
 The env vars defined in the environment can be overrided with the ones defined
 in the *dotenv file* using the `-o` flag.
 
 Now, go to the directory of the example and follow the next instructions:
 
-Install dependencies and build the project:
+Install the dependencies and build the project:
 
 ```shell
 $ stack build
-```
-
-or
-
-```shell
-$ cabal install --only-dependencies
-$ cabal build
 ```
 
 Two executable applications will be created: `dotenv-st` and `dotenv-code`. The
@@ -129,7 +116,7 @@ DB_USER=
 DB_PASS=
 ```
 
-This file contains all the *necesary env vars* for the configuration of the
+This file contains all the *necessary env vars* for the configuration of the
 connection with the database: the host, the port, the name of the database,
 the username and its password. Without these variables defined the application
 will be stopped before start.
@@ -274,10 +261,10 @@ User {id_ = 3, name = "User 3", lastname = "User 3", birthDate = 1990-01-01}
 The env vars will be in the environment before the rest of the application starts.
 
 # Conclusion
-Safety and complete set up configuration before execution is assured with dotenv
-Safey, because the execution of the application will stop if the necesary env
-vars are not defined the environment or in the dotenv file. And complete
-configuration, because the necesary env vars will be set up after dotenv execution.
+Safety and complete set up configuration before execution is assured with `dotenv`
+Safety, because the execution of the application will stop if the required env
+vars are not defined the environment or in the *dotenv file*. And complete
+configuration, because the necessary env vars will be set up after `dotenv` execution.
 Now, go ahead and use `dotenv` everywhere!
 
 [dotenv]: https://github.com/stackbuilders/dotenv-hs
