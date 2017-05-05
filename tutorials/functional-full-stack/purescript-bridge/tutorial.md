@@ -55,18 +55,33 @@ We will use REST and JSON. That's it, the frontend will send HTTP requests full 
 and the backend will respond to those requests with more JSON full of data, to be shown to the user.
 
 ### WebApp idea
-* TODO: Describe the idea
+So we are going to build the next big thing. The website everyone definitely needs in their lives: a scientist browser, where we can browse names, photos and biographies of renowed scientists. Well, it may not be the next big thing, but you will definitely need it. I promise.
 
 ### Backend
-* TODO: Describe the Haskell backend and API endpoints
+The backend is going to be simple: trusty Servant is going to provide us with endpoints that talk JSON and are full of scientist biographies. The API will provide (for now) a single endpoint:
+* GET /scientist/ : return a list of scientist biographies
+* TODO: show data structure
 
 ### Frontend
-* TODO: Describe the Purescript frontend and how it uses the API endpoints
+The frontend is (somewhat) simple. It's going to be the Pux starter app with small modifications to pull data from our backend. After pulling the data, it's going to show the scientists one at a time, offering buttons to see the next or the previous one.
+* TODO: Image of the frontend
 
 ### Changing the app
-* TODO: Implement a minor change on the backend that causes the frontend to fail on runtime
-* TODO: Fix the frontend
-* TODO: Show how clunky is having an app this way
+Did you know we have already ran into limitations?
+Some scientists don't just have a name and surname.
+My friend Gottfried Wilhelm Leibniz - the man behind Calculus - has a middle name. But that is not the only case.
+Wernher von Braun was a rocket scientist, and he has `von` in the middle of his name. That's not technically a middle name, but we somehow have to accept it.
+And Pythagoras, one of the pioneers of Geometry, well, we have no idea of his surname, if he ever had one.
+
+So it's time to change the name format.
+* TODO: show new format
+
+* TODO: show image of failure in frontend
+Ooops. We need to tweak the frontend to make it accept the new format.
+
+* TODO: show fixed code and instances on the frontend
+
+Ok, we can do that, but it's kinda silly, doesn't it? I'm copying the same code from the backend to the frontend, from data structures to serializer algorithms. I can watch myself getting very annoyed because of this repetition. But, do you imagine what would happen if we happened to have a backend team and a frontend team? Unless the communication is excellent, we are going to have trouble every single day.
 
 
 ## Tutorial
