@@ -132,7 +132,7 @@ feedConfiguration =
     , feedDescription = "Tutorials about tech Stack Builders consider important to promote"
     , feedAuthorName  = "Stack Builders"
     , feedAuthorEmail = "info@stackbuilders.com"
-    , feedRoot        = "https://stackbuilders.com/tutorials"
+    , feedRoot        = "https://stackbuilders.com"
     }
 
 data Hero
