@@ -60,7 +60,14 @@ So we are going to build the next big thing. The website everyone definitely nee
 ### Backend
 The backend is going to be simple: trusty Servant is going to provide us with endpoints that talk JSON and are full of scientist biographies. The API will provide (for now) a single endpoint:
 * GET /scientist/ : return a list of scientist biographies
-* TODO: show data structure
+
+```haskell
+data Scientist = Scientist
+  { sId        :: Int
+  , sFirstName :: String
+  , sLastName  :: String
+  } deriving (Eq, Show)
+```
 
 ### Frontend
 The frontend is (somewhat) simple. It's going to be the Pux starter app with small modifications to pull data from our backend. After pulling the data, it's going to show the scientists one at a time, offering buttons to see the next or the previous one.
@@ -74,7 +81,13 @@ Wernher von Braun was a rocket scientist, and he has `von` in the middle of his 
 And Pythagoras, one of the pioneers of Geometry, well, we have no idea of his surname, if he ever had one.
 
 So it's time to change the name format.
-* TODO: show new format
+
+```haskell
+ data Scientist = Scientist
+  { sId        :: Int
+  , sNames     :: [String]
+  } deriving (Eq, Show)
+```
 
 * TODO: show image of failure in frontend
 Ooops. We need to tweak the frontend to make it accept the new format.
@@ -86,17 +99,32 @@ Ok, we can do that, but it's kinda silly, doesn't it? I'm copying the same code 
 
 ## Tutorial
 ### Connecting the types on the backend to the frontend
+First of all, let's extend the types from the backend to the frontend.
+
 * TODO: How to change the backend to enable it to use puescript-bridge
 * TODO: How to change the frontend to use purescript-bridge generated results
 
 ### Using generics to simplify communication
+But that's not enough. Although the types are the same, the JSON instances are not the same. And they should be. But having to copy instances from the backend to the frontend is kind of silly. All I want is to copy this backend data to the frontend, where both use an equivalent representation! There has to be a way to do that automatically.
+
 * TODO: Changing backend endpoints to use generic fromJson/toJson
 * TODO: Changing frontend endpoints to use generic fromJson/toJson
 
+Now we are rolling!
+
 ### Changing the app again
+You know what? We don't need that much of an ID, but a photo would definitely help here. Let's change the types again.
+
 * TODO: Implement another minor change on the backend
+
+Now we run the bridge.
 * TODO: Run the new toolchain to auto-extend the change
+
+Oooopsie again.
 * TODO: The frontend doesn't typecheck. Fix it.
+
+The frontend no longer typechecks. Well, it's kinda obvious, we are trying to render an ID that no longer exists. Let's fix the view.
+
 * TODO: Everything works!
 
 ### Analysing the result
