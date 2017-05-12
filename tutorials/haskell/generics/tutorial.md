@@ -544,7 +544,7 @@ For a generic implementation to work without user's definition we need to
 provide it as the default definition. As you have already seen, a generic
 implementation often involves a `Generic` constraint and it would be ugly to
 add it to every type class (on the left hand side of `=>`) just to make
-deriving easier. The `default` keyword, enabled by the `DefaultSignartures`
+deriving easier. The `default` keyword, enabled by the `DefaultSignatures`
 language extension, allows us to give a different type signature for default
 implementation of a type class:
 
