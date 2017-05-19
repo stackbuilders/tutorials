@@ -92,7 +92,9 @@ So it's time to change the name format.
   } deriving (Eq, Show)
 ```
 
-* TODO: show image of failure in frontend
+![](error_on_frontend_2.png "Runtime errors? I hate runtime errors!")
+
+_Runtime errors? I hate runtime errors!_
 
 Ooops. We need to tweak the frontend to make it accept the new format.
 
