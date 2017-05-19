@@ -98,7 +98,27 @@ _Runtime errors? I hate runtime errors!_
 
 Ooops. We need to tweak the frontend to make it accept the new format.
 
-* TODO: show fixed code and instances on the frontend
+```haskell
+data Scientist = Scientist {
+                 id :: Int
+               , names :: Array String
+               }
+
+instance decodeScientist :: DecodeJson Scientist where
+  decodeJson j = case toObject j of
+                  Just o -> do
+                    id <- o .? "sId"
+                    names <- o .? "sNames"
+                    pure $ Scientist {
+                        id: id,
+                        names: names
+                      }
+                  Nothing -> Left "Noparse"
+```
+
+![](frontend_works_again_2.png "Yay, rolling again!")
+
+_Yay, rolling again!_
 
 Ok, we can do that, but it's kinda silly, isn't it? I'm copying the same code from the backend to the frontend, from data structures to serializer algorithms. I can watch myself getting very annoyed because of this repetition. But, do you imagine what would happen if we happened to have a backend team and a frontend team? Unless the communication is excellent, we are going to have trouble every single day.
 
