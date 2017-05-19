@@ -10,7 +10,7 @@ description: In this tutorial we will implement a way to extend the types in the
 ---
 # Connecting a Haskell Backend to a Purescript Frontend
 ## Introduction
-In Stackbuilders we are working on a full-stack app with a client using functional languages.
+At Stackbuilders we are working on a full-stack app with a client using functional languages.
 We have a Haskell backend, based on Servant, that manipulates the database and offers some endpoints to a Purescript frontend,
 that does all the React-like magic to show a really nice interface on the user's browser.
 It's great because we have advanced types, purity and all the awesome benefits that offers the Functional world.
@@ -38,7 +38,7 @@ Well, if we can't use the same files, we have to look for something not that far
 If we can somehow automatically generate the Purescript code from the Haskell code,
 we could prevent the problem of type difference. We would effectively extend the typesystem from the backend to the frontend.
 
-### purescript-bridge to the rescue
+### `purescript-bridge` to the rescue
 Turns out this idea is not new, and Robert Klotzner has already done it for us, which is quite nice.
 From the docs, purescript-bridge tells us it will write Purescript code from Haskell types,
 as long as those types conform to some restrictions.
@@ -71,7 +71,10 @@ data Scientist = Scientist
 
 ### Frontend
 The frontend is (somewhat) simple. It's going to be the Pux starter app with small modifications to pull data from our backend. After pulling the data, it's going to show the scientists one at a time, offering buttons to see the next or the previous one.
-* TODO: Image of the frontend
+
+![The Best Thing Since Sliced Bread: the Scientist Viewer!](scientist_viewer_1.png "The Best Thing Since Sliced Bread: the Scientist Viewer!")
+
+_The Best Thing Since Sliced Bread: the Scientist Viewer!_
 
 ### Changing the app
 Did you know we have already ran into limitations?
@@ -90,11 +93,12 @@ So it's time to change the name format.
 ```
 
 * TODO: show image of failure in frontend
+
 Ooops. We need to tweak the frontend to make it accept the new format.
 
 * TODO: show fixed code and instances on the frontend
 
-Ok, we can do that, but it's kinda silly, doesn't it? I'm copying the same code from the backend to the frontend, from data structures to serializer algorithms. I can watch myself getting very annoyed because of this repetition. But, do you imagine what would happen if we happened to have a backend team and a frontend team? Unless the communication is excellent, we are going to have trouble every single day.
+Ok, we can do that, but it's kinda silly, isn't it? I'm copying the same code from the backend to the frontend, from data structures to serializer algorithms. I can watch myself getting very annoyed because of this repetition. But, do you imagine what would happen if we happened to have a backend team and a frontend team? Unless the communication is excellent, we are going to have trouble every single day.
 
 
 ## Tutorial
@@ -118,9 +122,11 @@ You know what? We don't need that much of an ID, but a photo would definitely he
 * TODO: Implement another minor change on the backend
 
 Now we run the bridge.
+
 * TODO: Run the new toolchain to auto-extend the change
 
 Oooopsie again.
+
 * TODO: The frontend doesn't typecheck. Fix it.
 
 The frontend no longer typechecks. Well, it's kinda obvious, we are trying to render an ID that no longer exists. Let's fix the view.
