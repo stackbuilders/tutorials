@@ -10,7 +10,7 @@ description: In this tutorial we will implement a way to extend the types in the
 ---
 # Connecting a Haskell Backend to a Purescript Frontend
 ## Introduction
-At Stackbuilders we are working on a full-stack app with a client using functional languages.
+At Stackbuilders we are working on a full-stack app with CollegeVine https://www.collegevine.com/ using functional languages.
 We have a Haskell backend, based on Servant, that manipulates the database and offers some endpoints to a Purescript frontend,
 that does all the React-like magic to show a really nice interface on the user's browser.
 It's great because we have advanced types, purity and all the awesome benefits that offers the Functional world.
@@ -90,6 +90,8 @@ So it's time to change the name format.
   { sId        :: Int
   , sNames     :: [String]
   } deriving (Eq, Show)
+
+$(deriveJSON defaultOptions ''Scientist)
 ```
 
 ![](error_on_frontend_2.png "Runtime errors? I hate runtime errors!")
@@ -120,14 +122,81 @@ instance decodeScientist :: DecodeJson Scientist where
 
 _Yay, rolling again!_
 
-Ok, we can do that, but it's kinda silly, isn't it? I'm copying the same code from the backend to the frontend, from data structures to serializer algorithms. I can watch myself getting very annoyed because of this repetition. But, do you imagine what would happen if we happened to have a backend team and a frontend team? Unless the communication is excellent, we are going to have trouble every single day.
+Ok, we can do that, but it's kinda silly, isn't it?
+I'm copying the same code from the backend to the frontend, from data structures to serializer algorithms.
+I can watch myself getting very annoyed because of this repetition.
+But, do you imagine what would happen if we happened to have a backend team and a frontend team? Unless the communication is perfect, we are just going to have trouble.
+And we know it's impossible to have perfect communication, specially as the team grows.
 
 
 ## Tutorial
 ### Connecting the types on the backend to the frontend
-First of all, let's extend the types from the backend to the frontend.
+First of all, let's extend the types from the backend to the frontend. This is no small feat, but it's definitely worth it. We'll do it in several steps.
 
-* TODO: How to change the backend to enable it to use puescript-bridge
+First we extract the types to be shared to other files for the sake of keeping it all organised:
+
+```haskell
+{-# LANGUAGE TemplateHaskell #-}
+module Types where
+
+import Data.Aeson
+import Data.Aeson.TH
+
+data Scientist = Scientist
+  { sId        :: Int
+  , sNames     :: [String]
+  } deriving (Eq, Show)
+
+$(deriveJSON defaultOptions ''Scientist)
+
+scientists :: [Scientist]
+scientists = [ Scientist 1 ["Isaac", "Newton"]
+             , Scientist 2 ["Albert", "Einstein"]
+             , Scientist 3 ["Gottfried", "Wilhelm", "Leibniz"]
+             , Scientist 4 ["Stephen", "Hawking"]
+             , Scientist 5 ["Pythagoras"]
+             , Scientist 6 ["Wernher", "von", "Braun"]
+             ]
+```
+
+Now we need support for Generics.
+
+```haskell
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveGeneric #-}
+module Types where
+
+import Data.Aeson
+import Data.Aeson.TH
+import GHC.Generics (Generic)
+
+data Scientist = Scientist
+  { sId        :: Int
+  , sNames     :: [String]
+  } deriving (Eq, Show, Generic)
+
+[...]
+```
+
+And finally we create a Bridge binary and summon purescript-bridge.
+
+
+Now, when we execute the bridge, we get some sweet auto-generated Purescript code.
+
+```shell
+backend$ stack exec bridge
+The following purescript packages are needed by the generated code:
+
+  - purescript-prim
+
+Successfully created your PureScript modules!
+$ 
+```
+
+* TODO: Show bridge execution and generated code.
+
+Ok, it's time to make the frontend use the auto-generated code.
+
 * TODO: How to change the frontend to use purescript-bridge generated results
 
 ### Using generics to simplify communication
@@ -172,6 +241,8 @@ We have successfully connected the two worlds; and, as a result, we have gained 
 I shall thank Robert Klotzner for the awesome package he made.
 Purescript-bridge is incredible in the sense that it helps us extend the wonders of a strong type system across boundaries,
  such as different subsystems and languages. Definitely purescript-bridge it is worth every bit it costs.
+
+I shall thank Mohan Zhang from CollegeVine, for letting us experiment, play and deploy purescript-bridge in order to improve the type safety. BTW, if you want to study in a prestigious university in the USA, the team at CollegeVine https://www.collegevine.com/ knows all the secrets to get you accepted.
 
 More information:
 * purescript-bridge on Hackage: https://hackage.haskell.org/package/purescript-bridge
