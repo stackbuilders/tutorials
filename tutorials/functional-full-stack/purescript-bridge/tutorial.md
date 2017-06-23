@@ -380,5 +380,5 @@ I shall thank Robert Klotzner for the awesome package he made.
 * `purescript-bridge` Github's repository: https://github.com/eskimor/purescript-bridge
 
 ### Thanks to
-* [Mohan Zhang](http://www.mohanzhang.com/) from (CollegeVine)[https://www.collegevine.com/], for letting us experiment, play and deploy `purescript-bridge` in order to improve the type safety. BTW, if you want to study in a prestigious university in the USA, the team at (CollegeVine)[https://www.collegevine.com/] knows all the secrets to get you accepted.
+* [Mohan Zhang](http://www.mohanzhang.com/) from [CollegeVine](https://www.collegevine.com), for letting us experiment, play and deploy `purescript-bridge` in order to improve the type safety. BTW, if you want to study in a prestigious university in the USA, the team at [CollegeVine](https://www.collegevine.com) knows all the secrets to get you accepted.
 * [Wikipedia](https://www.wikipedia.org/) for providing nice photos of famous scientists, and for the great labour they are doing.
