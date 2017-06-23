@@ -11,10 +11,10 @@ description: In this tutorial we will implement a way to extend the types in the
 ---
 # Connecting a Haskell Backend to a PureScript Frontend
 ## Introduction
-At Stack Builders we are working on a full-stack app with CollegeVine https://www.collegevine.com/ using Functional Languages.
+At Stack Builders we are working on a full-stack app with [CollegeVine](https://www.collegevine.com/) using Functional Languages.
 We have a Haskell backend written in Servant that manipulates the database and offers some endpoints to a PureScript frontend,
 that does all the React-like magic to show a really nice interface on the user's browser.
-It's great because we have advanced types, purity and all the awesome benefits that offers the Functional world.
+It's great because we have advanced types, purity and all the awesome benefits that offers the Functional World.
 But not everything is perfect.
 
 ### Motivation
@@ -320,7 +320,7 @@ The following purescript packages are needed by the generated code:
 Successfully created your PureScript modules!                      
 backend$
 ```
-And, now we have the new types on the frontend:
+And now we have the new types on the frontend:
 
 ```Haskell
 data Scientist =
@@ -332,7 +332,7 @@ data Scientist =
 derive instance genericScientist :: Generic Scientist
 ```
 
-It seems lady luck was on our side.
+It seems Lady Luck was on our side.
 The frontend hasn't failed to compile, but that's because we have removed an ID field we weren't using anywhere.
 If we happened to remove a field we were using, the compiler would definitely refuse to compile.
 Now that we have photos on the data type, let's show 'em.
