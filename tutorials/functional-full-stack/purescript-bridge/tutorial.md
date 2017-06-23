@@ -311,7 +311,7 @@ scientists = [ Scientist ["Isaac", "Newton"] "https://upload.wikimedia.org/wikip
 
 Now we run the bridge.
 
-```shell
+```bash
 backend$ stack exec bridge
 The following purescript packages are needed by the generated code:
                                                                    
@@ -320,7 +320,7 @@ The following purescript packages are needed by the generated code:
 Successfully created your PureScript modules!                      
 backend$
 ```
-Ok, now we have the new types on the frontend:
+And, now we have the new types on the frontend:
 
 ```Haskell
 data Scientist =
@@ -332,7 +332,7 @@ data Scientist =
 derive instance genericScientist :: Generic Scientist
 ```
 
-Ok, it seems we were lucky.
+It seems lady luck was on our side.
 The frontend hasn't failed to compile, but that's because we have removed an ID field we weren't using anywhere.
 If we happened to remove a field we were using, the compiler would definitely refuse to compile.
 Now that we have photos on the data type, let's show 'em.
