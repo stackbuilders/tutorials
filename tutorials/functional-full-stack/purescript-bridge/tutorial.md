@@ -2,8 +2,9 @@
 title: Connecting a Haskell Backend to a Purescript Frontend
 published: not-yet
 ghc: 7.10.3
-lts: 5.18
-libraries: hspec-2.2.3 QuickCheck-2.8.1
+purs: 0.10.5
+lts: 7.17
+libraries: purescript-bridge
 language: haskell purescript
 author-name: Javier Casas Velasco
 description: In this tutorial we will implement a way to extend the types in the Haskell backend to the Purescript frontend while maintaining consistency and simplifying communication.
@@ -225,8 +226,10 @@ But that's not enough. Although the types are the same, the JSON instances are n
 
 Well, there is a way to do that. Can you see the `Generic` instances we have introduced somehow? We are going to leverage these instances for us. In fact, I have not invented this, the Argonaut guys did it! They made some Generic Argonaut-Aeson codecs `https://github.com/eskimor/purescript-argonaut-generic-codecs/blob/master/src/Data/Argonaut/Generic/Aeson.purs`.
 
-The backend is already using generic encoding thanks to TemplateHaskell.
-* TODO: Changing backend endpoints to use generic fromJson/toJson
+The backend is already using generic encoding thanks to Template Haskell. The code that does the magic is:
+```Haskell
+$(deriveJSON defaultOptions ''Scientist)
+```
 
 But we have to tweak the frontend to do it.
 ```Haskell
@@ -240,9 +243,7 @@ import Data.Argonaut.Generic.Aeson as Aeson
                                               }
 ...
 ```
-And we can drop `decodeScientist`.
-
-Now we are rolling!
+And we can drop `decodeScientist`. Now we are rolling!
 
 ### Changing the app again
 You know what? We don't need that much of an ID, but a photo would definitely help here. Let's change the types again.
@@ -286,7 +287,10 @@ data Scientist =
 derive instance genericScientist :: Generic Scientist
 ```
 
-Ok, it seems we were lucky. The frontend hasn't failed to compile, but that's because we have removed an ID field we weren't using anywhere. If we happened to remove a field we were using, the compiler would definitely refuse to compile. Now that we have photos on the data type, let's show 'em.
+Ok, it seems we were lucky.
+The frontend hasn't failed to compile, but that's because we have removed an ID field we weren't using anywhere.
+If we happened to remove a field we were using, the compiler would definitely refuse to compile.
+Now that we have photos on the data type, let's show 'em.
 
 ```Haskell
 view (State s) =
@@ -331,5 +335,5 @@ I shall thank Mohan Zhang from CollegeVine, for letting us experiment, play and 
 
 More information:
 * purescript-bridge on Hackage: https://hackage.haskell.org/package/purescript-bridge
-* The code in this tutorial: TODO
+* The code in this tutorial: https://github.com/javcasas/purescript-bridge-tutorial
 * purescript-bridge Github's repository: https://github.com/eskimor/purescript-bridge
