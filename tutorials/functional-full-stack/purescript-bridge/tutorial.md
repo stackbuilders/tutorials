@@ -60,7 +60,7 @@ So this is not possible.
 
 ### The next best thing
 Well, if we can't use the same files, we have to look for something not that far from that ideal world.
-If we can somehow automatically generate the PureScript code from the Haskell code,
+If we can somehow automatically generate PureScript data types from Haskell data types,
 we could prevent the problem of type difference. We would effectively extend the typesystem from the backend to the frontend.
 
 ### `purescript-bridge` to the rescue
@@ -70,21 +70,24 @@ as long as those types conform to some restrictions.
 But let's not talk about limitations. Instead, let's talk about awesomeness. But, before that, let's review the general architecture.
 
 ## Simple WebApp
-Our app will be split in two parts:
+Our app will be split into two parts:
  * A Haskell backend that talks to the database, coordinates people, sends emails and all that awesome stuff backends do.
- * A PureScript frontend that compiles to Javascript and runs on the browser;
+ * A PureScript frontend that compiles to JavaScript and runs on the browser;
    showing, in marvellous details using React, all the data that fetches from the backend.
 
-The two parts have to talk to eachother in order to have something useful.
+The two parts have to talk to each other in order to have something useful.
 We will use REST and JSON. That's it, the frontend will send HTTP requests full of JSON messages to the backend, in order to trigger actions;
 and the backend will respond to those requests with more JSON full of data, to be shown to the user.
 
 ### WebApp idea
-So we are going to build the next big thing. The website everyone definitely needs in their lives: a scientist browser, where we can browse names, photos and biographies of renowed scientists. Well, it may not be the next big thing, but you will definitely need it. I promise.
+So we are going to build the next big thing. The website everyone definitely needs in their lives: a scientist browser,
+where we can browse names, photos and biographies of renowed scientists.
+
+Well, it may not be the next big thing, but you will definitely need it. I promise.
 
 ### Backend
 The backend is going to be simple: trusty Servant is going to provide us with endpoints that talk JSON and are full of scientist biographies. The API will provide (for now) a single endpoint:
-* GET /scientist/ : return a list of scientist biographies
+* `GET /scientist/` : return a list of scientist biographies
 
 ```haskell
 data Scientist = Scientist
@@ -205,6 +208,19 @@ data Scientist = Scientist
 
 And finally we create a Bridge binary and summon purescript-bridge.
 
+```Haskell
+module Main where
+
+import Types (Scientist)
+import Language.PureScript.Bridge (writePSTypes, buildBridge, defaultBridge, mkSumType)
+import Data.Proxy (Proxy(..))
+
+main :: IO ()
+main = writePSTypes "../frontend/src" (buildBridge defaultBridge) myTypes
+  where
+    myTypes = [ mkSumType (Proxy :: Proxy Scientist)
+              ]
+```
 
 Now, when we execute the bridge, we get some sweet auto-generated PureScript code.
 
@@ -237,7 +253,7 @@ data Scientist =
 derive instance genericScientist :: Generic Scientist
 ```
 
-Ok, it's time to make the frontend use the auto-generated code. It's easy. We are auto-generating the `Scientist` datatype, so we are just going to import it.
+Ok, it's time to make the frontend use the auto-generated code. It's easy. We are already auto-generating the `Scientist` datatype, so we are just going to import it.
 
 ```haskell
 import Types (Scientist)
@@ -246,9 +262,14 @@ import Types (Scientist)
 Now our app has a lot less repetition.
 
 ### Using generics to simplify communication
-But that's not enough. Although the types are the same, the JSON instances are not the same. And they should be. But having to copy instances from the backend to the frontend is kind of silly. All I want is to copy this backend data to the frontend, where both use an equivalent representation! There has to be a way to do that automatically.
+But that's not enough. Although the types are the same, the JSON instances are not the same. And they should be.
+But having to copy instances from the backend to the frontend is kind of silly.
+All I want is to copy this backend data to the frontend, where both use an equivalent representation!
+There has to be a way to do that automatically.
 
-Well, there is a way to do that. Can you see the `Generic` instances we have introduced somehow? We are going to leverage these instances for us. In fact, I have not invented this, the Argonaut guys did it! They made some Generic Argonaut-Aeson codecs `https://github.com/eskimor/purescript-argonaut-generic-codecs/blob/master/src/Data/Argonaut/Generic/Aeson.purs`.
+Well, there is a way to do that. Can you see the `Generic` instances we have introduced somehow?
+We are going to leverage these instances for us. In fact, I have not invented this, the Argonaut guys did it!
+They made some Generic Argonaut-Aeson codecs `https://github.com/eskimor/purescript-argonaut-generic-codecs/blob/master/src/Data/Argonaut/Generic/Aeson.purs`.
 
 The backend is already using generic encoding thanks to Template Haskell. The code that does the magic is:
 ```Haskell
@@ -290,14 +311,14 @@ scientists = [ Scientist ["Isaac", "Newton"] "https://upload.wikimedia.org/wikip
 
 Now we run the bridge.
 
-```
-0 jcasas@mac-2017-29:~/projects/stackbuilders/tutorials/tutorials/functional-full-stack/purescript-bridge/code/backend$ stack exec bridge                                                                
+```shell
+backend$ stack exec bridge
 The following purescript packages are needed by the generated code:
                                                                    
   - purescript-prim                                                
                                                                    
 Successfully created your PureScript modules!                      
-0 jcasas@mac-2017-29:~/projects/stackbuilders/tutorials/tutorials/functional-full-stack/purescript-bridge/code/backend$
+backend$
 ```
 Ok, now we have the new types on the frontend:
 
