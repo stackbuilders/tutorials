@@ -98,7 +98,7 @@ data Scientist = Scientist
 ```
 
 ### Frontend
-The frontend is (somewhat) simple. It's going to be the Pux starter app with small modifications to pull data from our backend. After pulling the data, it's going to show the scientists one at a time, offering buttons to see the next or the previous one.
+The frontend is (somewhat) simple. It's going to be the [Pux starter app](https://github.com/alexmingoia/pux-starter-app) with small modifications to pull data from our backend. After pulling the data, it's going to show the scientists one at a time, offering buttons to see the next or the previous one.
 
 ![The Best Thing Since Sliced Bread: the Scientist Viewer!](scientist_viewer_1.png "The Best Thing Since Sliced Bread: the Scientist Viewer!")
 
@@ -107,9 +107,9 @@ _The Best Thing Since Sliced Bread: the Scientist Viewer!_
 ### Changing the app
 Did you know we have already ran into limitations?
 Some scientists don't just have a name and surname.
-My friend Gottfried Wilhelm Leibniz - the man behind Calculus - has a middle name. But that is not the only case.
-Wernher von Braun was a rocket scientist, and he has `von` in the middle of his name. That's not technically a middle name, but we somehow have to accept it.
-And Pythagoras, one of the pioneers of Geometry, well, we have no idea of his surname, if he ever had one.
+My friend [Gottfried Wilhelm Leibniz](https://en.wikipedia.org/wiki/Gottfried_Wilhelm_Leibniz) - the man behind Calculus - has a middle name. But that is not the only case.
+[Wernher von Braun](https://en.wikipedia.org/wiki/Wernher_von_Braun) was a rocket scientist, and he has `von` in the middle of his name. That's not technically a middle name, but we somehow have to accept it.
+And [Pythagoras](https://en.wikipedia.org/wiki/Pythagoras), one of the pioneers of Geometry, well, we have no idea of his surname, if he ever had one.
 
 So it's time to change the name format.
 
@@ -268,8 +268,8 @@ All I want is to copy this backend data to the frontend, where both use an equiv
 There has to be a way to do that automatically.
 
 Well, there is a way to do that. Can you see the `Generic` instances we have introduced somehow?
-We are going to leverage these instances for us. In fact, I have not invented this, the Argonaut guys did it!
-They made some Generic Argonaut-Aeson codecs `https://github.com/eskimor/purescript-argonaut-generic-codecs/blob/master/src/Data/Argonaut/Generic/Aeson.purs`.
+We are going to leverage these instances for us. In fact, I have not invented this, the [Argonaut](https://github.com/purescript-contrib/purescript-argonaut) guys did it!
+They made some [Generic Argonaut-Aeson codecs](https://pursuit.purescript.org/packages/purescript-argonaut-generic-codecs/6.0.3/docs/Data.Argonaut.Generic.Aeson) which should make the frontend speak [Aeson](https://hackage.haskell.org/package/aeson) exactly the same way the backend does.
 
 The backend is already using generic encoding thanks to Template Haskell. The code that does the magic is:
 ```Haskell
