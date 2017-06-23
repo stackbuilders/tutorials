@@ -11,8 +11,8 @@ description: In this tutorial we will implement a way to extend the types in the
 ---
 # Connecting a Haskell Backend to a PureScript Frontend
 ## Introduction
-At Stack Builders we are working on a full-stack app with [CollegeVine](https://www.collegevine.com/) using Functional Languages.
-We have a Haskell backend written in Servant that manipulates the database and offers some endpoints to a PureScript frontend,
+At [Stack Builders](https://www.stackbuilders.com) we are working on a full-stack app with [CollegeVine](https://www.collegevine.com/) using Functional Languages.
+We have a [Haskell](https://www.haskell.org) backend written in [Servant](http://haskell-servant.readthedocs.io) that manipulates the database and offers some endpoints to a [PureScript](http://www.purescript.org) frontend,
 that does all the React-like magic to show a really nice interface on the user's browser.
 It's great because we have advanced types, purity and all the awesome benefits that offers the Functional World.
 But not everything is perfect.
@@ -65,7 +65,7 @@ we could prevent the problem of type difference. We would effectively extend the
 
 ### `purescript-bridge` to the rescue
 Turns out this idea is not new, and Robert Klotzner has already done it for us, which is quite nice.
-From the docs, purescript-bridge tells us it will write PureScript code from Haskell types,
+From the docs, [`purescript-bridge`](https://hackage.haskell.org/package/purescript-bridge) tells us it will write PureScript types from Haskell types,
 as long as those types conform to some restrictions.
 But let's not talk about limitations. Instead, let's talk about awesomeness. But, before that, let's review the general architecture.
 
@@ -206,7 +206,7 @@ data Scientist = Scientist
 [...]
 ```
 
-And finally we create a Bridge binary and summon purescript-bridge.
+And finally we create a Bridge binary and summon `purescript-bridge`.
 
 ```Haskell
 module Main where
@@ -357,26 +357,28 @@ view (State s) =
 _Now I see you, Mr. Newton_
 
 ### Analysing the result
-Thanks to purescript-bridge, we have removed the mental tax on the shared types on the frontend.
+Thanks to `purescript-bridge`, we have removed the mental tax on the shared types on the frontend.
 The backend will generate those types for us, so we no longer have to care about them.
 
 Also, the backend guys can change without thinking too much about compatiblity with the frontend,
 because the tools we built will tell us when something is broken.
 
 Even better, the communication has been simplified a lot.
-We don't have to care anymore about message format, decoders and encoders, because Aeson and Argonaut, along with purescript-bridge, handles that for us.
+We don't have to care anymore about message format, decoders and encoders, because Aeson and Argonaut, along with `purescript-bridge`, handles that for us.
 
 And finally, the most awesome of all is that the type system is automatically consistent on the frontend and the backend.
 We have successfully connected the two worlds; and, as a result, we have gained some extra safety and peace of mind.
 
 ## Conclusion
 I shall thank Robert Klotzner for the awesome package he made.
-purescript-bridge is incredible in the sense that it helps us extend the wonders of a strong type system across boundaries,
- such as different subsystems and languages. Definitely purescript-bridge it is worth every bit it costs.
+`purescript-bridge` is incredible in the sense that it helps us extend the wonders of a strong type system across boundaries,
+ such as different subsystems and languages. Definitely `purescript-bridge` it is worth every bit it costs.
 
-I shall thank Mohan Zhang from CollegeVine, for letting us experiment, play and deploy purescript-bridge in order to improve the type safety. BTW, if you want to study in a prestigious university in the USA, the team at CollegeVine https://www.collegevine.com/ knows all the secrets to get you accepted.
-
-More information:
-* purescript-bridge on Hackage: https://hackage.haskell.org/package/purescript-bridge
+### More information
+* `purescript-bridge` on Hackage: https://hackage.haskell.org/package/purescript-bridge
 * The code in this tutorial: https://github.com/javcasas/purescript-bridge-tutorial
-* purescript-bridge Github's repository: https://github.com/eskimor/purescript-bridge
+* `purescript-bridge` Github's repository: https://github.com/eskimor/purescript-bridge
+
+### Thanks to
+* [Mohan Zhang](http://www.mohanzhang.com/) from (CollegeVine)[https://www.collegevine.com/], for letting us experiment, play and deploy `purescript-bridge` in order to improve the type safety. BTW, if you want to study in a prestigious university in the USA, the team at (CollegeVine)[https://www.collegevine.com/] knows all the secrets to get you accepted.
+* [Wikipedia](https://www.wikipedia.org/) for providing nice photos of famous scientists, and for the great labour they are doing.
