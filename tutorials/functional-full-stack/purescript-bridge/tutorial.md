@@ -377,7 +377,7 @@ I shall thank Robert Klotzner for the awesome package he made.
 
 ### More information
 * `purescript-bridge` on Hackage: https://hackage.haskell.org/package/purescript-bridge
-* The code in this tutorial: https://github.com/javcasas/purescript-bridge-tutorial
+* The code in this tutorial: https://github.com/stackbuilders/tutorials/tree/tutorials/tutorials/functional-full-stack/purescript-bridge/code
 * `purescript-bridge` Github's repository: https://github.com/eskimor/purescript-bridge
 
 ### Thanks to
