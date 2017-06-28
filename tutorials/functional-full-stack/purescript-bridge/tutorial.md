@@ -47,7 +47,7 @@ At the end of the day, that means we can't directly share files.
 So we have types that describe the entities in the backend,
 and we have the same types that describe the same entities in the frontend, in different files.
 And every now and then, the backend team changes something on the backend types,
-but forgets to change it on the front end types.
+but forgets to change it on the frontend types.
 Suddenly we start to get the dreaded runtime errors,
 because the frontend is no longer able to decode the data sent from the backend,
 because that data no longer conforms to the standard the frontend expects.
