@@ -28,7 +28,7 @@ data Blah = Blah
     bFoos :: [Foo]
   } deriving (Generic)
 ```
-Whereas if we want to get a Generic instance for my `Blah` type, in PureScript I have to do:
+Whereas if we want to get a Generic instance for my `Blah` type, in PureScript we have to do:
 
 ```Haskell
 data Blah = Blah
