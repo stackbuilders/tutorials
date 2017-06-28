@@ -28,7 +28,7 @@ data Blah = Blah
     bFoos :: [Foo]
   } deriving (Generic)
 ```
-Whereas if I want to get a Generic instance for my `Blah` type, in PureScript I have to do:
+Whereas if we want to get a Generic instance for my `Blah` type, in PureScript I have to do:
 
 ```Haskell
 data Blah = Blah
@@ -63,7 +63,7 @@ Well, if we can't use the same files, we have to look for something not that far
 If we can somehow automatically generate PureScript data types from Haskell data types,
 we could prevent the problem of type difference. We would effectively extend the typesystem from the backend to the frontend.
 
-### `purescript-bridge` to the rescue
+### purescript-bridge to the rescue
 Turns out this idea is not new, and Robert Klotzner has already done it for us, which is quite nice.
 From the docs, [`purescript-bridge`](https://hackage.haskell.org/package/purescript-bridge) tells us it will write PureScript types from Haskell types,
 as long as those types conform to some restrictions.
@@ -335,6 +335,7 @@ derive instance genericScientist :: Generic Scientist
 It seems Lady Luck was on our side.
 The frontend hasn't failed to compile, but that's because we have removed an ID field we weren't using anywhere.
 If we happened to remove a field we were using, the compiler would definitely refuse to compile.
+
 Now that we have photos on the data type, let's show 'em.
 
 ```Haskell
