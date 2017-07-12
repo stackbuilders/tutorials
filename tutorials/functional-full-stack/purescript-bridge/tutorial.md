@@ -14,12 +14,12 @@ description: In this tutorial we will implement a way to extend the types in the
 At [Stack Builders](https://www.stackbuilders.com) we are working on a full-stack app with [CollegeVine](https://www.collegevine.com/) using Functional Languages.
 We have a [Haskell](https://www.haskell.org) backend written in [Servant](http://haskell-servant.readthedocs.io) that manipulates the database and offers some endpoints to a [PureScript](http://www.purescript.org) frontend,
 that does all the React-like magic to show a really nice interface on the user's browser.
-It's great because we have advanced types, purity and all the awesome benefits that offers the Functional World.
+It's great because we have advanced types, purity and all the awesome benefits that the Functional World offers.
 But not everything is perfect.
 
 ### Motivation
 The problem is that we have two different codebases: one in Haskell and the other in PureScript.
-The syntax is almost the same, but not exactly the same. For example, on Haskell we do:
+The syntax is almost the same, but not exactly the same. For example, in Haskell we do:
 ```Haskell
 {-# LANGUAGE DeriveGeneric #-}
 
@@ -73,11 +73,10 @@ But let's not talk about limitations. Instead, let's talk about awesomeness. But
 Our app will be split into two parts:
  * A Haskell backend that talks to the database, coordinates people, sends emails and all that awesome stuff backends do.
  * A PureScript frontend that compiles to JavaScript and runs on the browser;
-   showing, in marvellous details using React, all the data that fetches from the backend.
+   showing, in marvellous details using React, all the data that it fetches from the backend.
 
 The two parts have to talk to each other in order to have something useful.
-We will use REST and JSON. That's it, the frontend will send HTTP requests full of JSON messages to the backend, in order to trigger actions;
-and the backend will respond to those requests with more JSON full of data, to be shown to the user.
+We will use REST and JSON. That's it - the frontend will send HTTP requests full of JSON messages to the backend, in order to trigger actions, and the backend will respond to those requests with more JSON full of data, to be shown to the user.
 
 ### WebApp idea
 So we are going to build the next big thing. The website everyone definitely needs in their lives: a scientist browser,
@@ -105,11 +104,11 @@ The frontend is (somewhat) simple. It's going to be the [Pux starter app](https:
 _The Best Thing Since Sliced Bread: the Scientist Viewer!_
 
 ### Changing the app
-Did you know we have already ran into limitations?
+Did you notice that we have already run into limitations?
 Some scientists don't just have a name and surname.
 My friend [Gottfried Wilhelm Leibniz](https://en.wikipedia.org/wiki/Gottfried_Wilhelm_Leibniz) - the man behind Calculus - has a middle name. But that is not the only case.
 [Wernher von Braun](https://en.wikipedia.org/wiki/Wernher_von_Braun) was a rocket scientist, and he has `von` in the middle of his name. That's not technically a middle name, but we somehow have to accept it.
-And [Pythagoras](https://en.wikipedia.org/wiki/Pythagoras), one of the pioneers of Geometry, well, we have no idea of his surname, if he ever had one.
+And [Pythagoras](https://en.wikipedia.org/wiki/Pythagoras), one of the pioneers of Geometry - well, we have no idea of his surname, if he ever had one.
 
 So it's time to change the name format.
 
@@ -268,7 +267,7 @@ All I want is to copy this backend data to the frontend, where both use an equiv
 There has to be a way to do that automatically.
 
 Well, there is a way to do that. Can you see the `Generic` instances we have introduced somehow?
-We are going to leverage these instances for us. In fact, I have not invented this, the [Argonaut](https://github.com/purescript-contrib/purescript-argonaut) guys did it!
+We are going to take advantage of these instances. In fact, I have not invented this - the [Argonaut](https://github.com/purescript-contrib/purescript-argonaut) guys did it!
 They made some [Generic Argonaut-Aeson codecs](https://pursuit.purescript.org/packages/purescript-argonaut-generic-codecs/6.0.3/docs/Data.Argonaut.Generic.Aeson) which should make the frontend speak [Aeson](https://hackage.haskell.org/package/aeson) exactly the same way the backend does.
 
 The backend is already using generic encoding thanks to Template Haskell. The code that does the magic is:
@@ -361,7 +360,7 @@ _Now I see you, Mr. Newton_
 Thanks to `purescript-bridge`, we have removed the mental tax on the shared types on the frontend.
 The backend will generate those types for us, so we no longer have to care about them.
 
-Also, the backend guys can change without thinking too much about compatiblity with the frontend,
+Also, the backend guys can make changes without thinking too much about compatiblity with the frontend,
 because the tools we built will tell us when something is broken.
 
 Even better, the communication has been simplified a lot.
@@ -382,4 +381,4 @@ I shall thank Robert Klotzner for the awesome package he made.
 
 ### Thanks to
 * [Mohan Zhang](http://www.mohanzhang.com/) from [CollegeVine](https://www.collegevine.com), for letting us experiment, play and deploy `purescript-bridge` in order to improve the type safety. BTW, if you want to study in a prestigious university in the USA, the team at [CollegeVine](https://www.collegevine.com) knows all the secrets to get you accepted.
-* [Wikipedia](https://www.wikipedia.org/) for providing nice photos of famous scientists, and for the great labour they are doing.
+* [Wikipedia](https://www.wikipedia.org/) for providing nice photos of famous scientists, and for the great work they are doing.
