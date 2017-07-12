@@ -360,7 +360,7 @@ _Now I see you, Mr. Newton_
 Thanks to `purescript-bridge`, we have removed the mental tax on the shared types on the frontend.
 The backend will generate those types for us, so we no longer have to care about them.
 
-Also, the backend guys can make changes without thinking too much about compatiblity with the frontend,
+Also, the backend folks can make changes without thinking too much about compatiblity with the frontend,
 because the tools we built will tell us when something is broken.
 
 Even better, the communication has been simplified a lot.
