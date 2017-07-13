@@ -267,7 +267,7 @@ All I want is to copy this backend data to the frontend, where both use an equiv
 There has to be a way to do that automatically.
 
 Well, there is a way to do that. Can you see the `Generic` instances we have introduced somehow?
-We are going to take advantage of these instances. In fact, I have not invented this - the [Argonaut](https://github.com/purescript-contrib/purescript-argonaut) guys did it!
+We are going to take advantage of these instances. In fact, I have not invented this - the [Argonaut](https://github.com/purescript-contrib/purescript-argonaut) folks did it!
 They made some [Generic Argonaut-Aeson codecs](https://pursuit.purescript.org/packages/purescript-argonaut-generic-codecs/6.0.3/docs/Data.Argonaut.Generic.Aeson) which should make the frontend speak [Aeson](https://hackage.haskell.org/package/aeson) exactly the same way the backend does.
 
 The backend is already using generic encoding thanks to Template Haskell. The code that does the magic is:
