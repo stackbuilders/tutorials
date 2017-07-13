@@ -52,7 +52,7 @@ rules env = do
   create ["archive.html"] $ do
     route idRoute
     compile $ do
-      tutorials <- recentFirst =<< loadAll "tutorials/haskell/*/*.md"
+      tutorials <- recentFirst =<< loadAll "tutorials/(haskell|functional-full-stack)/*/*.md"
       let
         archiveContext =
           listField "tutorials" tutorialCtx (return tutorials)
@@ -68,7 +68,7 @@ rules env = do
   match "tutorials/index.html" $ do
     route idRoute
     compile $ do
-      tutorials <- recentFirst =<< loadAll "tutorials/haskell/*/*.md"
+      tutorials <- recentFirst =<< loadAll "tutorials/(haskell|functional-full-stack)/*/*.md"
       let
         indexContext =
           listField "tutorials" tutorialCtx (return tutorials)
@@ -87,7 +87,7 @@ rules env = do
 
   match "templates/*" (compile templateCompiler)
 
-  match "tutorials/haskell/*/*.md" $ do
+  match "tutorials/(haskell|functional-full-stack)/*/*.md" $ do
     let
       tutorialRoute i = takeDirectory p </> "index.html"
         where p = toFilePath i
@@ -106,7 +106,7 @@ rules env = do
   create ["tutorials/sitemap.xml"] $ do
     route   idRoute
     compile $ do
-      posts <- recentFirst =<< loadAll "tutorials/haskell/*/*.md"
+      posts <- recentFirst =<< loadAll "tutorials/(haskell|functional-full-stack)/*/*.md"
       let allPosts = return posts
       let sitemapCtx = listField "entries" tutorialCtx allPosts
 
@@ -115,7 +115,7 @@ rules env = do
        >>= cleanIndexHtmls
 
   let pumpFeedPosts =
-        fmap (take 10) . recentFirst =<< loadAll "tutorials/haskell/*/*.md"
+        fmap (take 10) . recentFirst =<< loadAll "tutorials/(haskell|functional-full-stack)/*/*.md"
 
   create ["tutorials/atom.xml"] $ do
     route idRoute
