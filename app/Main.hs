@@ -17,8 +17,16 @@ main = getEnvironment >>= (hakyllWith configuration . rules)
 sitePort :: Int
 sitePort = 4000
 
+supportedLanguages :: [String]
+supportedLanguages = [  -- Name here the directories of the programming languages to be supported
+    "haskell"
+  , "functional-full-stack" -- Haskell backend + PureScript frontend
+]
+
 directories :: Pattern
-directories = "tutorials/haskell/*/*.md" .||. "tutorials/functional-full-stack/*/*.md"
+directories = foldl (.||.) (head patterns) (tail patterns)
+  where
+    patterns = fmap (\dir -> fromGlob $ "tutorials/" ++ dir ++ "/*/*.md") supportedLanguages
 
 configuration :: Configuration
 configuration =
