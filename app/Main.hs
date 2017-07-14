@@ -17,6 +17,23 @@ main = getEnvironment >>= (hakyllWith configuration . rules)
 sitePort :: Int
 sitePort = 4000
 
+supportedLanguages :: [String]
+supportedLanguages = [  -- Name here the directories of the programming languages to be supported
+    "haskell"
+  , "functional-full-stack" -- Haskell backend + PureScript frontend
+  ]
+
+markdownPattern :: Pattern
+markdownPattern = filePattern "md"
+
+imagePattern :: Pattern
+imagePattern = filePattern "png"
+
+filePattern :: String -> Pattern
+filePattern extension = foldl (.||.) (head patterns) (tail patterns)
+  where
+    patterns = fmap (\dir -> fromGlob $ "tutorials/" ++ dir ++ "/*/*." ++ extension) supportedLanguages
+
 configuration :: Configuration
 configuration =
   defaultConfiguration
@@ -52,7 +69,7 @@ rules env = do
   create ["archive.html"] $ do
     route idRoute
     compile $ do
-      tutorials <- recentFirst =<< loadAll "tutorials/haskell/*/*.md"
+      tutorials <- recentFirst =<< loadAll markdownPattern
       let
         archiveContext =
           listField "tutorials" tutorialCtx (return tutorials)
@@ -68,7 +85,7 @@ rules env = do
   match "tutorials/index.html" $ do
     route idRoute
     compile $ do
-      tutorials <- recentFirst =<< loadAll "tutorials/haskell/*/*.md"
+      tutorials <- recentFirst =<< loadAll markdownPattern
       let
         indexContext =
           listField "tutorials" tutorialCtx (return tutorials)
@@ -87,7 +104,7 @@ rules env = do
 
   match "templates/*" (compile templateCompiler)
 
-  match "tutorials/haskell/*/*.md" $ do
+  match markdownPattern $ do
     let
       tutorialRoute i = takeDirectory p </> "index.html"
         where p = toFilePath i
@@ -99,14 +116,14 @@ rules env = do
         >>= relativizeUrls
         >>= cleanIndexUrls
 
-  match "tutorials/haskell/*/*.png" $ do
+  match imagePattern $ do
     route idRoute
     compile copyFileCompiler
 
   create ["tutorials/sitemap.xml"] $ do
     route   idRoute
     compile $ do
-      posts <- recentFirst =<< loadAll "tutorials/haskell/*/*.md"
+      posts <- recentFirst =<< loadAll markdownPattern
       let allPosts = return posts
       let sitemapCtx = listField "entries" tutorialCtx allPosts
 
@@ -115,7 +132,7 @@ rules env = do
        >>= cleanIndexHtmls
 
   let pumpFeedPosts =
-        fmap (take 10) . recentFirst =<< loadAll "tutorials/haskell/*/*.md"
+        fmap (take 10) . recentFirst =<< loadAll markdownPattern
 
   create ["tutorials/atom.xml"] $ do
     route idRoute
