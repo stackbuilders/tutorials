@@ -1,11 +1,11 @@
 ---
 title: Connecting a Haskell Backend to a PureScript Frontend
-published: not-yet
+published: 2017-07-17
 ghc: 7.10.3
 purs: 0.10.5
 lts: 7.17
 libraries: purescript-bridge
-language: haskell purescript
+language: functional-full-stack
 author-name: Javier Casas Velasco
 description: In this tutorial we will implement a way to extend the types in the Haskell backend to the PureScript frontend while maintaining consistency and simplifying communication.
 ---

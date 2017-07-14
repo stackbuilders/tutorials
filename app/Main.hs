@@ -17,6 +17,9 @@ main = getEnvironment >>= (hakyllWith configuration . rules)
 sitePort :: Int
 sitePort = 4000
 
+directories :: Pattern
+directories = "tutorials/haskell/*/*.md" .||. "tutorials/functional-full-stack/*/*.md"
+
 configuration :: Configuration
 configuration =
   defaultConfiguration
@@ -52,7 +55,7 @@ rules env = do
   create ["archive.html"] $ do
     route idRoute
     compile $ do
-      tutorials <- recentFirst =<< loadAll "tutorials/(haskell|functional-full-stack)/*/*.md"
+      tutorials <- recentFirst =<< loadAll directories
       let
         archiveContext =
           listField "tutorials" tutorialCtx (return tutorials)
@@ -68,7 +71,7 @@ rules env = do
   match "tutorials/index.html" $ do
     route idRoute
     compile $ do
-      tutorials <- recentFirst =<< loadAll "tutorials/(haskell|functional-full-stack)/*/*.md"
+      tutorials <- recentFirst =<< loadAll directories
       let
         indexContext =
           listField "tutorials" tutorialCtx (return tutorials)
@@ -87,7 +90,7 @@ rules env = do
 
   match "templates/*" (compile templateCompiler)
 
-  match "tutorials/(haskell|functional-full-stack)/*/*.md" $ do
+  match directories $ do
     let
       tutorialRoute i = takeDirectory p </> "index.html"
         where p = toFilePath i
@@ -106,7 +109,7 @@ rules env = do
   create ["tutorials/sitemap.xml"] $ do
     route   idRoute
     compile $ do
-      posts <- recentFirst =<< loadAll "tutorials/(haskell|functional-full-stack)/*/*.md"
+      posts <- recentFirst =<< loadAll directories
       let allPosts = return posts
       let sitemapCtx = listField "entries" tutorialCtx allPosts
 
@@ -115,7 +118,7 @@ rules env = do
        >>= cleanIndexHtmls
 
   let pumpFeedPosts =
-        fmap (take 10) . recentFirst =<< loadAll "tutorials/(haskell|functional-full-stack)/*/*.md"
+        fmap (take 10) . recentFirst =<< loadAll directories
 
   create ["tutorials/atom.xml"] $ do
     route idRoute
