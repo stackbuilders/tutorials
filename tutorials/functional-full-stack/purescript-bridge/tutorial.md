@@ -71,6 +71,7 @@ But let's not talk about limitations. Instead, let's talk about awesomeness. But
 
 ## Simple WebApp
 Our app will be split into two parts:
+
  * A Haskell backend that talks to the database, coordinates people, sends emails and all that awesome stuff backends do.
  * A PureScript frontend that compiles to JavaScript and runs on the browser;
    showing, in marvellous details using React, all the data that it fetches from the backend.
@@ -86,6 +87,7 @@ Well, it may not be the next big thing, but you will definitely need it. I promi
 
 ### Backend
 The backend is going to be simple: trusty Servant is going to provide us with endpoints that talk JSON and are full of scientist biographies. The API will provide (for now) a single endpoint:
+
 * `GET /scientist/` : return a list of scientist biographies
 
 ```haskell
@@ -267,7 +269,7 @@ All I want is to copy this backend data to the frontend, where both use an equiv
 There has to be a way to do that automatically.
 
 Well, there is a way to do that. Can you see the `Generic` instances we have introduced somehow?
-We are going to take advantage of these instances. In fact, I have not invented this - the [Argonaut](https://github.com/purescript-contrib/purescript-argonaut) folks did it!
+We are going to take advantage of these instances. In fact, I have not invented this - the [Argonaut](https://github.com/purescript-contrib/purescript-argonaut) team did it!
 They made some [Generic Argonaut-Aeson codecs](https://pursuit.purescript.org/packages/purescript-argonaut-generic-codecs/6.0.3/docs/Data.Argonaut.Generic.Aeson) which should make the frontend speak [Aeson](https://hackage.haskell.org/package/aeson) exactly the same way the backend does.
 
 The backend is already using generic encoding thanks to Template Haskell. The code that does the magic is:
