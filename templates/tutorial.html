@@ -44,7 +44,29 @@
         $endif$
       </ul>
     </p>
+    <div class="btn-social-icon">
+       <script language="javascript" type="text/javascript">
+	  var url = window.location.href;
+	  linkTwitter = function(){
+	  location.href = "https://twitter.com/intent/tweet?text=$title$&url=" + url; }
+       </script>
 
+       <script language="javascript" type="text/javascript">
+	  var url = window.location.href;
+	  linkFacebook = function(){
+	  location.href ="https://www.facebook.com/sharer/sharer.php?u=" + url; }
+       </script>
+	
+       <a class="fa fa-twitter-square fa-2x"
+	  target="_blank"
+	  href="javascript:linkTwitter()">
+       </a>
+       
+       <a class="fa fa-facebook-square fa-2x"
+          target="_blank"
+	  href="javascript:linkFacebook()">
+       </a>
+   </div>
     <hr>
 
     $body$
