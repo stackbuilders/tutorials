@@ -11,6 +11,10 @@
       $endif$
       <br/>
       by $author-name$
+      <br/>
+	$if(tags)$
+        tags: $tags$
+        $endif$
     </p>
 
     <p>
@@ -44,29 +48,41 @@
         $endif$
       </ul>
     </p>
+
     <div class="btn-social-icon">
-       <script language="javascript" type="text/javascript">
-	  var url = window.location.href;
-	  linkTwitter = function(){
-	  location.href = "https://twitter.com/intent/tweet?text=$title$&url=" + url; }
+       <script>
+          var loc = window.location.href;
+          function ChangeHref(target,link){
+             document.getElementById(target).href= link + loc;
+          }
        </script>
 
-       <script language="javascript" type="text/javascript">
-	  var url = window.location.href;
-	  linkFacebook = function(){
-	  location.href ="https://www.facebook.com/sharer/sharer.php?u=" + url; }
-       </script>
-	
-       <a class="fa fa-twitter-square fa-2x"
-	  target="_blank"
-	  href="javascript:linkTwitter()">
+       <a id="myMail"
+	  onclick="ChangeHref('myMail','mailto:?subject=$title$&body=$title$ ')"
+	  href="">
+	  <img class="hoverable" alt="mail-icon" src="$host$/assets/img/mail-icon.png">
        </a>
        
-       <a class="fa fa-facebook-square fa-2x"
-          target="_blank"
-	  href="javascript:linkFacebook()">
+       <a id="myTwitter"
+	  onclick="ChangeHref('myTwitter','https://twitter.com/intent/tweet?text=$title$&url=')"
+	  href=""
+	  target="_blank">
+          <img class="hoverable" alt="twitter-icon" src="$host$/assets/img/twitter-share.png">
        </a>
-   </div>
+
+       <a id="myFacebook"
+	  onClick="MyWindow=window.open('https://www.facebook.com/sharer/sharer.php?u='+ window.location.href, 'MyWindow', 'width=600,height=500');return false;"
+	  href=""
+	  target="_blank">
+	  <img class="hoverable" alt="facebook-icon" src="$host$/assets/img/facebook-icon.png">
+       </a>
+       
+       <a href="#disqus_thread">
+	  <img class="hoverable" alt="disqus-icon" src="$host$/assets/img/comment-share.png">
+       </a>
+       
+    </div>
+    </br>
     <hr>
 
     $body$
