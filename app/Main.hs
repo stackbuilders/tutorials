@@ -65,6 +65,7 @@ rules env = do
   let commonCtx   = commonContext Blog env
       datedCtx    = datedContext env
       tutorialCtx = tutorialContext env
+
   create ["archive.html"] $ do
     route idRoute
     compile $ do
@@ -102,6 +103,7 @@ rules env = do
     compile compressCssCompiler
 
   match "templates/*" (compile templateCompiler)
+
   match markdownPattern $ do
     let
       tutorialRoute i = takeDirectory p </> "index.html"
