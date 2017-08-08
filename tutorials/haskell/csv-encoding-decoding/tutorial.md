@@ -7,7 +7,6 @@ libraries: cassava-0.4.5.0
 language: haskell
 author-name: Juan Pedro Villa Isaza
 description: Encoding and decoding CSV files is a common task while building software, so as developers it’s important to find efficient ways to do it. As an example, in this tutorial,  we use the Cassava library to encode and decode an Open Government CSV file.
-tags: haskell
 ---
 
 > “Is that right? Or is it left?”

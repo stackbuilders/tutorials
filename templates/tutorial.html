@@ -11,10 +11,6 @@
       $endif$
       <br/>
       by $author-name$
-      <br/>
-	$if(tags)$
-        tags: $tags$
-        $endif$
     </p>
 
     <p>
@@ -52,19 +48,19 @@
     <div class="btn-social-icon">
        <script>
           var loc = window.location.href;
-          function ChangeHref(target,link){
+          function changeHref(target,link){
              document.getElementById(target).href= link + loc;
           }
        </script>
 
        <a id="myMail"
-	  onclick="ChangeHref('myMail','mailto:?subject=$title$&body=$title$ ')"
+	  onclick="changeHref('myMail','mailto:?subject=$title$&body=$title$ ')"
 	  href="">
 	  <img class="hoverable" alt="mail-icon" src="$host$/assets/img/mail-icon.png">
        </a>
        
        <a id="myTwitter"
-	  onclick="ChangeHref('myTwitter','https://twitter.com/intent/tweet?text=$title$&url=')"
+	  onclick="changeHref('myTwitter','https://twitter.com/intent/tweet?text=$title$&url=')"
 	  href=""
 	  target="_blank">
           <img class="hoverable" alt="twitter-icon" src="$host$/assets/img/twitter-share.png">

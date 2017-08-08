@@ -102,9 +102,6 @@ rules env = do
     compile compressCssCompiler
 
   match "templates/*" (compile templateCompiler)
-
-  tags <- buildTags markdownPattern (fromCapture "tags/*.html")
-
   match markdownPattern $ do
     let
       tutorialRoute i = takeDirectory p </> "index.html"
@@ -112,8 +109,8 @@ rules env = do
     route (customRoute tutorialRoute)
     compile $
       tutorialsCompiler
-        >>= loadAndApplyTemplate "templates/tutorial.html" (tutorialCtxWithTags env tags)
-        >>= loadAndApplyTemplate "templates/default.html" (tutorialCtxWithTags env tags)
+        >>= loadAndApplyTemplate "templates/tutorial.html" tutorialCtx
+        >>= loadAndApplyTemplate "templates/default.html" tutorialCtx
         >>= relativizeUrls
         >>= cleanIndexUrls
 
@@ -142,11 +139,6 @@ rules env = do
   create ["tutorials/rss.xml"] $ do
     route idRoute
     compile (pumpFeedPosts >>= renderRss feedConfiguration datedCtx)
-   
-tutorialCtxWithTags :: [(String, String)] -> Tags -> Context String
-tutorialCtxWithTags env tags = do
-  let tutorialCtx = tutorialContext env
-  tagsField "tags" tags `mappend` tutorialCtx
 
 feedConfiguration :: FeedConfiguration
 feedConfiguration =
