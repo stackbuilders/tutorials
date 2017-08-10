@@ -45,6 +45,40 @@
       </ul>
     </p>
 
+    <div class="btn-social-icon">
+       <script>
+          var loc = window.location.href;
+          function changeHref(target,link){
+             document.getElementById(target).href= link + loc;
+          }
+       </script>
+
+       <a id="myMail"
+	  onclick="changeHref('myMail','mailto:?subject=$title$&body=$title$ ')"
+	  href="">
+	  <img class="hoverable" alt="mail-icon" src="$host$/assets/img/mail-icon.png">
+       </a>
+       
+       <a id="myTwitter"
+	  onclick="changeHref('myTwitter','https://twitter.com/intent/tweet?text=$title$&url=')"
+	  href=""
+	  target="_blank">
+          <img class="hoverable" alt="twitter-icon" src="$host$/assets/img/twitter-share.png">
+       </a>
+
+       <a id="myFacebook"
+	  onClick="MyWindow=window.open('https://www.facebook.com/sharer/sharer.php?u='+ window.location.href, 'MyWindow', 'width=600,height=500');return false;"
+	  href=""
+	  target="_blank">
+	  <img class="hoverable" alt="facebook-icon" src="$host$/assets/img/facebook-icon.png">
+       </a>
+       
+       <a href="#disqus_thread">
+	  <img class="hoverable" alt="disqus-icon" src="$host$/assets/img/comment-share.png">
+       </a>
+       
+    </div>
+    </br>
     <hr>
 
     $body$
