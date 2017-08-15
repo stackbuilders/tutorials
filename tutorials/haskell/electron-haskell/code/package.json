@@ -1,8 +1,12 @@
 {
-  "name": "Electron-Haskell",
+  "name": "electron-haskell",
   "version": "1.0.0",
   "description": "A Desktop client for a haskell server",
   "main": "electron.js",
+  "scripts": {
+    "compile": "tsc",
+    "start": "npm run compile && electron ."
+  },
   "repository": "https://github.com/stackbuilders/tutorials",
   "author": "Stack Builders",
   "license": "MIT",
