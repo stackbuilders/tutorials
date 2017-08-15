@@ -38,3 +38,4 @@ cabal.config-*
 *.hp
 .stack-work
 
+bin/*
