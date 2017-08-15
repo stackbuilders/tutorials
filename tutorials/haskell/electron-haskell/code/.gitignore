@@ -30,3 +30,11 @@ npm-debug.log
 # npm package-lock.json
 package-lock.json
 
+# Haskell
+.DS_Store
+cabal.sandbox.config*
+.cabal-sandbox*
+cabal.config-*
+*.hp
+.stack-work
+
