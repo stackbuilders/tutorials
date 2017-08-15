@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "commonjs",
+    "noImplicitAny": false,
+    "target": "es6",
+    "paths": {
+      "electron": ["./node_modules/electron/electron"]
+    }
+  }
+}
