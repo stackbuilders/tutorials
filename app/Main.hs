@@ -71,9 +71,11 @@ rules env = do
     compile $ do
       tutorials <- recentFirst =<< loadAll markdownPattern
       let
+        title = "Archives"
         archiveContext =
           listField "tutorials" tutorialCtx (return tutorials)
-            <> constField "title" "Archives"
+            <> constField "title" title
+            <> constField "title-list" title
             <> commonCtx
 
       makeItem ""
@@ -90,6 +92,7 @@ rules env = do
         indexContext =
           listField "tutorials" tutorialCtx (return tutorials)
             <> constField "title" "Home"
+            <> constField "title-list" "Tutorials"
             <> commonCtx
 
       getResourceBody
@@ -110,9 +113,10 @@ rules env = do
     let title = "Posts tagged \"" ++ tag ++ "\""
     route idRoute
     compile $ do
-      posts <- recentFirst =<< loadAll pattern
+      tutorials <- recentFirst =<< loadAll pattern
       let ctx = constField "title" title
-                `mappend` listField "tutorials" tutorialCtx (return posts)
+                `mappend` constField "title-list" title
+                `mappend` listField "tutorials" tutorialCtx (return tutorials)
                 `mappend` defaultContext
                 `mappend` commonCtx
 
