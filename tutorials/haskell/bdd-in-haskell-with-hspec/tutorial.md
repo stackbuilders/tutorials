@@ -3,7 +3,7 @@ title: Behavior-driven development (BDD) in Haskell with Hspec
 published: 2016-06-14
 ghc: 7.10.3
 lts: 5.18
-tags: haskell
+tags: haskell, bdd
 libraries: hspec-2.2.3 QuickCheck-2.8.1
 language: haskell
 author-name: Juan Carlos Pazmiño
