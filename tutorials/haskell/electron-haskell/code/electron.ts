@@ -22,8 +22,8 @@ function createWindow () : void {
   });
 }
 
-function startHaskellServer () {
-  apiServer = spawn(path.join(__dirname, "bin/electron-haskell-exe"));
+function startHaskellServer () : ChildProcess {
+  return apiServer = spawn(path.join(__dirname, "bin/electron-haskell-exe"));
 }
 
 Electron.app.on("ready", createWindow);
