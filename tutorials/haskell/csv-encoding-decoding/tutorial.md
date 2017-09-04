@@ -3,6 +3,7 @@ title: CSV encoding and decoding in Haskell with Cassava
 published: 2016-05-31
 ghc: 7.10.3
 lts: 5.15
+tags: haskell, parsing
 libraries: cassava-0.4.5.0
 language: haskell
 author-name: Juan Pedro Villa Isaza

@@ -3,6 +3,7 @@ title: GHC optimization and fusion
 published: 2016-11-29
 ghc: 8.0.1
 lts: 7.4
+tags: haskell, optimization
 libraries: criterion-1.1.1.0 weigh-0.0.3
 language: haskell
 author: Mark Karpov

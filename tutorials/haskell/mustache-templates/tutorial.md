@@ -2,6 +2,7 @@
 title: Mustache templates in Haskell
 published: 2016-08-17
 ghc: 8.0.1
+tags: haskell, templates
 nightly: 2016-08-15
 libraries: stache-0.1.6
 language: haskell
