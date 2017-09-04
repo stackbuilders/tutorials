@@ -107,7 +107,7 @@ rules env = do
 
   match "templates/*" (compile templateCompiler)
 
-  tags <- buildTags markdownPattern (fromCapture "tags/*.html")
+  tags <- buildTags markdownPattern (fromCapture "tutorials/tags/*.html")
 
   tagsRules tags $ \tag pattern -> do
     let title = "Posts tagged \"" ++ tag ++ "\""
