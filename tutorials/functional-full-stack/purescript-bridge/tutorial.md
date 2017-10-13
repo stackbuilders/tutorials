@@ -10,7 +10,6 @@ language: functional-full-stack
 author-name: Javier Casas Velasco
 description: In this tutorial we will implement a way to extend the types in the Haskell backend to the PureScript frontend while maintaining consistency and simplifying communication.
 ---
-# Connecting a Haskell Backend to a PureScript Frontend
 ## Introduction
 At [Stack Builders](https://www.stackbuilders.com) we are working on a full-stack app with [CollegeVine](https://www.collegevine.com/) using Functional Languages.
 We have a [Haskell](https://www.haskell.org) backend written in [Servant](http://haskell-servant.readthedocs.io) that manipulates the database and offers some endpoints to a [PureScript](http://www.purescript.org) frontend,
