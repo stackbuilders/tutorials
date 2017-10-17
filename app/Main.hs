@@ -9,7 +9,10 @@ import Data.Monoid ((<>))
 import Hakyll
 import System.Environment
 import System.FilePath
+import Text.Jasmine
 import Text.Pandoc
+
+import qualified Data.ByteString.Lazy.Char8 as C
 
 main :: IO ()
 main = getEnvironment >>= (hakyllWith configuration . rules)
@@ -92,7 +95,7 @@ rules env = do
         indexContext =
           listField "tutorials" tutorialCtx (return tutorials)
             <> constField "title" "Home"
-            <> constField "title-list" "Tutorials"
+            <> constField "title-list" ""
             <> commonCtx
 
       getResourceBody
@@ -104,6 +107,10 @@ rules env = do
   match "tutorials/stylesheets/*" $ do
     route idRoute
     compile compressCssCompiler
+
+  match "tutorials/javascripts/*" $ do
+    route idRoute
+    compile compressJsCompiler
 
   match "templates/*" (compile templateCompiler)
 
@@ -213,3 +220,9 @@ defaultTutorialsReaderOptions :: ReaderOptions
 defaultTutorialsReaderOptions = defaultHakyllReaderOptions
     { readerSmart = False
     }
+
+compressJsCompiler :: Compiler (Item String)
+compressJsCompiler = do
+  let minifyJS = C.unpack . minify . C.pack . itemBody
+  source <- getResourceString
+  return $ itemSetBody (minifyJS source) source

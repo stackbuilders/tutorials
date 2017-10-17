@@ -55,3 +55,8 @@ td.sourceCode { padding-left: 5px; }
 .sourceCode span.fu { color: #06287e; }
 .sourceCode span.re { }
 .sourceCode span.er { color: red; font-weight: bold; }
+
+.tutorials_social_icons {
+  padding: 0em;
+  margin: 0em;
+}

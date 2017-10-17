@@ -48,41 +48,34 @@
         $endif$
       </ul>
     </p>
-
-    <div class="btn-social-icon">
-       <script>
-          var loc = window.location.href;
-          function changeHref(target,link){
-             document.getElementById(target).href= link + loc;
-          }
-       </script>
-
-       <a id="myMail"
-	  onclick="changeHref('myMail','mailto:?subject=$title$&body=$title$ ')"
-	  href="">
-	  <img class="hoverable" alt="mail-icon" src="$host$/assets/img/mail-icon.png">
-       </a>
-       
-       <a id="myTwitter"
-	  onclick="changeHref('myTwitter','https://twitter.com/intent/tweet?text=$title$&url=')"
-	  href=""
-	  target="_blank">
-          <img class="hoverable" alt="twitter-icon" src="$host$/assets/img/twitter-share.png">
-       </a>
-
-       <a id="myFacebook"
-	  onClick="MyWindow=window.open('https://www.facebook.com/sharer/sharer.php?u='+ window.location.href, 'MyWindow', 'width=600,height=500');return false;"
-	  href=""
-	  target="_blank">
-	  <img class="hoverable" alt="facebook-icon" src="$host$/assets/img/facebook-icon.png">
-       </a>
-       
-       <a href="#disqus_thread">
-	  <img class="hoverable" alt="disqus-icon" src="$host$/assets/img/comment-share.png">
-       </a>
-       
+    <div class="tutorials_social_icons news container">
+      <div class="social-links scroll-always desktop">
+          <div class="hoverable mail-share">
+            <a href="mailto:?subject=$title$&body=$title$%0D%0A$host$$url$">
+              <img data-no-retina="" class="img-responsive image-normal" alt="mail-icon.png" src="$host$/assets/img/mail-icon.png">
+              <img data-no-retina="" class="img-responsive image-hover" alt="mail-icon-hover.png" src="$host$/assets/img/mail-icon-hover.png">
+            </a>
+          </div>
+          <div class="hoverable twitter-share">
+            <a href="https://twitter.com/intent/tweet?text=$title$&url=$host$$url$">
+              <img data-no-retina="" class="img-responsive image-normal" alt="twitter-icon.png" src="$host$/assets/img/twitter-icon.png">
+              <img data-no-retina="" class="img-responsive image-hover" alt="twitter-icon-hover.png" src="$host$/assets/img/twitter-icon-hover.png">
+            </a>
+          </div>
+          <div class="hoverable facebook-share">
+            <a href="$host$$url$">
+              <img data-no-retina="" class="img-responsive image-normal" alt="facebook-icon.png" src="$host$/assets/img/facebook-icon.png">
+              <img data-no-retina="" class="img-responsive image-hover" alt="facebook-icon-hover.png" src="$host$/assets/img/facebook-icon-hover.png">
+            </a>
+          </div>
+          <div class="hoverable comment-share">
+            <a href="#disqus_thread">
+              <img data-no-retina="" class="img-responsive image-normal" alt="comment-icon.png" src="$host$/assets/img/comment-icon.png">
+              <img data-no-retina="" class="img-responsive image-hover" alt="comment-icon-hover.png" src="$host$/assets/img/comment-icon-hover.png">
+            </a>
+          </div>
+        </div>
     </div>
-    </br>
     <hr>
 
     $body$
@@ -123,16 +116,6 @@
     </section>
 
     <div id="disqus_thread"></div>
-    <script>
-      (function() {
-      var d = document, s = d.createElement('script');
-
-      s.src = '//stackbuilders.disqus.com/embed.js';
-
-      s.setAttribute('data-timestamp', +new Date());
-      (d.head || d.body).appendChild(s);
-      })();
-    </script>
     <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
   </div>

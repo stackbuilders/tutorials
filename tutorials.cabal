@@ -16,8 +16,10 @@ executable tutorials
     Main.hs
   build-depends:
       base
+    , bytestring
     , filepath
     , hakyll >= 4.7  && < 4.8
+    , hjsmin
     , pandoc >= 1.14 && < 1.18
   ghc-options:
     -Wall

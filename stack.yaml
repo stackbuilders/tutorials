@@ -1,1 +1,4 @@
+extra-deps:
+- hjsmin-0.2.0.2
+- language-javascript-0.6.0.10
 resolver: lts-5.15
