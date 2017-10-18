@@ -31,6 +31,7 @@ blockquote {
 @media (min-width: 991px) {
   .news .blog-info {
     float: left;
+  }
 }
 
 .hoverable {
