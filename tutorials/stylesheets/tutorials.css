@@ -22,9 +22,21 @@ blockquote {
     font-size: 14px;
 }
 
+@media (max-width: 375px) {
+  .news.container .index.row > div:first-child {
+    display: block;
+  }
+}
+
 @media (max-width: 991px) {
   .tutorial-content, .tutorials .row{
     max-width: 100%;
+  }
+  .news {
+    padding: 0em;
+  }
+  .news.container .row > div:first-child {
+    float: none;
   }
 }
 
