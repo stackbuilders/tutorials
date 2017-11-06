@@ -7,6 +7,8 @@ tags: haskell
 language: haskell
 author: Mark Karpov
 author-name: Mark Karpov
+twitter-profile: mrkkrp
+github-profile: mrkkrp
 description: This tutorial will get you up to speed with GHC generics quickly.
 ---
 

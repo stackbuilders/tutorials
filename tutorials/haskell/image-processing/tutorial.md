@@ -8,6 +8,8 @@ libraries: JuicyPixels-3.2.7 repa-3.4.0.2
 language: haskell
 author: Mark
 author-name: Mark Karpov
+twitter-profile: mrkkrp
+github-profile: mrkkrp
 description: There are a lot of available libraries which help with image processing when working with functional programming languages. For this tutorial, we will use the JuicyPixels library for reading and writing image files, and Repa for efficient processing of numeric data.
 ---
 
