@@ -22,11 +22,11 @@ deployment:
   staging:
     branch: tutorials
     commands:
-      - ~/.local/bin/hap deploy -c deploy/staging.yaml:
+      - ~/.local/bin/hap deploy -c deploy/staging.yml:
           timeout: 6000
 
   production:
     branch: production
     commands:
-      - ~/.local/bin/hap deploy -c deploy/production.yaml:
+      - ~/.local/bin/hap deploy -c deploy/production.yml:
           timeout: 6000
