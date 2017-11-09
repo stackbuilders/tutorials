@@ -8,6 +8,8 @@ libraries: servant-auth-cookie-0.3.0.2 servant-0.8
 language: haskell
 author: Mark Karpov
 author-name: Mark Karpov
+twitter-profile: mrkkrp
+github-profile: mrkkrp
 description: Authentication is a sort of weak place in the Servant web framework. In this tutorial we build RESTful authentication in Servant storing all the session in an encrypted cookie client-side.
 ---
 

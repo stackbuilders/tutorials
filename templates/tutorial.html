@@ -17,6 +17,34 @@
         $endif$
     </p>
 
+    <div>
+      <div class="social-links-inline">
+        <p>
+          Follow this author:
+        </p>
+      </div>
+      <div class="tutorials_social_icons news social-links-inline">
+        <div class="social-links scroll-always desktop">
+          $if(twitter-profile)$
+          <div class="hoverable twitter-share">
+            <a href="https://twitter.com/intent/follow?screen_name=$twitter-profile$">
+              <img data-no-retina="" class="img-responsive image-normal" alt="twitter-icon.png" src="$host$/assets/img/twitter-icon.png">
+              <img data-no-retina="" class="img-responsive image-hover" alt="twitter-icon-hover.png" src="$host$/assets/img/twitter-icon-hover.png">
+            </a>
+          </div>
+          $endif$
+          $if(github-profile)$
+          <div class="hoverable github-share">
+            <a target="_blank" href="https://github.com/$github-profile$">
+              <img data-no-retina="" class="img-responsive image-normal" alt="github-icon.png" src="$host$/assets/img/github-icon.png">
+              <img data-no-retina="" class="img-responsive image-hover" alt="github-icon-hover.png" src="$host$/assets/img/github-icon-hover.png">
+            </a>
+          </div>
+          $endif$
+        </div>
+      </div>
+    </div>  
+
     <p>
       Tested with:
       <ul>
@@ -48,8 +76,14 @@
         $endif$
       </ul>
     </p>
-    <div class="tutorials_social_icons news">
-      <div class="social-links scroll-always desktop">
+    <div>
+      <div class="social-links-inline">
+        <p>
+          Share this article:
+        </p>
+      </div>
+      <div class="tutorials_social_icons news social-links-inline">
+        <div class="social-links scroll-always desktop">
           <div class="hoverable mail-share">
             <a href="mailto:?subject=$title$&body=$title$%0D%0A$host$$url$">
               <img data-no-retina="" class="img-responsive image-normal" alt="mail-icon.png" src="$host$/assets/img/mail-icon.png">
@@ -75,7 +109,9 @@
             </a>
           </div>
         </div>
+      </div>
     </div>
+
     <hr>
 
     $body$

@@ -8,6 +8,8 @@ libraries: gtk3-0.14.4 glib-0.13.2.2
 language: haskell
 author: Mark
 author-name: Mark Karpov
+twitter-profile: mrkkrp
+github-profile: mrkkrp
 description: This time we’re developing a calculator using bindings to GTK+. This tutorial in particular would be great for Haskell beginners and others who come from an imperative background.
 ---
 

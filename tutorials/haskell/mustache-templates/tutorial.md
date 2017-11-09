@@ -8,6 +8,8 @@ libraries: stache-0.1.6
 language: haskell
 author: Mark Karpov
 author-name: Mark Karpov
+twitter-profile: mrkkrp
+github-profile: mrkkrp
 description: In this tutorial we are going to use the Stache Haskell package developed by Stack Builders to work with Mustache templates — a popular logic-less template format.
 ---
 

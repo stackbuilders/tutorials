@@ -73,3 +73,17 @@ td.sourceCode { padding-left: 5px; }
   padding: 0em;
   margin: 0em;
 }
+
+.social-links-inline {
+  display:inline-block;
+  padding: 0em;
+  vertical-align: middle;
+}
+
+.social-links-inline > p {
+  margin-top: 7px;
+}
+
+.news .social-links {
+  padding-top: 0em;
+}

@@ -8,6 +8,7 @@ tags: purescript, haskell, web
 libraries: purescript-bridge
 language: functional-full-stack
 author-name: Javier Casas Velasco
+github-profile: javcasas
 description: In this tutorial we will implement a way to extend the types in the Haskell backend to the PureScript frontend while maintaining consistency and simplifying communication.
 ---
 ## Introduction
