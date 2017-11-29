@@ -63,7 +63,7 @@ main = do
   mainGUI
 
 ----------------------------------------------------------------------------
--- Calucaltor's state
+-- Calculator's state
 
 -- | 'Value' holds textual representation of first argument reversed and
 -- 'Action' to apply to it, which see.

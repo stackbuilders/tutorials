@@ -9,7 +9,10 @@ import Data.Monoid ((<>))
 import Hakyll
 import System.Environment
 import System.FilePath
+import Text.Jasmine
 import Text.Pandoc
+
+import qualified Data.ByteString.Lazy.Char8 as C
 
 main :: IO ()
 main = getEnvironment >>= (hakyllWith configuration . rules)
@@ -71,9 +74,11 @@ rules env = do
     compile $ do
       tutorials <- recentFirst =<< loadAll markdownPattern
       let
+        title = "Archives"
         archiveContext =
           listField "tutorials" tutorialCtx (return tutorials)
-            <> constField "title" "Archives"
+            <> constField "title" title
+            <> constField "title-list" title
             <> commonCtx
 
       makeItem ""
@@ -90,6 +95,7 @@ rules env = do
         indexContext =
           listField "tutorials" tutorialCtx (return tutorials)
             <> constField "title" "Home"
+            <> constField "title-list" ""
             <> commonCtx
 
       getResourceBody
@@ -102,7 +108,29 @@ rules env = do
     route idRoute
     compile compressCssCompiler
 
+  match "tutorials/javascripts/*" $ do
+    route idRoute
+    compile compressJsCompiler
+
   match "templates/*" (compile templateCompiler)
+
+  tags <- buildTags markdownPattern (fromCapture "tutorials/tags/*.html")
+
+  tagsRules tags $ \tag pattern -> do
+    let title = "Posts tagged \"" ++ tag ++ "\""
+    route idRoute
+    compile $ do
+      tutorials <- recentFirst =<< loadAll pattern
+      let ctx = constField "title" title
+                `mappend` constField "title-list" title
+                `mappend` listField "tutorials" tutorialCtx (return tutorials)
+                `mappend` defaultContext
+                `mappend` commonCtx
+
+      makeItem ""
+        >>= loadAndApplyTemplate "templates/tag.html" ctx
+        >>= loadAndApplyTemplate "templates/default.html" ctx
+        >>= relativizeUrls
 
   match markdownPattern $ do
     let
@@ -111,8 +139,8 @@ rules env = do
     route (customRoute tutorialRoute)
     compile $
       tutorialsCompiler
-        >>= loadAndApplyTemplate "templates/tutorial.html" tutorialCtx
-        >>= loadAndApplyTemplate "templates/default.html" tutorialCtx
+        >>= loadAndApplyTemplate "templates/tutorial.html" (tutorialCtxWithTags env tags)
+        >>= loadAndApplyTemplate "templates/default.html" (tutorialCtxWithTags env tags)
         >>= relativizeUrls
         >>= cleanIndexUrls
 
@@ -141,6 +169,11 @@ rules env = do
   create ["tutorials/rss.xml"] $ do
     route idRoute
     compile (pumpFeedPosts >>= renderRss feedConfiguration datedCtx)
+
+tutorialCtxWithTags :: [(String, String)] -> Tags -> Context String
+tutorialCtxWithTags env tags = do
+  let tutorialCtx = tutorialContext env
+  tagsField "tags" tags `mappend` tutorialCtx
 
 feedConfiguration :: FeedConfiguration
 feedConfiguration =
@@ -187,3 +220,9 @@ defaultTutorialsReaderOptions :: ReaderOptions
 defaultTutorialsReaderOptions = defaultHakyllReaderOptions
     { readerSmart = False
     }
+
+compressJsCompiler :: Compiler (Item String)
+compressJsCompiler = do
+  let minifyJS = C.unpack . minify . C.pack . itemBody
+  source <- getResourceString
+  return $ itemSetBody (minifyJS source) source
