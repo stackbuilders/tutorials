@@ -3,10 +3,13 @@ title: GHC optimization and fusion
 published: 2016-11-29
 ghc: 8.0.1
 lts: 7.4
+tags: haskell, optimization
 libraries: criterion-1.1.1.0 weigh-0.0.3
 language: haskell
 author: Mark Karpov
 author-name: Mark Karpov
+twitter-profile: mrkkrp
+github-profile: mrkkrp
 description: You may have seen GHC pragmas with mysterious rules and phase indication in the source code of some great Haskell libraries like ‘text’ or ‘vector’. What is this all about? How do you use them in your project? As it turns out, it's easier than you may think.
 ---
 

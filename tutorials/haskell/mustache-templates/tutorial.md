@@ -2,11 +2,14 @@
 title: Mustache templates in Haskell
 published: 2016-08-17
 ghc: 8.0.1
+tags: haskell, templates
 nightly: 2016-08-15
 libraries: stache-0.1.6
 language: haskell
 author: Mark Karpov
 author-name: Mark Karpov
+twitter-profile: mrkkrp
+github-profile: mrkkrp
 description: In this tutorial we are going to use the Stache Haskell package developed by Stack Builders to work with Mustache templates — a popular logic-less template format.
 ---
 

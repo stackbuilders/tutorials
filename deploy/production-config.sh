@@ -1,5 +1,0 @@
-export HOST="stackbuilders@www.stackbuilders.com"
-export REPOSITORY="git@stackbuilders-tutorials:stackbuilders/tutorials.git"
-export REVISION="origin/production"
-export BUILD_SCRIPT="deploy/stack-tutorials-production-build.sh"
-export RESTART_COMMAND="pwd"

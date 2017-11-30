@@ -7,11 +7,10 @@ dependencies:
   override:
     - stack setup
     - stack build --only-dependencies
-    - stack install hapistrano-0.2.1.2
+    - stack install hapistrano-0.3.3.0
 
   pre:
     - mkdir -p .stack-work/
-    - bash ./scripts/install-stack.sh
 
 test:
 
@@ -23,11 +22,11 @@ deployment:
   staging:
     branch: tutorials
     commands:
-      - "source deploy/staging-config.sh && ~/.local/bin/hap deploy":
+      - ~/.local/bin/hap deploy -c deploy/staging.yml:
           timeout: 6000
 
   production:
     branch: production
     commands:
-      - "source deploy/production-config.sh && ~/.local/bin/hap deploy":
+      - ~/.local/bin/hap deploy -c deploy/production.yml:
           timeout: 6000

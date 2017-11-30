@@ -3,9 +3,12 @@ title: GHC Generics Explained
 published: 2017-02-01
 ghc: 8.0.1
 lts: 7.16
+tags: haskell
 language: haskell
 author: Mark Karpov
 author-name: Mark Karpov
+twitter-profile: mrkkrp
+github-profile: mrkkrp
 description: This tutorial will get you up to speed with GHC generics quickly.
 ---
 
