@@ -146,9 +146,11 @@ to deal with simple business rules. For instance, the plate license example.
 
 So, basically:
 
-- Pure functions are easily to write, but not really easy to understand, and also it could be necessary to generate many code depending on the parsing rules.
+- Pure functions are easily to write, but not really easy to understand, and
+also it could be necessary to generate many code depending on the parsing rules.
 - Regexes are easy to use, but hard to maintain and understand.
-- Use recursive-descent parsing works, but it is tedious, verbose and error-prone as Haoyi says in his blog post.
+- Use recursive-descent parsing works, but it is tedious, verbose and error-prone
+as Haoyi says in his blog post.
 - Parser generators are flexible, but could be an over engineered for some scenarios.
 
 Parser combinators to the rescue!
@@ -310,7 +312,11 @@ parseTime' :: ByteString -> Parser TimeOfDay
 parseTime' = withParser parserTime
 ```
 
-The withParser function is just a helper that takes a parser combinator, a bytesting to parse and return the data type extracted from the bytesting but in the context of the parser of Data.Csv. The from12HourTo24Hour function will change the format from 12-hour to 24-hour convention. And also, a couple of strings with the valid province and key letters.
+The withParser function is just a helper that takes a parser combinator, a bytesting
+to parse and return the data type extracted from the bytesting but in the context
+of the parser of Data.Csv. The `from12HourTo24Hour` function will change the format
+from 12-hour to 24-hour convention. And also, a couple of strings with the valid
+province and key letters.
 
 ```haskell
 withParser :: ParserM a -> ByteString -> Parser a
@@ -344,9 +350,9 @@ decodeTicketRows
 decodeTicketRows = decodeByName "" . BL8.pack
 ```
 
-The parserDate will take the first 4 digit chars for the year, then the value of the divisor
+The `parserDate` will take the first 4 digit chars for the year, then the value of the divisor
 is held, so then it can be checked that this value is the same to separate the month and day.
-Finally, the `fromGregorian` function will take the parsed values to return the Day.
+Finally, `fromGregorian` will take the parsed values to return the `Day`.
 
 ```haskell
 parserDate :: ParserM Day
@@ -359,8 +365,9 @@ parserDate = do
   return $ fromGregorian year month day
 ```
 
-To parse the time of the day, the `try` parse combinator will attempt to parse the time in 24 hour
-convention otherwise the 12 hour convention. 
+To parse the time of the day, the `try` parse combinator will attempt to parse
+the time in 24 hour convention first, if `parser24HourTime` fails then the 12
+hour convention parser starts parsing.
 
 ```haskell
 parserTime :: ParserM TimeOfDay
@@ -383,7 +390,7 @@ parserGregorianTime = do
 ```
 
 For the time of the day parser, the parser combinator `eof` will stop looking for more input.
-Then makeTimeOfDayValid will attempt to create a valid TimeOfDay.
+Then `makeTimeOfDayValid` will attempt to create a valid `TimeOfDay`.
 
 ```haskell
 parser24HourTime :: ParserM TimeOfDay
@@ -395,7 +402,9 @@ parser24HourTime = do
    in maybe failToFormat return validTime
 ```
 
-For the time of day parser in the 12-hour convention, after getting the time an space char and the period of the date are parsed. Then the helper from12HourTo24Hour will try to transform the time in a valid TimeOfTheDay.
+For the time of day parser in the 12-hour convention, after getting the time an
+space char and the period of the date are parsed. Then the helper `from12HourTo24Hour`
+will try to transform the time in a valid `TimeOfTheDay`.
 
 ```haskell
 parser12HourTime :: ParserM TimeOfDay
@@ -409,7 +418,8 @@ parser12HourTime = do
    in maybe failToFormat return (validHour >>= validTime)
 ```
 
-I will skip the explanation of the parserPlate, since it was described at the beginning of the reading.
+I will skip the explanation of the parserPlate, since it was described at the
+beginning of the reading.
 
 ```haskell
 parserPlate :: ParserM Plate
@@ -422,7 +432,8 @@ parserPlate = do
   return Plate{..}
 ```
 
-Finally the parserAmount will try to read an Amount, that starts with a `$` and separates the dollars from the cents by a ‘.’.
+Finally the parserAmount will try to read an Amount, that starts with a `$` and
+separates the dollars from the cents by a ‘.’.
 
 ```haskell
 parserAmount :: ParserM Amount
@@ -434,7 +445,8 @@ parserAmount = do
   return $ Amount amountDollar amountCents
 ```
 
-Finally, plug all together in a main function that will read a file called `example.csv` in the current folder and will display the error or print the parsed items.
+Finally, plug all together in a main function that will read a file called `example.csv`
+in the current folder and will display the error or print the parsed items.
 
 ```haskell
 main :: IO ()
