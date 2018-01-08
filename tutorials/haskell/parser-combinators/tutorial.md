@@ -12,32 +12,40 @@ github-profile: CristhianMotoche
 description: Parser Combinators will help you to parse structures easily and save time while checking business rules.
 ---
 
-Parsing is a common task in software development and consists on looking for
-structures into strings of symbols. For instance, getting an object from a JSON,
-XML, etc. Some formats are very well known and there are some libraries to deal
-with them. However, what would happen with structures that meet specific business
-rules? Like license plates of a country, phone numbers, identificators, etc. Perhaps,
-it would be hard or impossible to find a library for them. Because of that,
-the programmer will have to write a parser to deal with those specific structures.
+## Introduction
 
-A parser for a [plate of Ecuador](https://en.wikipedia.org/wiki/Vehicle_registration_plates_of_Ecuador)
-(e. g. ABC-1234) will be the example to show the
-methods of parsing. The plate will meet the following criteria:
-
-- Start with three letters
-- The first letters belongs to a province of the country (e. g. P stands for Pichincha)
-- The second letter called the key letter identifies the type of license plate.
-	If the key letter is one of [AZQEMW] then it belongs to a special vehicle,
-  otherwise it refrest to a particular or private vehicle.
-- After the letters there is a hyphen (-)
-- At the end there are three of four numbers from 000 to 9999
+Parsing is a common task in software development: consists on search through a
+string of symbols and extract structures from them. For instance, a JSON,
+de facto format for sending data, is an string of symbols that follows a
+[syntax](https://www.w3schools.com/js/js_json_syntax.asp) to define a JavaScript Object.
+When we need to extract data from a JSON (or a well known format like XML or Yaml)
+we can search for a library to deal with it.
 
 We can use the parser for two things:
-1. Verify that an input text plate is correctly written. Basically, to say "Yes, it’s correct" or
+1. Verify that an input text is correctly written. Basically, to say "Yes, it’s correct" or
 "No, it isn’t".
-2. Extract the plate from an input text and use that structure to deal with it in an application.
+2. Extract an structure from an input text and use that structure in an application.
 
-The plate could be represented with the following structure:
+However, what would happen with structures that meet specific some specific business
+rules or syntax but it is not well known? For instance: license plates of a country,
+phone numbers, identificators, etc. Perhaps, it would be hard (or impossible)
+to find a library for them. In those cases, programmers will have to write a parser
+to deal with those very specific structures.
+
+We will write a parser for a [plate of Ecuador](https://en.wikipedia.org/wiki/Vehicle_registration_plates_of_Ecuador)
+(e. g. ABC-1234) to explain some of the methods of parsing. The plate will meet
+the following criteria:
+
+- It starts with three letters.
+- The first letters belongs to a province of the country (e. g. P stands for Pichincha).
+- The second letter, called the key letter, identifies the type of license plate.
+	If the key letter is one of [AZQEMW] then it belongs to a special vehicle,
+  otherwise it is just a particular or private vehicle.
+- A hyhpen (-) separates the letters from the numbers.
+- Finally, the plane ends with a set of three to four numbers, from 000 to 9999.
+
+We are going to use the following data types to represent a plate and its
+attributes:
 
 ```haskell
 data Plate =
@@ -53,29 +61,25 @@ data KeyLetter = A | Z | Q | E | M | W | Other Char
 
 ## Methods of parsing
 ### Using pure functions
-It will be necessary to implement a few functions to extract every field of the
-defined data type. For instance, let’s try to get the numbers:
+It is possible to parse a data structure from a text using plain functions.
+Nevertheless, it will be necessary to implement a few functions to extract every field of the
+defined data type.
+
+The following functions will help us to extract the first letters:
 
 ```haskell
-getNumbers :: String -> Maybe Int
-getNumbers plate =
-    let nums = dropWhile (not . isDigit) plate
- in readMaybe nums
-
-The following functions will also have to return a
-
 getProvinceLetter :: String -> Maybe Char
 getProvinceLetter plate
-    | length plate > 1 && head plate `elem` provinceLetters = Just (head plate)
-    | otherwise = Nothing
+  | length plate > 1 && head plate `elem` provinceLetters = Just (head plate)
+  | otherwise = Nothing
 
 getKeyLetter :: String -> Maybe Char
 getKeyLetter plate =
-    let second = head (drop 1 plate)
-    in
-if length plate > 2 && second `elem` keyLetters
-then Just (mapKeyLetter second)
-    else Nothing
+  let second = head (drop 1 plate)
+  in
+  if length plate > 2 && second `elem` keyLetters
+  then Just (mapKeyLetter second)
+      else Nothing
 
 mapKeyLetter :: Char -> KeyLetter
 mapKeyLetter ‘A’ = A
@@ -92,7 +96,16 @@ getThirdLetter plate
     | otherwise = Nothing
 ```
 
-And then we can use Functor instance of Maybe to do:
+And the next function wil extract the final integer.
+
+```haskell
+getNumbers :: String -> Maybe Int
+getNumbers plate =
+  let nums = dropWhile (not . isDigit) plate
+  in readMaybe nums
+```
+
+Then, we can use `Functor` instance of `Maybe` to extract the whole `Plate`:
 
 ```haskell
 getPlate :: String -> Maybe Plate
@@ -103,17 +116,22 @@ getPlate plate =
     <*> getNumbers plate
 ```
 
-So far, so good. However, there are many conditional statements and we depend of
-short-circuit evaluation, otherwise the use of `head` is not a good idea. For that
-and more, I consider using simple functions not always a good idea to deal with parsing.
+So far, so good. However, there are many conditions which makes it harder to reand,
+and we depend so much on short-circuit evaluation, otherwise, the use of partial
+functions (like `head`) is not a good idea. I consider using simple functions
+not a good idea for parsing.
 
 ### Use regexes
-Regular expressions could make things easier.
+Regular expressions (regex) could make things easier since they are a sequence of
+characters that search a pattern. The parser for the plate will look like:
 
 ```haskell
+regex :: Regex
+regex = mkRegex $ “([” ++ provLetters ++ ”])([” ++ keyLetters ++  ”])([A-Z])-([0-9]{3,4})”
+
 getPlate :: String -> Maybe Plate
 getPlate plate =
-case matchRegex (mkRegex "([A-Z])([A-Z])([A-Z])-([0-9]{3,4})") plate of
+  case matchRegex regex plate of
     Just groups ->
       let prov = head (groups !! 0)
           key = mapKeyLetter (head (groups !! 1))
@@ -124,17 +142,12 @@ case matchRegex (mkRegex "([A-Z])([A-Z])([A-Z])-([0-9]{3,4})") plate of
     Nothing -> Nothing
 ```
 
-Indeed it makes the code smaller. However, it is unreadable and hard to maintain.
-Also, I’m omitting the specific rules for the province letter and the key letter
-just to make the regex smaller. The real regex would be something like:
+Indeed it makes the code smaller. However, it is less readable than the parser
+with plain functions and definately it will be hard to maintain. Also, we are
+using more paratial functions (`head` and `!!`) because the restul of `matchRegex`
+are a list of the patterns that match the regex.
 
-```haskell
-regex :: Regex
-regex = mkRegex $ “([” ++ provLetters ++ ”])([” ++ keyLetters ++  ”])([A-Z])-([0-9]{3,4})”
-```
-
-Sometimes, using regex is a bad idea for dealing with some parsing structures,
-because it is hard to maintain and understand.
+Sometimes, using regex is a bad idea to parse structures, because it is hard to maintain and understand.
 
 There are other ways like [recursive-descent](https://en.wikipedia.org/wiki/Recursive_descent_parser)
 parsing and parser generators. Of course, there are some implementations of those
@@ -149,22 +162,22 @@ So, basically:
 - Pure functions are easily to write, but not really easy to understand, and
 also it could be necessary to generate many code depending on the parsing rules.
 - Regexes are easy to use, but hard to maintain and understand.
-- Use recursive-descent parsing works, but it is tedious, verbose and error-prone
+- Recursive-descent parsing works, but it is tedious, verbose and error-prone
 as Haoyi says in his blog post.
 - Parser generators are flexible, but could be an over engineered for some scenarios.
 
 Parser combinators to the rescue!
 
-What are parser combinators?
-First, a parser is a function that accepts strings as input and returning some structure as output.
+## What are parser combinators?
+A _parser_ is a function that accepts strings as input and returning some structure as output.
 For instance: `parserInteger :: Parser Integer` is a function that accepts a string of symbols and
 returns an integer.
 
-A parser combinator is a higher-order function that accepts several parsers as input
+A _parser combinator_ is a higher-order function that accepts several parsers as input
 and returns a new parser as its output. For instance: `Parser Integer -> Parser [Integer]` it
 takes a parser of integers and returns a parser for a list of integers.
 
-Some examples of parser combinators are defined in the Applicative type class:
+Some examples of parser combinators are defined in the `Applicative` type class:
 
 ```haskell
 (<|>) :: Parser a -> Parser a -> Parser a
