@@ -122,16 +122,16 @@ functions (like `head`) is not a good idea. I consider using simple functions
 not a good idea for parsing.
 
 ### Use regexes
-Regular expressions (regex) could make things easier since they are a sequence of
+Regular expressions (regex) could make things easier, since they are a sequence of
 characters that search a pattern. The parser for the plate will look like:
 
 ```haskell
-regex :: Regex
-regex = mkRegex $ “([” ++ provLetters ++ ”])([” ++ keyLetters ++  ”])([A-Z])-([0-9]{3,4})”
+regexPlate :: Regex
+regexPlate = mkRegex $ “([” ++ provLetters ++ ”])([” ++ keyLetters ++  ”])([A-Z])-([0-9]{3,4})”
 
 getPlate :: String -> Maybe Plate
 getPlate plate =
-  case matchRegex regex plate of
+  case matchRegex regexPlate plate of
     Just groups ->
       let prov = head (groups !! 0)
           key = mapKeyLetter (head (groups !! 1))
@@ -144,40 +144,37 @@ getPlate plate =
 
 Indeed it makes the code smaller. However, it is less readable than the parser
 with plain functions and definately it will be hard to maintain. Also, we are
-using more paratial functions (`head` and `!!`) because the restul of `matchRegex`
-are a list of the patterns that match the regex.
+using more partial functions (`head` and `!!`) because the result of `matchRegex`
+is a list with the patterns matched in the regex. The use of regex makes the code
+hard to maintain and understand.
 
-Sometimes, using regex is a bad idea to parse structures, because it is hard to maintain and understand.
-
-There are other ways like [recursive-descent](https://en.wikipedia.org/wiki/Recursive_descent_parser)
-parsing and parser generators. Of course, there are some implementations of those
-parsers in Haskell. For instance [Happy](https://www.haskell.org/happy/) is a parser
-generator similar to Yacc. It gets a grammar file from input, then happy generates a
-Haskell source which can be used within an application for parsing. Those parsers are
+There are other ways for parsing like [recursive-descent](https://en.wikipedia.org/wiki/Recursive_descent_parser)
+parsing and parser generators. You can find libraries for those methods in Haskell.
+For instance [Happy](https://www.haskell.org/happy/), which is a parser
+generator similar to Yacc. Happy takes a grammar file as input, then it generates a
+Haskell source code to use in an application to parse the structures. Those parsers are
 quite complete and based on a formal definition. However, they are quite complex
-to deal with simple business rules. For instance, the plate license example.
+to deal with simple business rules (like the plate license example).
 
 So, basically:
 
-- Pure functions are easily to write, but not really easy to understand, and
-also it could be necessary to generate many code depending on the parsing rules.
+- Pure functions are easy to write, seldom they are easy to understand, but
+depend on short-circuit evaluation and partial functions.
 - Regexes are easy to use, but hard to maintain and understand.
-- Recursive-descent parsing works, but it is tedious, verbose and error-prone
-as Haoyi says in his blog post.
-- Parser generators are flexible, but could be an over engineered for some scenarios.
+- Parser generators are flexible, but could be an overwhelming for some scenarios.
 
 Parser combinators to the rescue!
 
 ## What are parser combinators?
-A _parser_ is a function that accepts strings as input and returning some structure as output.
+A _parser_ is a _function_ that accepts strings as input and returns some structure as output.
 For instance: `parserInteger :: Parser Integer` is a function that accepts a string of symbols and
 returns an integer.
 
-A _parser combinator_ is a higher-order function that accepts several parsers as input
+A _parser combinator_ is a _higher-order function_ that accepts several parsers as input
 and returns a new parser as its output. For instance: `Parser Integer -> Parser [Integer]` it
 takes a parser of integers and returns a parser for a list of integers.
 
-Some examples of parser combinators are defined in the `Applicative` type class:
+Some examples of parser combinators are:
 
 ```haskell
 (<|>) :: Parser a -> Parser a -> Parser a
@@ -197,7 +194,7 @@ many :: Parser a -> Parser [a]
 
 It will try the given parser for at least one otherwise it will fail.
 
-As them, there are many more defined in parser-combinators package. For instance:
+As them, there are many more defined in `parser-combinators` package. For instance:
 
 ```haskell
 count :: Int -> Parser a -> Parser [a]
@@ -205,9 +202,9 @@ count :: Int -> Parser a -> Parser [a]
 
 It will attempt an amount of times the parser that has as second parameter.
 
-**Note:** I wrote the type annotations of the above functions to see the Parser type
+**Note:** I wrote the type annotations of the above functions to see the `Parser` type
 on them, although those functions are polymorphic and work for any instance of
-Alternative and Monad.
+`Alternative` and `Monad`.
 
 Parser combinators are flexible and easy to use. Let’s see them in action:
 
@@ -222,7 +219,7 @@ parserPlate = do
   return Plate{..}
 ```
 
-And that is all what is necessary for the parser. Now, to tests the parser the following function will be enough:
+This is what we need for the parser. Now, to tests the parser the following function will be enough:
 
 ```
 getPlate :: String -> Maybe Plate
@@ -232,7 +229,7 @@ getPlate = parseMaybe parserPlate
 The parser is easy to understand and not very large. In the next section, a more
 real example of parser combinators will be described.
 
-Parser combinators in action
+## Parser combinators in action
 Parser combinators can be used to check rules when looking for structures in text.
 In order to explain this, a CSV about tickets to owners of cars will be parsed.
 The file will have the following structure:
