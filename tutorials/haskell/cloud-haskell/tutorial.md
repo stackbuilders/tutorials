@@ -188,3 +188,21 @@ Our chat server has an state represented by the ClientPortMap type which may be 
 Thus, besides matching specific messages, handlers also get access to the current state of the server which they can update according to the flow
 of the application. In our case, one of the handlers which must update the state of the application is the one in charge of registering the clients
 which connect to the chat server:
+
+
+```Haskell
+joinChatHandler :: ChannelHandler ClientPortMap JoinChatMessage ChatMessage
+joinChatHandler sendPort = handler
+  where
+    handler :: ActionHandler ClientPortMap JoinChatMessage
+    handler clients JoinChatMessage{..} =
+      if clientName `M.member` clients
+      then replyChan sendPort (ChatMessage Server "Nickname already in use ... ") >> continue clients
+        else do
+          void $ monitorPort sendPort
+          let clients' = M.insert clientName sp clients
+              msg = clientName ++ " has joined the chat ..."
+          logStr msg
+          broadcastMessage clients $ ChatMessage Server msg
+          continue clients'
+```
