@@ -234,3 +234,22 @@ broadcastMessage clientPorts msg =
 ```
 
 Which simply iterates over the ReceivePorts of the clients stored in the current server’s state sending a ChatMessage with the [replyChan](https://hackage.haskell.org/package/distributed-process-client-server-0.2.3/docs/Control-Distributed-Process-ManagedProcess-Server.html#v:replyChan) function.
+
+Finally, notice how this handler updates the state of the server: in case a new client joins the chat, our process will [continue](https://hackage.haskell.org/package/distributed-process-client-server-0.2.3/docs/Control-Distributed-Process-ManagedProcess-Server.html#v:continue) its execution
+with a ClientPortMap that includes the new (nickname, port) pair, that is, it is performing an [Action](https://hackage.haskell.org/package/distributed-process-client-server-0.2.3/docs/Control-Distributed-Process-ManagedProcess-Internal-Types.html#t:Action) that updates the state of the server process.
+
+The messageHandler, in charge of broadcasting the messages in the chat room among all the clients, is even simpler:
+
+
+```Haskell
+messageHandler :: CastHandler ClientPortMap ChatMessage
+messageHandler = handler
+  where
+    handler :: ActionHandler ClientPortMap ChatMessage
+    handler clients msg = do
+      broadcastMessage clients msg
+      continue clients
+```
+
+It only matches messages of type ChatMessage and broadcasts them to the other clients by using the broadcastMessage function defined above.
+Notice that here our process continues its execution without updating the state of the server.
