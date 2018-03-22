@@ -200,7 +200,7 @@ joinChatHandler sendPort = handler
       then replyChan sendPort (ChatMessage Server "Nickname already in use ... ") >> continue clients
         else do
           void $ monitorPort sendPort
-          let clients' = M.insert clientName sp clients
+          let clients' = M.insert clientName sendPort clients
               msg = clientName ++ " has joined the chat ..."
           logStr msg
           broadcastMessage clients $ ChatMessage Server msg
@@ -253,3 +253,37 @@ messageHandler = handler
 
 It only matches messages of type ChatMessage and broadcasts them to the other clients by using the broadcastMessage function defined above.
 Notice that here our process continues its execution without updating the state of the server.
+
+
+## The server's info handlers
+
+Perhaps in the definition of the joinChatHandler you noticed the following mysterious line of code:
+
+
+```Haskell
+void $ monitorPort sendPort
+```
+
+This means that we are attaching a monitoring process to every client that is connecting to the chat server. In other words, we want our server to
+receive a signal whenever a client disconnects (for, example, by typing `ctrl + c` in the terminal). In this way, we can define a handler to match
+those signals and take an appropriate action on client disconnection:
+
+
+```Haskell
+disconnectHandler :: ActionHandler ClientPortMap PortMonitorNotification
+disconnectHandler clients (PortMonitorNotification _ spId reason) = do
+  let search = M.filter (\v -> sendPortId v == spId) clients
+  case (null search, reason) of
+    (False, DiedDisconnect)-> do
+      let (clientName, _) = M.elemAt 0 search
+          clients' = M.delete clientName clients
+      broadcastMessage clients' (ChatMessage Server $ clientName ++ " has left the chat ... ")
+      continue clients'
+    _ -> continue clients
+```
+
+Whenever a client disconnects it sends a message of type PortMonitorNotification which carries the id of its SendPort. This way, we can perform a
+search to find which client disconnected, which is used to notify the remaining clients, and finally the server’s process continues execution with
+a new state which does not include the (nickname, port) pair of the disconnected client.
+
+Next let’s see how to implement the client that will interact with our server!
