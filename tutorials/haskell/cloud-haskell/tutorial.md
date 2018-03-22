@@ -8,7 +8,7 @@ libraries: distributed-process
 language: haskell
 author-name: Sebastian Pulido Gomez
 github-profile: sebashack
-description: ...
+description: “How to use Cloud Haskell to write a distributed chat with Erlang’s style and Haskell’s type safety”
 ---
 
 
