@@ -1,5 +1,5 @@
 ---
-title: Erlang programming style with Cloud Haskell: Implementing a chat
+title: Using Cloud Haskell to write a type-safe distributed chat
 published: 2018-03-20
 ghc: 8.0.2
 lts: 9.17
@@ -8,8 +8,9 @@ libraries: distributed-process
 language: haskell
 author-name: Sebastian Pulido Gomez
 github-profile: sebashack
-description: This is missing...
+description: ...
 ---
+
 
 ## What is Cloud Haskell?
 
