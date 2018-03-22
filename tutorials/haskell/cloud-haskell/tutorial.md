@@ -8,7 +8,7 @@ libraries: distributed-process
 language: haskell
 author-name: Sebastian Pulido Gomez
 github-profile: sebashack
-description: “How to use Cloud Haskell to write a distributed chat with Erlang’s style and Haskell’s type safety”
+description: “How to write a distributed chat with Erlang’s style and Haskell’s type safety using Cloud Haskell”
 ---
 
 
@@ -37,7 +37,7 @@ Erlang.
 ## Overview
 
 As an overview, let’s see how Cloud Haskell makes use of Erlang’s model by analyzing a very simple example.  First, Cloud Haskell’s most
-fundamental entity is a process. Processes are isolated and lightweight threads of execution which run in a node, and the only way they can
+fundamental entity is a process. *Processes* are isolated and lightweight threads of execution which run in a node, and the only way they can
 interact is by passing messages between each other. This is why processes are highly isolated since they do not share resources, which is the main
 cause of deadlocks and race conditions in distributed and concurrent systems. Having this in mind, sending a message to a process is as easy as
 creating a node for the process to reside and sending a message to it with its unique process-id:
@@ -168,7 +168,7 @@ launchChatServer =
 ```
 
 Thus, a server process is basically a definition which specifies different kinds of handlers that match different types of messages. That’s why we
-have several kinds of handler lists in the ProcessDefinition each one containing dispatchers that try to match a message queued in the process
+have several kinds of handler lists in the *ProcessDefinition* each one containing dispatchers that try to match a message queued in the process
 mailbox.
 
 You can notice that our server process has two kinds of handlers, namely:
@@ -178,7 +178,7 @@ You can notice that our server process has two kinds of handlers, namely:
   2. infoHandlers which are useful for handling messages that clients are not explicitly sending to the server (e.g. when a client disconnects) and
      that have extra information about the SendPort which must be deregistered when a client disconnects.
 
-Finally, we are specifying an unhandledMessagePolicy which makes the server log any of the messages which match none of the handlers defined above.
+Finally, we are specifying an *unhandledMessagePolicy* which makes the server log any of the messages which match none of the handlers defined above.
 
 In order to have a better understanding of how our chat server will handle messages coming from the clients, let’s analyze the implementation of
 the handlers referenced in our process definition.
@@ -186,7 +186,7 @@ the handlers referenced in our process definition.
 
 ## The server’s api handlers
 
-Our chat server has an state represented by the ClientPortMap type which may be updated by a handler whenever this matches a specific message.
+Our chat server has an state represented by the *ClientPortMap* type which may be updated by a handler whenever this matches a specific message.
 Thus, besides matching specific messages, handlers also get access to the current state of the server which they can update according to the flow
 of the application. In our case, one of the handlers which must update the state of the application is the one in charge of registering the clients
 which connect to the chat server:
@@ -216,15 +216,15 @@ ChannelHandler is a type synonym with the following definition:
 type ChannelHandler state msg1 msg2 = SendPort msg2 -> (state -> msg1 -> Action state)
 ```
 
-Which instantiated to the specific type parameters of the joinChartHandler definition, it would be:
-  * state: The state of the server which is of type ClientPortMap
-  * msg2: The type of message which can be sent through the SendPort, namely, a ChatMessage.
-  * msg1: The type of message our handler is expecting from a client and that will be matched in the process’ mailbox, that is,  JoinChatMessage.
+Which instantiated to the specific type parameters of the *joinChartHandler* definition, it would be:
+  * state: The state of the server which is of type *ClientPortMap*
+  * msg2: The type of message which can be sent through the SendPort, namely, a *ChatMessage*.
+  * msg1: The type of message our handler is expecting from a client and that will be matched in the process’ mailbox, that is, *JoinChatMessage*.
 
-This definition expresses that it handles a [channel](https://hackage.haskell.org/package/distributed-process-client-server-0.2.3/docs/Control-Distributed-Process-ManagedProcess.html#t:ChannelHandler) by having as argument the [SendPort](https://hackage.haskell.org/package/distributed-process-0.6.6/docs/Control-Distributed-Process-Internal-Types.html#t:SendPort) of the chat client that is communicating to the server. This handler only matches messages of type JoinChatMessage and it replies to the clients with a message of type ChatMessage. A SendPort is one end of a tuple of communication ports whose other end is a [ReceivePort](https://hackage.haskell.org/package/distributed-process-0.6.6/docs/Control-Distributed-Process-Internal-Types.html#t:ReceivePort). Together they componse an abstraction  named channel which is useful for communicating two processes in a type-safe fashion. For example, in our handler, our chat server can only send messages of type ChatMessage to our clients through a port of type ‘SendPort ChatMessage’ while the clients can only accept messages from this handler through a port of type ‘ReceivePort ChatMessage’.
+This definition expresses that it handles a [channel](https://hackage.haskell.org/package/distributed-process-client-server-0.2.3/docs/Control-Distributed-Process-ManagedProcess.html#t:ChannelHandler) by having as argument the [SendPort](https://hackage.haskell.org/package/distributed-process-0.6.6/docs/Control-Distributed-Process-Internal-Types.html#t:SendPort) of the chat client that is communicating to the server. This handler only matches messages of type JoinChatMessage and it replies to the clients with a message of type *ChatMessage*. A *SendPort* is one end of a tuple of communication ports whose other end is a [ReceivePort](https://hackage.haskell.org/package/distributed-process-0.6.6/docs/Control-Distributed-Process-Internal-Types.html#t:ReceivePort). Together they componse an abstraction  named channel which is useful for communicating two processes in a type-safe fashion. For example, in our handler, our chat server can only send messages of type ChatMessage to our clients through a port of type `SendPort ChatMessage` while the clients can only accept messages from this handler through a port of type `ReceivePort ChatMessage`.
 
 With the concept of channel in mind, it is now clear that our handler basically does two things: if the client that is attempting to join the chat
-server wants to use a nickname that has already been taken by another client, the server will reply through its specific SendPort with a message
+server wants to use a nickname that has already been taken by another client, the server will reply through its specific *SendPort* with a message
 notifying that the nickname is already in use (“Nickname already in use ...”). On the other hand, if the nickname is available, the server will
 broadcast a message to the currently connected clients notifying that a new user has joined the chat. The definition of the broadcast function is
 the following:
@@ -235,7 +235,7 @@ broadcastMessage clientPorts msg =
   forM_ clientPorts (flip replyChan msg)
 ```
 
-Which simply iterates over the ReceivePorts of the clients stored in the current server’s state sending a ChatMessage with the [replyChan](https://hackage.haskell.org/package/distributed-process-client-server-0.2.3/docs/Control-Distributed-Process-ManagedProcess-Server.html#v:replyChan) function.
+Which simply iterates over the *ReceivePorts* of the clients stored in the current server’s state sending a *ChatMessage* with the [replyChan](https://hackage.haskell.org/package/distributed-process-client-server-0.2.3/docs/Control-Distributed-Process-ManagedProcess-Server.html#v:replyChan) function.
 
 Finally, notice how this handler updates the state of the server: in case a new client joins the chat, our process will [continue](https://hackage.haskell.org/package/distributed-process-client-server-0.2.3/docs/Control-Distributed-Process-ManagedProcess-Server.html#v:continue) its execution
 with a ClientPortMap that includes the new (nickname, port) pair, that is, it is performing an [Action](https://hackage.haskell.org/package/distributed-process-client-server-0.2.3/docs/Control-Distributed-Process-ManagedProcess-Internal-Types.html#t:Action) that updates the state of the server process.
@@ -253,13 +253,13 @@ messageHandler = handler
       continue clients
 ```
 
-It only matches messages of type ChatMessage and broadcasts them to the other clients by using the broadcastMessage function defined above.
+It only matches messages of type ChatMessage and broadcasts them to the other clients by using the *broadcastMessage* function defined above.
 Notice that here our process continues its execution without updating the state of the server.
 
 
 ## The server's info handlers
 
-Perhaps in the definition of the joinChatHandler you noticed the following mysterious line of code:
+Perhaps in the definition of the *joinChatHandler* you noticed the following mysterious line of code:
 
 
 ```Haskell
@@ -284,7 +284,7 @@ disconnectHandler clients (PortMonitorNotification _ spId reason) = do
     _ -> continue clients
 ```
 
-Whenever a client disconnects it sends a message of type PortMonitorNotification which carries the id of its SendPort. This way, we can perform a
+Whenever a client disconnects it sends a message of type *PortMonitorNotification* which carries the id of its SendPort. This way, we can perform a
 search to find which client disconnected, which is used to notify the remaining clients, and finally the server’s process continues execution with
 a new state which does not include the (nickname, port) pair of the disconnected client.
 
@@ -316,7 +316,7 @@ searchChatServer name serverAddr = do
     Nothing -> searchChatServer name serverAddr
 ```
 
-The heart of this definition is the [whereisRemoteAsync](http://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Internal-Primitives.html#v:whereisRemoteAsync) function provided by the distributed-process package. It asynchronously queries a remote node for a process that is in its local registry. That is why we pass to it the id of the remote node ([NodeId](http://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Internal-Types.html#t:NodeId)) and the name of the chat server room. Notice that we recursively invokethis function until we get a [WhereIsReply](http://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Internal-Types.html#t:WhereIsReply) with the id of the remote process belonging to the chat server.
+The heart of this definition is the [whereisRemoteAsync](http://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Internal-Primitives.html#v:whereisRemoteAsync) function provided by the *distributed-process* package. It asynchronously queries a remote node for a process that is in its local registry. That is why we pass to it the id of the remote node ([NodeId](http://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Internal-Types.html#t:NodeId)) and the name of the chat server room. Notice that we recursively invokethis function until we get a [WhereIsReply](http://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Internal-Types.html#t:WhereIsReply) with the id of the remote process belonging to the chat server.
 
 With this in mind we can cover almost all the implementation:
 
@@ -351,8 +351,8 @@ logStr "You have joined the chat ... "
 ...
 ```
 
-We are only sending a message to the server of type JoinChatMessage  that it will handle with the joinChatHandler explained above. This means that the server will
-add your client to the ClientPortMap defined in the application’s types. Moreover, we are getting the ReceivePort for the server which will be useful to get the
+We are only sending a message to the server of type *JoinChatMessage*  that it will handle with the *joinChatHandler* explained above. This means that the server will
+add your client to the *ClientPortMap* defined in the application’s types. Moreover, we are getting the ReceivePort for the server which will be useful to get the
 messages that are broadcast.
 
 Finally, we need to fork two loops, namely, one for constantly receiving messages from the chat server and another to constantly wait for user input. The first
@@ -385,8 +385,8 @@ forever $ do
 ...
 ```
 
-Which makes use of the standard input to get text from the user that will be cast to the server in the form of a ChatMessage. The function [cast](https://hackage.haskell.org/package/distributed-process-client-server-0.2.3/docs/Control-Distributed-Process-ManagedProcess-Client.html#v:cast) allows us to send a message to a
-remote process without expecting a reply from it, which suits the kind of messages that our chat server dispatches with the messageHandler explained above.
+Which makes use of the standard input to get text from the user that will be cast to the server in the form of a *ChatMessage*. The function [cast](https://hackage.haskell.org/package/distributed-process-client-server-0.2.3/docs/Control-Distributed-Process-ManagedProcess-Client.html#v:cast) allows us to send a message to a
+remote process without expecting a reply from it, which suits the kind of messages that our chat server dispatches with the *messageHandler* explained above.
 
 And ... that’s it! We have covered all the tasks the chat client needs to perform. The full code looks like this:
 
@@ -419,7 +419,7 @@ launchChatClient serverAddr clientHost port name  = do
 
 ## Final remarks
 
-You can check the repository for this tutorial’s source code [here](https://github.com/stackbuilders/cloud-haskell-chat) together with a README that explains how to launch both the chat server and the client so that you can try it out. Now that you have learnt the essentials of cloud Haskell, do not hesitate to fork this repo and add your experiments or further refinements!
+You can check the repository for this tutorial’s source code [here](https://github.com/stackbuilders/cloud-haskell-chat) together with a *README* that explains how to launch both the chat server and the client so that you can try it out. Now that you have learnt the essentials of cloud Haskell, do not hesitate to fork this repo and add your experiments or further refinements!
 
 In case you need additional documents or readings you can visit the following links:
 
