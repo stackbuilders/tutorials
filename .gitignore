@@ -1,3 +1,6 @@
 .stack-work/
 _cache/
 _site/
+
+# Emacs backups
+*~
