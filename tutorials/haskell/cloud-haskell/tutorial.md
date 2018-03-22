@@ -8,5 +8,5 @@ libraries: distributed-process
 language: haskell
 author-name: Sebastian Pulido Gomez
 github-profile: sebashack
-description: In this tutorial we will implement a way to extend the types in the Haskell backend to the PureScript frontend while maintaining consistency and simplifying communication.
+description: This is missing...
 ---
