@@ -206,3 +206,10 @@ joinChatHandler sendPort = handler
           broadcastMessage clients $ ChatMessage Server msg
           continue clients'
 ```
+
+ChannelHandler is a type synonym with the following definition:
+
+
+``` Haskell
+type ChannelHandler state msg1 msg2 = SendPort msg2 -> (state -> msg1 -> Action state)
+```
