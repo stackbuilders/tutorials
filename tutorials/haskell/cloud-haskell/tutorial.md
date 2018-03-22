@@ -21,7 +21,7 @@ processes -running in the same local node or in a remote node- pattern match ove
 Haskell’s capabilities of modeling messages with algebraic data types.
 
 
-# Why Cloud Haskell?
+## Why Cloud Haskell?
 
 Programming concurrent and distributed applications is way too hard. On top of the several challenges that you face when designing software, you
 will also struggle with race conditions, deadlocks, bad communication protocols, network problems that are hard to detect and to recover from, and
@@ -31,3 +31,11 @@ interesting. However, it still lacks type-level guarantees since Erlang is a dyn
 programs as type-safe and predictable communication protocols. Cloud Haskell fills this gap by providing Erlang’s powerful distributed model
 shielded by Haskell’s powerful type system, so you can write your distributed programs with the robustness of Haskell and the error recovery from
 Erlang.
+
+## Overview
+
+As an overview, let’s see how Cloud Haskell makes use of Erlang’s model by analyzing a very simple example.  First, Cloud Haskell’s most
+fundamental entity is a process. Processes are isolated and lightweight threads of execution which run in a node, and the only way they can
+interact is by passing messages between each other. This is why processes are highly isolated since they do not share resources, which is the main
+cause of deadlocks and race conditions in distributed and concurrent systems. Having this in mind, sending a message to a process is as easy as
+creating a node for the process to reside and sending a message to it with its unique process-id:
