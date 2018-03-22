@@ -414,3 +414,15 @@ launchChatClient serverAddr clientHost port name  = do
           cast serverPid (ChatMessage (Client nickName) chatInput)
           liftIO $ threadDelay 500000
 ```
+
+## Final remarks
+
+You can check the repository for this tutorial’s source code here together with a README that explains how to launch both the chat server and the client so that
+you can try it out. Now that you have learnt the essentials of cloud Haskell, do not hesitate to fork this repo and add your experiments or further refinements!
+
+In case you need additional documents or readings you can visit the following links:
+
+  * [Get-started tutorial for cloud haskell.](http://haskell-distributed.github.io/tutorials/1ch.html)
+  * [Distributed process library.](https://hackage.haskell.org/package/distributed-process)
+  * [Implementing a chat with the low level Network.Socket library.](https://wiki.haskell.org/Implement_a_chat_server)
+  * [Some basic Erlang concepts.](http://learnyousomeerlang.com/what-is-otp)
