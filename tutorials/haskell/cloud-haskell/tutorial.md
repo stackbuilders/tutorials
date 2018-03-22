@@ -19,3 +19,15 @@ applications that are fault tolerant, can work on several network transports, an
 that processes communicate explicitly by sending messages to each other rather than by sharing resources in memory. This also implies that
 processes -running in the same local node or in a remote node- pattern match over the specific messages they can handle, which fits very well
 Haskell’s capabilities of modeling messages with algebraic data types.
+
+
+# Why Cloud Haskell?
+
+Programming concurrent and distributed applications is way too hard. On top of the several challenges that you face when designing software, you
+will also struggle with race conditions, deadlocks, bad communication protocols, network problems that are hard to detect and to recover from, and
+code that is hard to debug and to maintain. That’s why Erlang was invented: Erlang is a language for manipulating distributed systems that focuses
+on recovery from failure. Additionally, Erlang brought the possibility to write distributed programs in a functional style. All this is pretty
+interesting. However, it still lacks type-level guarantees since Erlang is a dynamically typed language, and we cannot model our concurrent
+programs as type-safe and predictable communication protocols. Cloud Haskell fills this gap by providing Erlang’s powerful distributed model
+shielded by Haskell’s powerful type system, so you can write your distributed programs with the robustness of Haskell and the error recovery from
+Erlang.
