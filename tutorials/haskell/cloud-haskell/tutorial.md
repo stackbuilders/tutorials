@@ -286,4 +286,131 @@ Whenever a client disconnects it sends a message of type PortMonitorNotification
 search to find which client disconnected, which is used to notify the remaining clients, and finally the server’s process continues execution with
 a new state which does not include the (nickname, port) pair of the disconnected client.
 
-Next let’s see how to implement the client that will interact with our server!
+Next, let’s see how to implement the client that will interact with our server!
+
+
+## The chat client
+
+Implementing a client that can connect to a specific chat-server is even easier. Basically we have to do 5 things:
+
+  1. Create a node for our client process to reside.
+  2. Search our remote chat server and get its [ProcressId](http://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Internal-Types.html#t:ProcessId).
+  3. Send a message to the remote chat server signaling that we want to join the chat.
+  4. Fork a separate process to log the messages coming from other clients connected to the server.
+  5. Fork a separate process that constantly waits for user input and that broadcasts it as a message to the other clients connected to the remote chat server.
+
+
+```Haskell
+searchChatServer :: ChatName -> ServerAddress -> Process ProcessId
+searchChatServer name serverAddr = do
+  let addr = EndPointAddress (BS.pack serverAddr)
+      srvId = NodeId addr
+  whereisRemoteAsync srvId name
+  reply <- expectTimeout 1000
+  case reply of
+    Just (WhereIsReply _ msid) -> case msid of
+      Just sid -> return sid
+      Nothing  -> searchChatServer name serverAddr
+    Nothing -> searchChatServer name serverAddr
+```
+
+The heart of this definition is the [whereisRemoteAsync](http://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Internal-Primitives.html#v:whereisRemoteAsync) function provided by the distributed-process package. It asynchronously queries a remote node for a process that is in its local registry. That is why we pass to it the id of the remote node ([NodeId](http://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Internal-Types.html#t:NodeId)) and the name of the chat server room. Notice that we recursively invokethis function until we get a [WhereIsReply](http://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Internal-Types.html#t:WhereIsReply) with the id of the remote process belonging to the chat server.
+
+With this in mind we can cover almost all the implementation:
+
+
+```Haskell
+...
+
+node <- newLocalNode transport initRemoteTable
+      runChatLogger node
+      runProcess node $ do
+        serverPid <- searchChatServer name serverAddr
+        link serverPid
+        logStr "Joining chat server ... "
+        logStr "Please, provide your nickname ... "
+        nickName <- liftIO getLine
+
+...
+
+```
+
+First, we are creating the node to host our client and run its process. Then, after getting the server’s id we have done some extra things for linking our client
+to the remote server, logging a string in console indicating  that you are joining that chat and must provide your nickname in the standard input. [Linking](http://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process.html#v:link) our client means that if the remote server unexpectedly dies, our process will be killed.
+
+The third step is straightforward:
+
+```Haskell
+...
+
+rp <- callChan serverPid (JoinChatMessage nickName) :: Process (ReceivePort ChatMessage)
+logStr "You have joined the chat ... "
+
+...
+```
+
+We are only sending a message to the server of type JoinChatMessage  that it will handle with the joinChatHandler explained above. This means that the server will
+add your client to the ClientPortMap defined in the application’s types. Moreover, we are getting the ReceivePort for the server which will be useful to get the
+messages that are broadcast.
+
+Finally, we need to fork two loops, namely, one for constantly receiving messages from the chat server and another to constantly wait for user input. The first
+one is implemented as follows:
+
+
+```Haskell
+...
+
+void $ spawnLocal $ forever $ do
+  msg <- receiveChan rp
+  logChatMessage msg
+
+...
+```
+
+This means that we are spawning (forking) another process which will be listening (forever!) to messages coming from the server and it will log those messages to
+the standard output. For this we pass the ReceivePort from the server to [receiveChan](http://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Internal-Primitives.html#v:receiveChan) which is a function that waits for messages being sent through a channel.
+
+
+The second loop has the following implementation:
+
+```Haskell
+...
+
+forever $ do
+  chatInput <- liftIO getLine
+  cast serverPid (ChatMessage (Client nickName) chatInput)
+
+...
+```
+
+Which makes use of the standard input to get text from the user that will be cast to the server in the form of a ChatMessage. The function [cast](https://hackage.haskell.org/package/distributed-process-client-server-0.2.3/docs/Control-Distributed-Process-ManagedProcess-Client.html#v:cast) allows us to send a message to a
+remote process without expecting a reply from it, which suits the kind of messages that our chat server dispatches with the messageHandler explained above.
+
+And ... that’s it! We have covered all the tasks the chat client needs to perform. The full code looks like this:
+
+
+```Haskell
+launchChatClient :: ServerAddress -> Host -> Int -> ChatName -> IO ()
+launchChatClient serverAddr clientHost port name  = do
+  mt <- createTransport clientHost (show port) defaultTCPParameters
+  case mt of
+    Left err -> putStrLn (show err)
+    Right transport -> do
+      node <- newLocalNode transport initRemoteTable
+      runChatLogger node
+      runProcess node $ do
+        serverPid <- searchChatServer name serverAddr
+        link serverPid
+        logStr "Joining chat server ... "
+        logStr "Please, provide your nickname ... "
+        nickName <- liftIO getLine
+        rp <- callChan serverPid (JoinChatMessage nickName) :: Process (ReceivePort ChatMessage)
+        logStr "You have joined the chat ... "
+        void $ spawnLocal $ forever $ do
+          msg <- receiveChan rp
+          logChatMessage msg
+        forever $ do
+          chatInput <- liftIO getLine
+          cast serverPid (ChatMessage (Client nickName) chatInput)
+          liftIO $ threadDelay 500000
+```
