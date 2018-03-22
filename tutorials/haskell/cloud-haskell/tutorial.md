@@ -70,3 +70,38 @@ In this tutorial we will approach more interesting and advanced concepts of Clou
   * Command line interface for writing messages in the chat room.
   * Broadcasting messages to all clients which are connected to a chat server room.
   * Handling the disconnection of clients from a chat server room.
+
+
+## First steps: The chat types
+
+As mentioned above, one of the goals of Cloud Haskell is to set up an expressive messaging model between processes. By expressive we mean that we
+can specify which messages we want our process to handle, similar to specifying a communication protocol. This is achieved by pattern matching
+over the messages a process must handle and specifying some policy for unhandled messages which do not match any of the handlers. Thus, the first
+step in our implementation consists of defining the data types that will be signaled between our chat server and clients.
+
+Initially, our chat server will have to handle two types of messages coming from clients, namely, 1) a message that lets a new client join the
+chat and 2) messages to be broadcast to all the clients on the chat.
+
+The first of this these messages is straightforward:
+
+
+```Haskell
+{-# LANGUAGE DeriveDataTypeable     #-}
+{-# LANGUAGE DeriveGeneric          #-}
+
+module Types where
+
+import GHC.Generics
+import Data.Binary
+import Data.Typeable.Internal
+import Data.Map (Map)
+import Control.Distributed.Process (SendPort)
+
+type NickName = String
+
+newtype JoinChatMessage = JoinChatMessage {
+    clientName :: NickName
+  } deriving (Generic, Typeable, Show)
+
+instance Binary JoinChatMessage
+```
