@@ -213,3 +213,24 @@ ChannelHandler is a type synonym with the following definition:
 ``` Haskell
 type ChannelHandler state msg1 msg2 = SendPort msg2 -> (state -> msg1 -> Action state)
 ```
+
+Which instantiated to the specific type parameters of the joinChartHandler definition, it would be:
+  * state: The state of the server which is of type ClientPortMap
+  * msg2: The type of message which can be sent through the SendPort, namely, a ChatMessage.
+  * msg1: The type of message our handler is expecting from a client and that will be matched in the process’ mailbox, that is,  JoinChatMessage.
+
+This definition expresses that it handles a [channel](https://hackage.haskell.org/package/distributed-process-client-server-0.2.3/docs/Control-Distributed-Process-ManagedProcess.html#t:ChannelHandler) by having as argument the [SendPort](https://hackage.haskell.org/package/distributed-process-0.6.6/docs/Control-Distributed-Process-Internal-Types.html#t:SendPort) of the chat client that is communicating to the server. This handler only matches messages of type JoinChatMessage and it replies to the clients with a message of type ChatMessage. A SendPort is one end of a tuple of communication ports whose other end is a [ReceivePort](https://hackage.haskell.org/package/distributed-process-0.6.6/docs/Control-Distributed-Process-Internal-Types.html#t:ReceivePort). Together they componse an abstraction  named channel which is useful for communicating two processes in a type-safe fashion. For example, in our handler, our chat server can only send messages of type ChatMessage to our clients through a port of type ‘SendPort ChatMessage’ while the clients can only accept messages from this handler through a port of type ‘ReceivePort ChatMessage’.
+
+With the concept of channel in mind, it is now clear that our handler basically does two things: if the client that is attempting to join the chat
+server wants to use a nickname that has already been taken by another client, the server will reply through its specific SendPort with a message
+notifying that the nickname is already in use (“Nickname already in use ...”). On the other hand, if the nickname is available, the server will
+broadcast a message to the currently connected clients notifying that a new user has joined the chat. The definition of the broadcast function is
+the following:
+
+```Haskell
+broadcastMessage :: ClientPortMap -> ChatMessage -> Process ()
+broadcastMessage clientPorts msg =
+  forM_ clientPorts (flip replyChan msg)
+```
+
+Which simply iterates over the ReceivePorts of the clients stored in the current server’s state sending a ChatMessage with the [replyChan](https://hackage.haskell.org/package/distributed-process-client-server-0.2.3/docs/Control-Distributed-Process-ManagedProcess-Server.html#v:replyChan) function.
