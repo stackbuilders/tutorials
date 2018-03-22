@@ -180,3 +180,11 @@ Finally, we are specifying an unhandledMessagePolicy which makes the server log 
 
 In order to have a better understanding of how our chat server will handle messages coming from the clients, let’s analyze the implementation of
 the handlers referenced in our process definition.
+
+
+## The server’s api handlers
+
+Our chat server has an state represented by the ClientPortMap type which may be updated by a handler whenever this matches a specific message.
+Thus, besides matching specific messages, handlers also get access to the current state of the server which they can update according to the flow
+of the application. In our case, one of the handlers which must update the state of the application is the one in charge of registering the clients
+which connect to the chat server:
