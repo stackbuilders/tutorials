@@ -41,12 +41,13 @@ interact is by passing messages between each other. This is why processes are hi
 cause of deadlocks and race conditions in distributed and concurrent systems. Having this in mind, sending a message to a process is as easy as
 creating a node for the process to reside and sending a message to it with its unique process-id:
 
+
+```Haskell
 import Network.Transport.TCP (createTransport, defaultTCPParameters)
 import Control.Distributed.Process
 import Control.Distributed.Process.Node
 
 
-```Haskell
 main :: IO ()
 main = do
   Right transport <- createTransport "127.0.0.1" "4001" defaultTCPParameters
@@ -417,8 +418,7 @@ launchChatClient serverAddr clientHost port name  = do
 
 ## Final remarks
 
-You can check the repository for this tutorial’s source code here together with a README that explains how to launch both the chat server and the client so that
-you can try it out. Now that you have learnt the essentials of cloud Haskell, do not hesitate to fork this repo and add your experiments or further refinements!
+You can check the repository for this tutorial’s source code [here](https://github.com/stackbuilders/cloud-haskell-chat) together with a README that explains how to launch both the chat server and the client so that you can try it out. Now that you have learnt the essentials of cloud Haskell, do not hesitate to fork this repo and add your experiments or further refinements!
 
 In case you need additional documents or readings you can visit the following links:
 
