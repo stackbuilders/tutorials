@@ -143,3 +143,24 @@ type ClientPortMap = Map NickName (SendPort ChatMessage)
 The state of our chat server process consists of a map from a client’s nickname (or identifier) to a send port. We’ll give more details about the
 SendPort data type when we talk about channels. Meanwhile, we can think about this type as an inventory of the clients that join the chat and a
 port through which we can send messages to them.
+
+
+
+## The server
+
+
+As we mentioned above, the most fundamental entity in cloud Haskell is a process and that is why we can naturally define our chat server as a process. Nevertheless, in order to define server processes we can take advantage of the [ProcessDefinition](https://hackage.haskell.org/package/distributed-process-client-server-0.1.3.1/candidate/docs/Control-Distributed-Process-ManagedProcess.html#t:ProcessDefinition) data type defined in the [distributed-process-client-server](https://hackage.haskell.org/package/distributed-process-client-server-0.1.3.1) package. A ProcessDefinition has several components which determine how different kinds of messages must be handled,  but we will be focusing only in the two ones used in our chat server’s definition:
+
+
+```Haskell
+launchChatServer :: Process ProcessId
+launchChatServer =
+  let server = defaultProcess {
+          apiHandlers =  [ handleRpcChan joinChatHandler
+                         , handleCast messageHandler
+                         ]
+        , infoHandlers = [ handleInfo disconnectHandler ]
+        , unhandledMessagePolicy = Log
+        }
+  in spawnLocal $ serve () (const (return $ InitOk M.empty Infinity)) server
+```
