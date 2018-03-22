@@ -164,3 +164,19 @@ launchChatServer =
         }
   in spawnLocal $ serve () (const (return $ InitOk M.empty Infinity)) server
 ```
+
+Thus, a server process is basically a definition which specifies different kinds of handlers that match different types of messages. That’s why we
+have several kinds of handler lists in the ProcessDefinition each one containing dispatchers that try to match a message queued in the process
+mailbox.
+
+You can notice that our server process has two kinds of handlers, namely:
+
+  1. apiHandlers which are in charge of handling the core messages of the application , that is, messages from clients which want to join the chat,
+     and messages which have to be broadcast to all the clients connected to the server.
+  2. infoHandlers which are useful for handling messages that clients are not explicitly sending to the server (e.g. when a client disconnects) and
+     that have extra information about the SendPort which must be deregistered when a client disconnects.
+
+Finally, we are specifying an unhandledMessagePolicy which makes the server log any of the messages which match none of the handlers defined above.
+
+In order to have a better understanding of how our chat server will handle messages coming from the clients, let’s analyze the implementation of
+the handlers referenced in our process definition.
