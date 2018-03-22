@@ -105,3 +105,20 @@ newtype JoinChatMessage = JoinChatMessage {
 
 instance Binary JoinChatMessage
 ```
+
+Whenever a client wants to join a chat server, it provides a unique nickname that identifies it. Note that we are using Generics to derive instances for [Binary](https://hackage.haskell.org/package/binary-0.9.0.0/docs/Data-Binary.html) and [Typeable](https://hackage.haskell.org/package/base-4.10.1.0/docs/Data-Typeable.html). This is necessary so that our type can automatically be an instance of [Serializable](https://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Serializable.html#t:Serializable) which is about “objects that can be sent across the network” or, in other words, objects that can be encoded to raw bytestrings and decoded again to their original form.
+
+Our second type represents any message which is broadcast to the clients connected to a chat:
+
+```Haskell
+data Sender = Server | Client NickName
+  deriving (Generic, Typeable, Eq, Show)
+
+data ChatMessage = ChatMessage {
+    from :: Sender
+  , message :: String
+  } deriving (Generic, Typeable, Show)
+
+
+instance Binary ChatMessage
+```
