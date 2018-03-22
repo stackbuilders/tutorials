@@ -32,6 +32,7 @@ programs as type-safe and predictable communication protocols. Cloud Haskell fil
 shielded by Haskell’s powerful type system, so you can write your distributed programs with the robustness of Haskell and the error recovery from
 Erlang.
 
+
 ## Overview
 
 As an overview, let’s see how Cloud Haskell makes use of Erlang’s model by analyzing a very simple example.  First, Cloud Haskell’s most
@@ -39,3 +40,21 @@ fundamental entity is a process. Processes are isolated and lightweight threads 
 interact is by passing messages between each other. This is why processes are highly isolated since they do not share resources, which is the main
 cause of deadlocks and race conditions in distributed and concurrent systems. Having this in mind, sending a message to a process is as easy as
 creating a node for the process to reside and sending a message to it with its unique process-id:
+
+import Network.Transport.TCP (createTransport, defaultTCPParameters)
+import Control.Distributed.Process
+import Control.Distributed.Process.Node
+
+```Haskell
+main :: IO ()
+main = do
+  Right transport <- createTransport "127.0.0.1" "4001" defaultTCPParameters
+  node <- newLocalNode transport initRemoteTable
+  _ <- runProcess node $ do
+    -- get the id of this process
+    self <- getSelfPid
+    send self "Talking to myself"
+    message <- expect :: Process String
+    liftIO $ putStrLn message
+  return ()
+```
