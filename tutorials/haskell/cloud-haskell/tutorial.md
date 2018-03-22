@@ -110,6 +110,7 @@ Whenever a client wants to join a chat server, it provides a unique nickname tha
 
 Our second type represents any message which is broadcast to the clients connected to a chat:
 
+
 ```Haskell
 data Sender = Server | Client NickName
   deriving (Generic, Typeable, Eq, Show)
@@ -122,3 +123,23 @@ data ChatMessage = ChatMessage {
 
 instance Binary ChatMessage
 ```
+
+Note that we capture the fact that the sender of that message can be either a client or the server itself -For example, when a client connects to
+the chat, the server broadcasts a message to the other clients announcing that a new member has joined.
+
+Finally, with Cloud Haskell we can define processes which can update their state after handling a message. Thus we can define the type of the state
+that the chat server process will update after a client joins:
+
+```Haskell
+...
+
+import Control.Distributed.Process (SendPort)
+
+...
+
+type ClientPortMap = Map NickName (SendPort ChatMessage)
+```
+
+The state of our chat server process consists of a map from a client’s nickname (or identifier) to a send port. We’ll give more details about the
+SendPort data type when we talk about channels. Meanwhile, we can think about this type as an inventory of the clients that join the chat and a
+port through which we can send messages to them.
