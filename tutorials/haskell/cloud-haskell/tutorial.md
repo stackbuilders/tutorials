@@ -1,6 +1,6 @@
 ---
 title: Using Cloud Haskell to write a type-safe distributed chat
-published: 2018-03-20
+published: 2018-03-27
 ghc: 8.0.2
 lts: 9.17
 tags: haskell, distributed-computing, erlang
