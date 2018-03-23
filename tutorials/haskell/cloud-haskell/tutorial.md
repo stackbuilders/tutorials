@@ -220,6 +220,7 @@ type ChannelHandler state msg1 msg2 = SendPort msg2 -> (state -> msg1 -> Action 
 ```
 
 Which instantiated to the specific type parameters of the *joinChartHandler* definition, it would be:
+
   * *state*: The state of the server which is of type *ClientPortMap*
   * *msg2*: The type of message which can be sent through the SendPort, namely, a *ChatMessage*.
   * *msg1*: The type of message our handler is expecting from a client and that will be matched in the process' mailbox, that is, *JoinChatMessage*.
@@ -298,11 +299,11 @@ Next, let’s see how to implement the client that will interact with our server
 
 Implementing a client that can connect to a specific chat-server is even easier. Basically we have to do 5 things:
 
-  1. Create a node for our client process to reside.
-  2. Search our remote chat server and get its [ProcressId](http://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Internal-Types.html#t:ProcessId).
-  3. Send a message to the remote chat server signaling that we want to join the chat.
-  4. Fork a separate process to log the messages coming from other clients connected to the server.
-  5. Fork a separate process that constantly waits for user input and that broadcasts it as a message to the other clients connected to the remote chat server.
+  * Create a node for our client process to reside.
+  * Search our remote chat server and get its [ProcressId](http://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Internal-Types.html#t:ProcessId).
+  * Send a message to the remote chat server signaling that we want to join the chat.
+  * Fork a separate process to log the messages coming from other clients connected to the server.
+  * Fork a separate process that constantly waits for user input and that broadcasts it as a message to the other clients connected to the remote chat server.
 
 ```Haskell
 searchChatServer :: ChatName -> ServerAddress -> Process ProcessId
