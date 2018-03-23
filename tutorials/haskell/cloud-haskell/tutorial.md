@@ -27,7 +27,7 @@ Haskell’s capabilities of modeling messages with algebraic data types.
 Programming concurrent and distributed applications is way too hard. On top of the several challenges that you face when designing software, you
 will also struggle with race conditions, deadlocks, bad communication protocols, network problems that are hard to detect and to recover from, and
 code that is hard to debug and to maintain. That’s why Erlang was invented: Erlang is a language for manipulating distributed systems that focuses
-on recovery from failure. 
+on recovery from failure.
 
 Additionally, Erlang brought the possibility to write distributed programs in a functional style. All this is pretty
 interesting. However, it still lacks type-level guarantees since Erlang is a dynamically typed language, and we cannot model our concurrent
@@ -69,6 +69,7 @@ decoupled from the network layer so that you can inject any transport backend yo
 until one arrives. In this case, the process is immediately receiving the "Talking to myself" string.
 
 In this tutorial we will approach more interesting and advanced concepts of Cloud Haskell by implementing a simple chat server and client which supports the following features:
+
   * Launching a chat server room in a specific endpoint address that can be found by chat clients.
   * Launching chat clients that can search a chat server room in a specific endpoint address and connect to it.
   * Command line interface for writing messages in the chat room.
@@ -175,9 +176,9 @@ mailbox.
 
 You can notice that our server process has two kinds of handlers, namely:
 
-  1. *apiHandlers* which are in charge of handling the core messages of the application , that is, messages from clients which want to join the chat,
+  *  *apiHandlers* which are in charge of handling the core messages of the application , that is, messages from clients which want to join the chat,
      and messages which have to be broadcast to all the clients connected to the server.
-  2. *infoHandlers* which are useful for handling messages that clients are not explicitly sending to the server (e.g. when a client disconnects) and
+  *  *infoHandlers* which are useful for handling messages that clients are not explicitly sending to the server (e.g. when a client disconnects) and
      that have extra information about the *SendPort* which must be deregistered when a client disconnects.
 
 Finally, we are specifying an *unhandledMessagePolicy* which makes the server log any of the messages which match none of the handlers defined above.
