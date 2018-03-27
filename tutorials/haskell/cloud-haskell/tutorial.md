@@ -8,7 +8,7 @@ libraries: distributed-process
 language: haskell
 author-name: Sebastian Pulido Gomez
 github-profile: sebashack
-description: “How to write a distributed chat with Erlang’s style and Haskell’s type safety using Cloud Haskell”
+description: In this tutorial we will implement a distributed chat with Erlang’s style and Haskell’s type safety using Cloud Haskell.
 ---
 
 
@@ -18,7 +18,7 @@ description: “How to write a distributed chat with Erlang’s style and Haskel
 [Erlang’s](https://www.erlang.org/) style of concurrency and distributed programming. This brings a lot of power in order to implement networking
 applications that are fault tolerant, can work on several network transports, and have an expressive model of communication. By expressive we mean
 that processes communicate explicitly by sending messages to each other rather than by sharing resources in memory. This also implies that
-processes -running in the same local node or in a remote node- pattern match over the specific messages they can handle, which fits very well
+processes -running in the same local node or in a remote node- pattern match over the specific messages they can handle, which fits very well with
 Haskell’s capabilities of modeling messages with algebraic data types.
 
 
@@ -41,8 +41,8 @@ Erlang.
 As an overview, let’s see how Cloud Haskell makes use of Erlang’s model by analyzing a very simple example.  First, Cloud Haskell’s most
 fundamental entity is a process. *Processes* are isolated and lightweight threads of execution which run in a node, and the only way they can
 interact is by passing messages between each other. This is why processes are highly isolated since they do not share resources, which is the main
-cause of deadlocks and race conditions in distributed and concurrent systems. Having this in mind, sending a message to a process is as easy as
-creating a node for the process to reside and sending a message to it with its unique *process-id*:
+cause of deadlocks and race conditions in distributed and concurrent systems. Keeping this in mind, sending a message to a process is as easy as
+creating a node for the process to reside in and sending a message to it with its unique *process-id*:
 
 
 ```Haskell
@@ -73,7 +73,7 @@ In this tutorial we will approach more interesting and advanced concepts of Clou
   * Launching a chat server room in a specific endpoint address that can be found by chat clients.
   * Launching chat clients that can search a chat server room in a specific endpoint address and connect to it.
   * Command line interface for writing messages in the chat room.
-  * Broadcasting messages to all clients which are connected to a chat server room.
+  * Broadcasting messages to all clients who are connected to a chat server room.
   * Handling the disconnection of clients from a chat server room.
 
 
@@ -85,7 +85,7 @@ over the messages a process must handle and specifying some policy for unhandled
 step in our implementation consists of defining the data types that will be signaled between our chat server and clients.
 
 Initially, our chat server will have to handle two types of messages coming from clients, namely, 1) a message that lets a new client join the
-chat and 2) messages to be broadcast to all the clients on the chat.
+chat and 2) messages to be broadcasted to all the clients on the chat.
 
 The first of these messages is straightforward:
 
@@ -111,9 +111,9 @@ newtype JoinChatMessage = JoinChatMessage {
 instance Binary JoinChatMessage
 ```
 
-Whenever a client wants to join a chat server, it provides a unique nickname that identifies it. Note that we are using Generics to derive instances for [Binary](https://hackage.haskell.org/package/binary-0.9.0.0/docs/Data-Binary.html) and [Typeable](https://hackage.haskell.org/package/base-4.10.1.0/docs/Data-Typeable.html). This is necessary so that our type can automatically be an instance of [Serializable](https://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Serializable.html#t:Serializable) which is about “objects that can be sent across the network” or, in other words, objects that can be encoded to raw bytestrings and decoded again to their original form.
+Whenever a client wants to join a chat server, it provides a unique nickname that identifies him/her. Note that we are using Generics to derive instances for [Binary](https://hackage.haskell.org/package/binary-0.9.0.0/docs/Data-Binary.html) and [Typeable](https://hackage.haskell.org/package/base-4.10.1.0/docs/Data-Typeable.html). This is necessary so that our type can automatically be an instance of [Serializable](https://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Serializable.html#t:Serializable) which is about “objects that can be sent across the network” or, in other words, objects that can be encoded to raw bytestrings and decoded again to their original form.
 
-Our second type represents any message which is broadcast to the clients connected to a chat:
+Our second type represents any message which is broadcasted to the clients connected to a chat:
 
 
 ```Haskell
@@ -154,7 +154,7 @@ port through which we can send messages to them.
 ## The server
 
 
-As we mentioned above, the most fundamental entity in cloud Haskell is a process and that is why we can naturally define our chat server as a process. Nevertheless, in order to define server processes we can take advantage of the [ProcessDefinition](https://hackage.haskell.org/package/distributed-process-client-server-0.1.3.1/candidate/docs/Control-Distributed-Process-ManagedProcess.html#t:ProcessDefinition) data type defined in the [distributed-process-client-server](https://hackage.haskell.org/package/distributed-process-client-server-0.1.3.1) package. A *ProcessDefinition* has several components which determine how different kinds of messages must be handled,  but we will be focusing only in the two ones used in our chat server’s definition:
+As we mentioned above, the most fundamental entity in cloud Haskell is a process and that is why we can naturally define our chat server as a process. Nevertheless, in order to define server processes we can take advantage of the [ProcessDefinition](https://hackage.haskell.org/package/distributed-process-client-server-0.1.3.1/candidate/docs/Control-Distributed-Process-ManagedProcess.html#t:ProcessDefinition) data type defined in the [distributed-process-client-server](https://hackage.haskell.org/package/distributed-process-client-server-0.1.3.1) package. A *ProcessDefinition* has several components which determine how different kinds of messages must be handled,  but we will be focusing only on the two used in our chat server’s definition:
 
 
 ```Haskell
@@ -176,7 +176,7 @@ mailbox.
 
 You can notice that our server process has two kinds of handlers, namely:
 
-  *  *apiHandlers* which are in charge of handling the core messages of the application , that is, messages from clients which want to join the chat,
+  *  *apiHandlers* which are in charge of handling the core messages of the application , that is, messages from clients who want to join the chat,
      and messages which have to be broadcast to all the clients connected to the server.
   *  *infoHandlers* which are useful for handling messages that clients are not explicitly sending to the server (e.g. when a client disconnects) and
      that have extra information about the *SendPort* which must be deregistered when a client disconnects.
@@ -192,7 +192,7 @@ the handlers referenced in our process definition.
 Our chat server has a state represented by the *ClientPortMap* type which may be updated by a handler whenever this matches a specific message.
 Thus, besides matching specific messages, handlers also get access to the current state of the server which they can update according to the flow
 of the application. In our case, one of the handlers which must update the state of the application is the one in charge of registering the clients
-which connect to the chat server:
+who connect to the chat server:
 
 
 ```Haskell
@@ -300,7 +300,7 @@ Next, let’s see how to implement the client that will interact with our server
 Implementing a client that can connect to a specific chat-server is even easier. Basically we have to do 5 things:
 
   * Create a node for our client process to reside.
-  * Search our remote chat server and get its [ProcressId](http://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Internal-Types.html#t:ProcessId).
+  * Search our remote chat server and get its [ProcessId](http://hackage.haskell.org/package/distributed-process-0.7.3/docs/Control-Distributed-Process-Internal-Types.html#t:ProcessId).
   * Send a message to the remote chat server signaling that we want to join the chat.
   * Fork a separate process to log the messages coming from other clients connected to the server.
   * Fork a separate process that constantly waits for user input and that broadcasts it as a message to the other clients connected to the remote chat server.
@@ -420,7 +420,7 @@ launchChatClient serverAddr clientHost port name  = do
 
 ## Final remarks
 
-You can check the repository for this tutorial’s source code [here](https://github.com/stackbuilders/cloud-haskell-chat) together with a *README* that explains how to launch both the chat server and the client so that you can try it out. Now that you have learnt the essentials of cloud Haskell, do not hesitate to fork this repo and add your experiments or further refinements!
+You can check the repository for this tutorial’s source code [here](https://github.com/stackbuilders/cloud-haskell-chat) together with a *README* that explains how to launch both the chat server and the client so that you can try it out. Now that you have learned the essentials of cloud Haskell, do not hesitate to fork this repo and add your experiments or further refinements!
 
 In case you need additional documents or readings you can visit the following links:
 
