@@ -132,7 +132,7 @@ instance Binary ChatMessage
 Note that we capture the fact that the sender of that message can be either a client or the server itself -For example, when a client connects to
 the chat, the server broadcasts a message to the other clients announcing that a new member has joined.
 
-Finally, with Cloud Haskell we can define processes which can update their state after handling a message. Thus we can define the type of the state
+Finally, with Cloud Haskell we can define processes which can update their state after handling a message. Thus, we can define the type of the state
 that the chat server process will update after a client joins:
 
 ```Haskell
@@ -176,7 +176,7 @@ mailbox.
 
 You can notice that our server process has two kinds of handlers, namely:
 
-  *  *apiHandlers* which are in charge of handling the core messages of the application , that is, messages from clients who want to join the chat,
+  *  *apiHandlers* which are in charge of handling the core messages of the application, that is, messages from clients who want to join the chat,
      and messages which have to be broadcast to all the clients connected to the server.
   *  *infoHandlers* which are useful for handling messages that clients are not explicitly sending to the server (e.g. when a client disconnects) and
      that have extra information about the *SendPort* which must be deregistered when a client disconnects.
@@ -225,7 +225,7 @@ Which instantiated to the specific type parameters of the *joinChartHandler* def
   * *msg2*: The type of message which can be sent through the SendPort, namely, a *ChatMessage*.
   * *msg1*: The type of message our handler is expecting from a client and that will be matched in the process' mailbox, that is, *JoinChatMessage*.
 
-This definition expresses that it handles a [channel](https://hackage.haskell.org/package/distributed-process-client-server-0.2.3/docs/Control-Distributed-Process-ManagedProcess.html#t:ChannelHandler) by having as argument the [SendPort](https://hackage.haskell.org/package/distributed-process-0.6.6/docs/Control-Distributed-Process-Internal-Types.html#t:SendPort) of the chat client that is communicating to the server. This handler only matches messages of type *JoinChatMessage* and it replies to the clients with a message of type *ChatMessage*. A *SendPort* is one end of a tuple of communication ports whose other end is a [ReceivePort](https://hackage.haskell.org/package/distributed-process-0.6.6/docs/Control-Distributed-Process-Internal-Types.html#t:ReceivePort). Together they componse an abstraction  named channel which is useful for communicating two processes in a type-safe fashion. For example, in our handler, our chat server can only send messages of type ChatMessage to our clients through a port of type `SendPort ChatMessage` while the clients can only accept messages from this handler through a port of type `ReceivePort ChatMessage`.
+This definition expresses that it handles a [channel](https://hackage.haskell.org/package/distributed-process-client-server-0.2.3/docs/Control-Distributed-Process-ManagedProcess.html#t:ChannelHandler) by having as argument the [SendPort](https://hackage.haskell.org/package/distributed-process-0.6.6/docs/Control-Distributed-Process-Internal-Types.html#t:SendPort) of the chat client that is communicating to the server. This handler only matches messages of type *JoinChatMessage* and it replies to the clients with a message of type *ChatMessage*. A *SendPort* is one end of a tuple of communication ports whose other end is a [ReceivePort](https://hackage.haskell.org/package/distributed-process-0.6.6/docs/Control-Distributed-Process-Internal-Types.html#t:ReceivePort). Together they compose an abstraction  named channel which is useful for communicating two processes in a type-safe fashion. For example, in our handler, our chat server can only send messages of type ChatMessage to our clients through a port of type `SendPort ChatMessage` while the clients can only accept messages from this handler through a port of type `ReceivePort ChatMessage`.
 
 With the concept of channel in mind, it is now clear that our handler basically does two things: if the client that is attempting to join the chat
 server wants to use a nickname that has already been taken by another client, the server will reply through its specific *SendPort* with a message
