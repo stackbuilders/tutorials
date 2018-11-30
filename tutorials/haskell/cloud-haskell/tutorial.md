@@ -46,6 +46,8 @@ creating a node for the process to reside in and sending a message to it with it
 
 
 ```Haskell
+{-# LANGUAGE TupleSections     #-}
+
 import Network.Transport.TCP (createTransport, defaultTCPParameters)
 import Control.Distributed.Process
 import Control.Distributed.Process.Node
@@ -53,7 +55,7 @@ import Control.Distributed.Process.Node
 
 main :: IO ()
 main = do
-  Right transport <- createTransport "127.0.0.1" "4001" defaultTCPParameters
+  Right transport <- createTransport "127.0.0.1" "4001" ("127.0.0.1",) defaultTCPParameters
   node <- newLocalNode transport initRemoteTable
   _ <- runProcess node $ do
     -- get the id of this process
