@@ -4,3 +4,8 @@ _site/
 
 # Emacs backups
 *~
+
+# Vim files
+*.swn
+*.swo
+*.swp
