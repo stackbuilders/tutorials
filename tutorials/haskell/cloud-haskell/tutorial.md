@@ -1,8 +1,8 @@
 ---
 title: Using Cloud Haskell to write a type-safe distributed chat
 published: 2018-04-10
-ghc: 8.0.2
-lts: 9.17
+ghc: 8.2.2
+lts: 11.22
 tags: haskell, distributed-computing, erlang
 libraries: distributed-process
 language: haskell
@@ -46,6 +46,8 @@ creating a node for the process to reside in and sending a message to it with it
 
 
 ```Haskell
+{-# LANGUAGE TupleSections     #-}
+
 import Network.Transport.TCP (createTransport, defaultTCPParameters)
 import Control.Distributed.Process
 import Control.Distributed.Process.Node
@@ -53,7 +55,7 @@ import Control.Distributed.Process.Node
 
 main :: IO ()
 main = do
-  Right transport <- createTransport "127.0.0.1" "4001" defaultTCPParameters
+  Right transport <- createTransport "127.0.0.1" "4001" ("127.0.0.1",) defaultTCPParameters
   node <- newLocalNode transport initRemoteTable
   _ <- runProcess node $ do
     -- get the id of this process
@@ -98,7 +100,7 @@ module Types where
 
 import GHC.Generics
 import Data.Binary
-import Data.Typeable.Internal
+import Data.Typeable
 import Data.Map (Map)
 import Control.Distributed.Process (SendPort)
 
@@ -119,6 +121,8 @@ Our second type represents any message which is broadcasted to the clients conne
 ```Haskell
 data Sender = Server | Client NickName
   deriving (Generic, Typeable, Eq, Show)
+
+instance Binary Sender
 
 data ChatMessage = ChatMessage {
     from :: Sender
@@ -395,7 +399,7 @@ And ... that’s it! We have covered all the tasks the chat client needs to perf
 ```Haskell
 launchChatClient :: ServerAddress -> Host -> Int -> ChatName -> IO ()
 launchChatClient serverAddr clientHost port name  = do
-  mt <- createTransport clientHost (show port) defaultTCPParameters
+  mt <- createTransport clientHost (show port) (clientHost,) defaultTCPParameters
   case mt of
     Left err -> putStrLn (show err)
     Right transport -> do
