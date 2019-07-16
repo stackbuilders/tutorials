@@ -318,7 +318,7 @@ just a bit of complexity in the calculations.
 
 [django]: https://www.djangoproject.com
 [flask]: http://flask.pocoo.org/
-[moviepy]: https://zulko.github.io/Moviepy/
+[moviepy]: https://zulko.github.io/moviepy/
 [gizeh]: https://github.com/Zulko/Gizeh
 [cairo]: https://cairocffi.readthedocs.io/en/stable/
 [readme]: https://github.com/stackbuilders/tutorials/blob/tutorials/tutorials/python/python-video-generation/code/Readme.md
