@@ -24,6 +24,7 @@ supportedLanguages :: [String]
 supportedLanguages = [  -- Name here the directories of the programming languages to be supported
     "haskell"
   , "functional-full-stack" -- Haskell backend + PureScript frontend
+  , "python"
   ]
 
 markdownPattern :: Pattern
