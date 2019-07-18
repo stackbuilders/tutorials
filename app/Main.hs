@@ -28,15 +28,16 @@ supportedLanguages = [  -- Name here the directories of the programming language
   ]
 
 markdownPattern :: Pattern
-markdownPattern = filePattern "md"
+markdownPattern = filePattern ["md"]
 
 imagePattern :: Pattern
-imagePattern = filePattern "png"
+imagePattern = filePattern ["png", "gif"]
 
-filePattern :: String -> Pattern
-filePattern extension = foldl (.||.) (head patterns) (tail patterns)
+filePattern :: [String] -> Pattern
+filePattern extensions = foldl (.||.) (head patterns) (tail patterns)
   where
-    patterns = fmap (\dir -> fromGlob $ "tutorials/" ++ dir ++ "/*/*." ++ extension) supportedLanguages
+    patterns = fmap (\(dir, ext) -> fromGlob $ "tutorials/" ++ dir ++ "/*/*." ++ ext) extensionByLanguage
+    extensionByLanguage = [(dir, ext) | dir <- supportedLanguages, ext <- extensions]
 
 configuration :: Configuration
 configuration =
