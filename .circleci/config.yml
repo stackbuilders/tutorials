@@ -50,7 +50,7 @@ jobs:
           name: Build tutorials site
           command: make build
 
-  deploy-master:
+  deploy-tutorials:
     docker:
       - image: stackbuilders/hapistrano:latest
     steps:
@@ -77,13 +77,13 @@ workflows:
   build-deploy:
     jobs:
       - build-tutorials
-      - deploy-master:
+      - deploy-tutorials:
           requires:
             - build-tutorials
           filters:
             branches:
               only:
-                - master
+                - tutorials
       - deploy-production:
           requires:
             - build-tutorials
