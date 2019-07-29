@@ -59,7 +59,7 @@ jobs:
           name: Deploying
           command: |
             echo -e "Host * \n  StrictHostKeyChecking no" >> ~/.ssh/config
-            hap deploy -c deploy/staging.yaml
+            hap deploy -c deploy/staging.yml
 
   deploy-production:
     docker:
@@ -70,7 +70,7 @@ jobs:
           name: Deploying
           command: |
             echo -e "Host * \n  StrictHostKeyChecking no" >> ~/.ssh/config
-            hap deploy -c deploy/production.yaml
+            hap deploy -c deploy/production.yml
 
 workflows:
   version: 2
