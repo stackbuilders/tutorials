@@ -1,0 +1,93 @@
+---
+version: 2
+
+jobs:
+  build-tutorials:
+    docker:
+      - image: fpco/stack-build:lts-9.21
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-stack-{{ checksum "stack.yaml" }}
+            - v1-stack-
+
+      - run:
+          name: Upgrading stack
+          command: |
+            export PATH=$HOME/.local/bin:$PATH
+            stack upgrade
+
+      - run:
+          name: Installing compiler
+          command: stack setup
+
+      - restore_cache:
+          keys:
+            - v1-stack-work-{{ checksum "stack.yaml" }}
+            - v1-stack-work-
+
+      - run:
+          name: Installing dependencies
+          command: stack build --only-dependencies
+
+      - save_cache:
+          key: v1-stack-{{ checksum "stack.yaml" }}
+          paths:
+            - ~/.stack
+
+      - run:
+          name: Compiling
+          command: stack build
+
+      - save_cache:
+          key: v1-stack-work-{{ checksum "stack.yaml" }}
+          paths:
+            - .stack-work
+
+      - run:
+          name: Build tutorials site
+          command: make build
+
+  deploy-master:
+    docker:
+      - image: stackbuilders/hapistrano:latest
+    steps:
+      - checkout
+      - run:
+          name: Deploying
+          command: |
+            echo -e "Host * \n  StrictHostKeyChecking no" >> ~/.ssh/config
+            hap deploy -c deploy/staging.yaml
+
+  deploy-production:
+    docker:
+      - image: stackbuilders/hapistrano:latest
+    steps:
+      - checkout
+      - run:
+          name: Deploying
+          command: |
+            echo -e "Host * \n  StrictHostKeyChecking no" >> ~/.ssh/config
+            hap deploy -c deploy/production.yaml
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build-tutorials
+      - deploy-master:
+          requires:
+            - build-tutorials
+          filters:
+            branches:
+              only:
+                - master
+      - deploy-production:
+          requires:
+            - build-tutorials
+          filters:
+            branches:
+              only:
+                - production
