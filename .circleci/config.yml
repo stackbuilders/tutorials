@@ -16,7 +16,7 @@ jobs:
       - run:
           name: Upgrading stack
           command: |
-            export PATH=$HOME/.local/bin:$PATH
+            echo 'export PATH=$HOME/.local/bin:$PATH' >> $BASH_ENV
             stack upgrade
 
       - run:
