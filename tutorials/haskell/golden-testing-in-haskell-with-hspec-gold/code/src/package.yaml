@@ -1,0 +1,53 @@
+name:                hspec-golden-tutorial
+version:             0.1.0.0
+github:              "MedAdrian/hspec-golden-tutorial"
+license:             BSD3
+author:              "Adrian Vera Medina"
+maintainer:          "adrian-860@hotmail.com"
+copyright:           "2019 Adrian Vera Medina"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/MedAdrian/hspec-golden-tutorial#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+
+library:
+  source-dirs: src
+
+executables:
+  hspec-golden-tutorial-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - hspec-golden-tutorial
+
+tests:
+  hspec-golden-tutorial-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - hspec
+    - hspec-golden
+    - hspec-golden-tutorial
+    - yaml
+    - bytestring
+    - aeson

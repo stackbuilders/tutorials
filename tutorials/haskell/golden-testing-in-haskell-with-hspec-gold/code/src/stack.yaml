@@ -1,0 +1,6 @@
+resolver: lts-14.0
+packages:
+- .
+extra-deps:
+- hspec-golden-0.1.0.0
+- simple-get-opt-0.3

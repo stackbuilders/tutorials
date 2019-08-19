@@ -1,0 +1,1 @@
+[{"name":"Install a list of packages","apt":{"name":"{{ packages }}"},"become":true,"vars":{"packages":["git","htop","nmap","strace","tmux","vim"]}}]

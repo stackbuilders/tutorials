@@ -13,6 +13,10 @@ description: In this tutorial we will implement golden tests in Haskell using hs
 
 Golden testing (also known as Golden master testing or Snapshot testing) is pretty similar to unit testing, except that the test output is stored in a separate file known as the "Golden File".
 
+> ‘A Golden File is your source of truth. You validate your test response against the Golden File. To summarize, the Golden file contains the response you expect from your test’
+
+Source: [Medium](https://medium.com/@jarifibrahim/golden-files-why-you-should-use-them-47087ec994bf) 
+
 This kind of testing will help us verify modifications made to a reference version of our SUT(Subject Under Test) and validate that it has not modified its
 behaviour in an incorrect way. Thus giving us some safety when extending and refactoring code that doesn't have proper tests.
 
@@ -24,20 +28,14 @@ Once we adopt this perspective, we have a completely different frame for underst
 we can see tests as descriptions of what we have rather than statements of correctness.
 We can review our tests periodically to tighten up their conditions as we decide what the behavior should be at each level of our systems.
 
-##The Main idea
-
-####‘A Golden File is your source of truth. You validate your test response against the Golden File. To summarize, the Golden file contains the response you expect from your test’
-Source: [Medium](https://medium.com/@jarifibrahim/golden-files-why-you-should-use-them-47087ec994bf) 
-
-##Changes on test flow
+## Changes on test flow
 The workflow for running the tests now becomes the following:
 
-* Run a test and make sure it fails.
-* Review the output from your test to see if it is accurate.
-* Update the existing golden file (or create new ones).
-* Re-run your tests to ensure that the test does not fail.
+* Write some execution for the subject under test, this can be a small test wich will pass as at the first execution time.
+* Change the SUT(Subject Under Test) and evaluate the result of the golden file.
+* Update the golden file with the new value output from the Subject Under Test.
 
-##How do Golden tests differentiate from unit tests?
+## How do Golden tests differentiate from unit tests?
 * If the output is larger in size, it's not practical to put it in the source code.
 
 * There is no need to escape quotes or binary data in the output.
@@ -52,12 +50,12 @@ The workflow for running the tests now becomes the following:
 
 * If some of your tests suddenly started failing, you can use diff or other such tools to compare the golden file to the actual file and figure out what exactly changed.
 
-##What is hspec-golden?
+## What is hspec-golden?
 [hspec-golden](https://github.com/stackbuilders/hspec-golden) is a superset for the popular Haskell B.D.D. testing framework [hspec](https://github.com/hspec/hspec),
 that will allow us to create golden test for our Haskell projects,
 currently being developed by [Cristhian Motoche](https://github.com/CristhianMotoche) an active Open Source code enthusiast and Stackbuilders developer.
 
-##What do we need?
+## What do we need?
 For this tutorial, we need an environment running Haskell with base 4.6 up to 5,
 if we don’t have a Haskell environment we could refer to this [link](https://wiki.haskell.org/Haskell_in_5_steps#Install_Haskell) to get a clean installation using `stack` or `cabal`.
 
@@ -71,15 +69,15 @@ With cabal:
 
 ``$ cabal update && cabal install hspec``
 
-##Getting started
+## Getting started
 This code sample will help us to understand how does basic golden testing works.
 
-##Installing the library:
+## Installing the library:
 To install the [hspec-golden](https://github.com/stackbuilders/hspec-golden) superset we need to run this command on the console:
 
 ``$ stack install hspec-golden``
 
-##Importing the libraries
+## Importing the libraries
 In our project on we have created a GoldenSpec.hs and added the following lines.
 ``` 
 module GoldenSpec where
@@ -98,7 +96,7 @@ we are adding the test framework [hspec](https://github.com/hspec/hspec) and [hs
 with some additional libs to implement our own Golden type.
 
 
-###Writing our first golden test
+### Writing our first golden test
 The [hspec-golden](https://github.com/stackbuilders/hspec-golden) library provides us with an easy example to test the functionality of the library with the `defaultGolden` helper:
 
 ``` 
@@ -133,11 +131,9 @@ spec = do
         myGoldenTest "conversion" json                                        --Generates the golden test.
 ```
 
-To see the full code example access this [rerpository](https://github.com/MedAdrian/hspec-golden-tutorial).
+To see the full code example access this [repository](https://github.com/MedAdrian/hspec-golden-tutorial).
 
-If you are confused about how test are written you can follow this [link](http://hspec.github.io/hspec-discover.html).
-
-#####I.e: Directory Structure 
+##### I.e: Directory Structure 
 ``` 
 |_.golden
    |_id
@@ -147,7 +143,7 @@ If you are confused about how test are written you can follow this [link](http:/
 
 For this example we are testing that the output from the function will return the expected golden value.
 
-##Installing the CLI
+## Installing the CLI
 You can install the [hspec-golden](https://github.com/stackbuilders/hspec-golden) command line interface (CLI) with stack:
 
 ``` $ stack install hspec-golden ```
@@ -155,19 +151,6 @@ You can install the [hspec-golden](https://github.com/stackbuilders/hspec-golden
 or cabal:
 
 ``` $ cabal install hspec-golden ```
-
-The CLI is called hgold:
-```
-$ hgold
-
-Parameters:
-  DIR    The testing directory where you're dumping your results (default: .golden/)
-
-Flags:
-  -u[DIR]  --update[=DIR]  Replaces `golden` files with `actual` files
-  -v       --version       Displays the version of hgold
-  -h       --help          Displays help information
-```
 
 Update the golden tests under .golden directory:
 
@@ -177,7 +160,7 @@ Update the golden tests under .myGoldenTest directory:
 
 ``` $ hgold -u .myGoldenTest ```
 
-##Conclusions
+## Conclusions
 We can determine that the name “golden file” only refers to the file with the output value, not the input.
 On most libraries there is no input values stored in a file,
 but in practice is often convenient to store them both in files so that there is an input file for every output file and vice versa.

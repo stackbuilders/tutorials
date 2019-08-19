@@ -1,0 +1,14 @@
+---
+
+- name: Install a list of packages
+  become: true
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - git
+      - htop
+      - nmap
+      - strace
+      - tmux
+      - vimASaså
