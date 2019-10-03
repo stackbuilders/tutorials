@@ -18,9 +18,9 @@ executable tutorials
       base
     , bytestring
     , filepath
-    , hakyll >= 4.7  && <= 4.9.7.0
+    , hakyll
     , hjsmin
-    , pandoc >= 1.14 && <= 1.19.2.1
+    , pandoc
   ghc-options:
     -Wall
   default-language:
