@@ -1,4 +1,16 @@
-# Bridging Haskell and Reason
+---
+title: Bridge Haskell and ReasonML
+published: 2019-11-01
+tags: Haskell, OCaml, ReasonML, types, testing
+language: OCaml
+author-name: Diego Balseiro
+twitter-profile: dbalseiro
+github-profile: dbalseiro
+description: Learn how to use your Haskell types in your ReasonML (OCaml) frontend (almost) for free!! You will also get automatic code generation of JSON serialization functions with their respective golden files, and code for your serialization tests. You can't miss this offer!!
+
+---
+
+# Bridge Haskell and Reason
 
 The different tools and technologies that we often use when developing software add complexity to our systems. One of the challenges that we face in web development is that we are often writing the backend and the frontend in different languages and type systems. To continue to build reliable applications we need a way to connect both.
 
