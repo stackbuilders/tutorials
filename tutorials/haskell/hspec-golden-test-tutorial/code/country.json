@@ -1,0 +1,42 @@
+[
+  {
+    "cname"      :"Ecuador",
+    "continent" :"America",
+    "ctag"       :3
+  },
+  {
+    "cname"      :"Austria",
+    "continent" :"Europe",
+    "ctag"       :23
+  },
+  {
+    "cname"      :"Nepal",
+    "continent" :"Asia",
+    "ctag"       :3
+  },
+  {
+    "cname"      :"Japan",
+    "continent" :"Asia",
+    "ctag"       :23
+  },
+  {
+    "cname"      :"Egypt",
+    "continent" :"Africa",
+    "ctag"       :3
+  },
+  {
+    "cname"      :"Ghana",
+    "continent" :"Africa",
+    "ctag"       :23
+  },
+  {
+    "cname"      :"Usa",
+    "continent" :"America",
+    "ctag"       :3
+  },
+  {
+    "cname"      :"Spain",
+    "continent" :"Europe",
+    "ctag"       :23
+  }
+]
