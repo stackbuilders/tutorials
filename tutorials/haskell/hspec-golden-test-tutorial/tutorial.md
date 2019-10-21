@@ -35,9 +35,17 @@ spec = do
             sayHi `shouldBe` "Hello Golden Testers"
 ```
 
-So, in a nutshell we are comparing the output of the function with a string that is stored in the code of our test. We can take a different approach and store this output in a separate file. This approach is known as golden testing and the file in which we store the output takes the name of "golden file".
+So, in a nutshell we are comparing the output of the function with a string that is stored inside the code of our test. We can take a different approach and store this output in a separate file. This approach is known as golden testing and the file in which we store the output takes the name of "golden file".
 
+So, now we know what golden testing is. But if unit tests and golden tests are so similar, why don't we just keep up with unit tests right?
 
-#### Difference from Unit tests
+The truth is that unit tests are not useful when evaluating complex and large outputs and that's where the difference lies. Here are some advantages of golden tests over unit tests.
+
+ - It wouldn't be practical to store a large output inside the test code.
+
+ - With some golden tests libraries the expected output (Golden File) can be automatically generated .
+
+ - Some golden test libraries also updates automatically the golden file.
+
 
 # How does Hspec-golden
