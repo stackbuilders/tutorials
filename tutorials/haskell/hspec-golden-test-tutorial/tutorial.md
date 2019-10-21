@@ -13,8 +13,29 @@ description: Software testing is necessary to check if an application behaves in
 ---
 
 
-The importance of software testing relies on the ability to check if a determined applications behaves in an appropriate way. Unit tests are the first level of testing and helps developers to detect early bugs in the code by testing each component individually.
+The importance of software testing relies on the ability to check if a determined application behaves in an appropriate way. Unit tests are the first level of testing and helps developers to detect early bugs in the code by testing each component individually.
 
+For example, lets create a function that outputs the string "Hello Golden Testers":
+```
+sayHi :: String
+sayHi = "Hello Golden Testers"
+
+```
+
+Using Hspec we can easily test our function :
+
+```
+import HelloWorld
+import Test.Hspec
+
+spec :: Spec
+spec = do
+    describe "sayHi" $
+        it "shows a Hello Golden Testers string" $
+            sayHi `shouldBe` "Hello Golden Testers"
+```
+
+So, in a nutshell we are comparing the output of the function with a string that is stored in the code of our test. We can take a different approach and store this output in a separate file. This approach is known as golden testing and the file in which we store the output takes the name of "golden file".
 
 
 #### Difference from Unit tests
