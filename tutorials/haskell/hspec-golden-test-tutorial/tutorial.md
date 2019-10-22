@@ -7,7 +7,7 @@ tags: haskell, golden, tests
 libraries: hspec-golden-0.1.0.1
 language: haskell
 author-name: Jorge Andrés Guerra Landázuri
-twitter-profile: Jagl257
+twitter-profile: Jorge_257
 github-profile: Jagl257
 description: Software testing is necessary to check if an application behaves in a expected way. Sometimes it is useful to store the expected output in a separate file. This is how golden tests works and in this tutorial we will be using Hspec-golden haskell library to create and update with no problem our golden tests.
 ---
