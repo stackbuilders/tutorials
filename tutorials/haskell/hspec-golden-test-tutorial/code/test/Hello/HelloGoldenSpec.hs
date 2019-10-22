@@ -1,12 +1,12 @@
 module Hello.HelloGoldenSpec where
 
-import           Test.Hspec
-import           Test.Hspec.Golden
-import           HelloWorld
+import           Test.Hspec                -- Test
+import           Test.Hspec.Golden         -- Golden Tests
+import           HelloWorld                -- SUT
 
 
 spec :: Spec
 spec =
     describe "sayHi" $
-    it "shows a Hello Golden Testers string" $
+    it "returns Hello Golden Testers string" $
     defaultGolden "hello" sayHi
