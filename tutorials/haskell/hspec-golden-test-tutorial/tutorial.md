@@ -82,7 +82,7 @@ dependencies:
 - hspec-golden
 
 ```
-## Our First Test
+## A Simple Test
 
 Now that we have all dependencies installed, lets create our golden tests.
 
@@ -107,9 +107,9 @@ Hspec-golden provides us a defaultGolden function which creates and compares the
   - the name of the test (Directory where our golden file will be located)
   - the output of our SUT  
 
-By default this function search for golden test inside a .golden directory, so it would be a great idea if we create one right now.
+By default this function search for golden test inside a /.golden directory, so it would be a great idea if we create one right now.
 
-Ok nough reading, lets create our tests. First create a test module named ```HelloGoldenSpec``` . For convenience I have create the this module under test/Hello directory.
+Ok enough reading, lets create our tests. We will first create a test module named ```HelloGoldenSpec``` . For convenience I have created this module under test/Hello directory.
 
 ```Haskell
 
@@ -162,7 +162,10 @@ hspec-golden-tests> Test suite hspec-golden-tests-test passed
 
 ```
 
-We can see that the test is successful. Now lets check .golden directory.
+We can see that the test is successful. If we check the .golden directory we will find two files.
+
+ - golden : Is where the expected output is located.
+ - actual : Stores the real output from the SUT.
 
 
 ```shell
@@ -178,3 +181,230 @@ user@ubuntu:~/hspec-golden-test/.golden$ tree
 ```
 
 The testing framework recognized that this was the first execution therefore created the hello test with the actual and golden files.
+
+
+
+## A more complete test
+
+So far we have implemented the hspec-golden defaultGolden tool for testing and automatically creating our golden files. But we haven't really test the whole functionality of hspec-golden nor the hgold CLI from hspec-golden for updating the golden files.
+
+We will now test two haskell modules that really need  golden tests.
+
+- Html.hs : Renders a HTML template.
+- Json.hs : Encodes a data type into a JSON Bytestring.  
+
+For convenience each module will be located inside its own directory.
+
+```shell
+
+user@ubuntu:~/hspec-golden-test/src$ tree
+.
+├── HelloWorld.hs
+├── HTML
+│   └── Html.hs
+├── JSON
+│   └── Json.hs
+└── Lib.hs
+
+```
+
+To make things easy and save time lets paste the following code into each module.
+
+###### Html.hs
+
+```haskell
+
+{-# LANGUAGE OverloadedStrings #-}
+
+
+module HTML.Html  where
+
+import           Text.Blaze.Html5               as H
+import           Text.Blaze.Html5.Attributes    as A
+import           Text.Blaze.Html.Renderer.Pretty        (renderHtml)
+
+
+htmlRendered :: Html -> String
+htmlRendered page = renderHtml page
+
+somePage :: Html
+somePage = html $ do
+    H.head $ do
+        H.title "StackBuilders Tutorial."
+    body $ do
+       "Hello Golden Testers."
+
+```
+
+
+###### Json.hs
+
+```haskell
+
+{-# LANGUAGE DeriveGeneric #-}
+
+module JSON.Json where
+
+import            Data.Aeson                   (ToJSON, encode)
+import            GHC.Generics                 (Generic)
+import            Data.ByteString.Lazy         (ByteString)
+
+data Country = Country
+  {
+    cname      :: String,
+    continent :: String,
+    ctag       :: Int
+  } deriving (Generic, Show)
+
+instance ToJSON Country
+
+
+ecuador = Country "Ecuador" "America" 1
+germany = Country "Germany" "Europe" 2
+japan = Country "Japan" "Asia" 3
+
+countries :: [Country]
+countries = [ecuador,germany,japan]
+
+encodeCountries :: [Country] -> ByteString
+encodeCountries = encode
+
+```
+
+We are ready to start coding our tests. First lets organize our tests into directories. And inside the respective directory create HtmlGoldenSpec.hs and JsonGoldenSpec.hs.
+
+```shell
+
+user@ubuntu:~/hspec-golden-test-tutorial/test$ tree
+.
+├── Hello
+│   ├── HelloGoldenSpec.hs
+│   └── HelloSpec.hs
+├── Html
+│   └── HtmlGoldenSpec.hs
+├── Json
+│   └── JsonGoldenSpec.hs
+└── Spec.hs
+
+```
+
+#### HTML Golden tests
+
+Now that we have our module lets imports all the things we need.
+
+``` haskell
+
+import           Test.Hspec
+import           Test.Hspec.Golden
+import           HTML.Html
+
+```
+And finally we can write our test.
+
+``` haskell
+
+spec :: Spec
+spec =
+    describe "renderHtml" $
+    it "Renders an Html5 file " $
+    defaultGolden "html" (htmlRendered somePage)
+
+```
+
+Just like the previous example, after running the test we will have a new directory (/.golden/html/) that contains our actual and golden file. But what would happen if we change the output of our SUT ?
+
+For example let change the html body to "Goodbye Golden Testers" in the Html module and run the tests.   
+
+```shell
+
+test/Html/HtmlGoldenSpec.hs:11:5:
+  1) Html.HtmlGolden.renderHtml Renders an Html5 file
+      expected: "   
+       <body>
+               Hello Golden Testers.
+       </body>"
+      but got: "
+       <body>
+               Goodbye Golden Testers.
+       </body>"
+
+
+Finished in 0.0013 seconds
+3 examples, 1 failure
+```
+
+Our html test failed but not big deal we can change our golden file and things will work just fine. Pretty simple right?
+Actually its not that simple. Lets imagine that we have a really large golden file and we had to update it by hand, that would be a waste of time. Fortunately hspec-golden provides us with a tool "hgold" that helps updating our golden files using its CLI. Lets install it.
+
+Using stack:
+
+```shell
+
+stack install hspec-golden
+
+```
+
+using Cabal:
+
+```shell
+
+cabal install hspec-golden
+
+```
+Once installed we can use the --help flag to see how the CLI works.
+
+```
+
+Update your golden files
+
+Usage: hgold [-u|--update [DIR]] [-v|--version]
+
+Available options:
+  -u,--update [DIR]        The testing directory where youre dumping your
+                           results. (default: )
+  -v,--version             Show version
+  -h,--help                Show this help text
+
+
+```
+
+According to [hspec-golden](https://github.com/stackbuilders/hspec-golden) when hgold is used without flags it updates on default the "./golden" directory. If we store our golden files in a different dierctory we should use the --update flag and specify the name of the directory as an argument.
+
+Ok, lets update our golden files. When using hgold the golden files (Expected output) will be replaced with the actual files (Output).
+
+```shell
+
+user@ubuntu:~/hspec-golden-test$ hgold
+Replacing golden with actual...
+  Replacing file: .golden/hello/golden with: .golden/hello/actual
+  Replacing file: .golden/html/golden with: .golden/html/actual
+Finish...
+
+```
+
+So now we are ready to test our updated golden files.
+
+```shell 
+
+Hello.HelloGolden
+  sayHi
+    returns Hello Golden Testers string
+      Golden and Actual output hasn't changed
+Hello.Hello
+  sayHi
+    shows a Hello Golden Testers string
+Html.HtmlGolden
+  renderHtml
+    Renders an Html5 file 
+      Golden and Actual output hasn't changed
+
+Finished in 0.0034 seconds
+3 examples, 0 failures
+
+```
+
+And we can see that everything works fine.
+
+#### JSON Golden Test
+
+
