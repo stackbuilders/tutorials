@@ -21,9 +21,10 @@ goldenBytestring name actualOutput =
 
 spec :: Spec
 spec =
+
   describe "encodeCountries" $ do
-   it "encodes a group of Countries into a JSON String " $
-    defaultGolden "json" (show $ encodeCountries countries)
+--   it "encodes a group of Countries into a JSON String " $
+--    defaultGolden "json" (encodeCountries countries)
   
    it "encodes a group of Countries into a JSON bytestring " $
     goldenBytestring "json" (encodeCountries countries)

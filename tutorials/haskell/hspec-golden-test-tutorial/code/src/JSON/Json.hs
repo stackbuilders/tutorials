@@ -20,7 +20,7 @@ instance ToJSON Country
 
 ecuador = Country "Ecuador" "America" 1
 germany = Country "Germany" "Europe" 2
-japan = Country "Japan" "Asia" 3
+japan = Country "Japan" "Asia" 4
 
 countries :: [Country]
 countries = [ecuador,germany,japan]
