@@ -2,26 +2,20 @@
 
 module JSON.Json where
 
-import            Data.Aeson                                  (ToJSON, encode) 
+import            Data.Aeson                                  (ToJSON, encode)
 import            GHC.Generics                                (Generic)
 import            Data.ByteString.Lazy                        (ByteString)
-import qualified  Data.ByteString.Lazy    as ByteString
-
-countriesPath :: FilePath
-countriesPath = "country.json"
-
-countriesJSON :: IO ByteString
-countriesJSON = ByteString.readFile countriesPath
 
 
-data Country = Country 
+
+data Country = Country
   {
     cname      :: String,
     continent :: String,
     ctag       :: Int
   } deriving (Generic, Show)
 
-instance ToJSON Country 
+instance ToJSON Country
 
 
 ecuador = Country "Ecuador" "America" 1
@@ -33,4 +27,3 @@ countries = [ecuador,germany,japan]
 
 encodeCountries :: [Country] -> ByteString
 encodeCountries = encode
-

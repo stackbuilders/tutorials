@@ -4,7 +4,6 @@
 module HTML.Html  where
 
 import           Text.Blaze.Html5               as H
-import           Text.Blaze.Html5.Attributes    as A
 import           Text.Blaze.Html.Renderer.Pretty        (renderHtml)
 
 
@@ -16,5 +15,4 @@ somePage = html $ do
     H.head $ do
         H.title "StackBuilders Tutorial."
     body $ do
-       "Hello Golden Testers."
-
+       "Goodbye Golden Testers."
