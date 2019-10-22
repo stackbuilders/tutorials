@@ -407,4 +407,127 @@ And we can see that everything works fine.
 
 #### JSON Golden Test
 
+Until now we have managed components that returns strings only, but what if our return type is different like an Integer or Boolean? For example lets analize our Json.hs module encodeCountries function.
+
+```Haskell
+
+encodeCountries :: [Country] -> ByteString
+encodeCountries = encode
+
+```
+
+This function returns a bytestring, that means that if we try to assert the output with our defaultGolden function,
+
+``` Haskell
+
+  describe "encodeCountries" $ do
+   it "encodes a group of Countries into a JSON String " $
+    defaultGolden "json" (encodeCountries countries)
+
+```
+
+test wont even compile.
+
+```shell
+• Couldn't match type ‘B.ByteString’ with ‘[Char]’
+      Expected type: String
+        Actual type: B.ByteString
+```
+
+Conviniently hspec-golden export a Golden data type. With this tool we can configure how our golden test works.
+
+```
+data Golden str =
+  Golden {
+    output       :: str,                      --  Output
+    encodePretty :: str -> String,            --  Makes the comparison pretty when the test fails
+    writeToFile  :: FilePath -> str -> IO (), --  How to write into the golden file the file
+    readFromFile :: FilePath -> IO str,       --  How to read the file,
+    testName     :: String,                   --  Test name 
+    directory    :: FilePath                  --  Directory where you write your tests
+  }
+
+```
+
+We are now able to create a new function to assert our output. Lets start by importing some modules.
+
+``` Haskell
+module Json.JsonGoldenSpec where
+
+import           Test.Hspec
+import           Test.Hspec.Golden
+import           JSON.Json
+import qualified Data.ByteString.Lazy as B    
+
+```
+
+Next, based on the Golden data type documentation , lets create our assert function.
+
+```Haskell
+
+goldenBytestring :: String -> B.ByteString -> Golden B.ByteString
+goldenBytestring name actualOutput =
+    Golden {
+        output = actualOutput,
+        encodePretty = show,
+        writeToFile = B.writeFile,
+        readFromFile = B.readFile,
+        testName = name,
+        directory = ".otherGolden"
+          
+    }
+```
+
+If we check our goldenBytestring function, we have specified a new directory to store our golden files,so we will have to create this one before running our tests.
+
+```shell
+
+├── .golden
+│   ├── hello
+│   │   ├── actual
+│   │   └── golden
+│   └── html
+│       ├── actual
+│       └── golden
+|
+└── .otherGolden
+
+```
+
+We are now ready to create our test.
+
+```Haskell
+
+spec :: Spec
+spec =
+
+  describe "encodeCountries" $ do
+   it "encodes a group of Countries into a JSON bytestring " $
+    goldenBytestring "json" (encodeCountries countries)
+
+```
+And run them to see if our assert function is working fine.
+
+```shell
+  encodeCountries
+    encodes a group of Countries into a JSON bytestring 
+      First time execution. Golden file created.
+
+Finished in 0.0034 seconds
+4 examples, 0 failures
+
+```
+
+Lets remember that our golden files are stored in a different directory so in case of making an update we should use the --update flag from out hgold CLI.
+
+```shell
+
+user@ubuntu:~/hspec-golden-test$ hgold --update ".otherGolden"
+
+Replacing golden with actual...
+  Replacing file: .otherGolden/json/golden with: .otherGolden/json/actual
+Finish...
+
+```
+
 
