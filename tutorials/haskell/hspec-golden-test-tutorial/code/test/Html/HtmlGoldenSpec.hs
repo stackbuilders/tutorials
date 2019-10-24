@@ -8,5 +8,5 @@ import           HTML.Html
 spec :: Spec
 spec =
     describe "renderHtml" $
-    it "Renders an Html5 file " $
-    defaultGolden "html" (htmlRendered somePage)
+      it "Renders an Html5 file " $
+       defaultGolden "html" (htmlRendered somePage)
