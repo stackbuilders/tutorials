@@ -1,14 +1,13 @@
 name:                hspec-golden-tests
 version:             0.1.0.0
 github:              "githubuser/hspec-golden-tests"
-license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2019 Author name here"
+license:              MIT 
+author:              "Stack Builders"
+maintainer:          "jguerra@stackbuilders.com"
+copyright:           "2019 Stack Builders"
 
 extra-source-files:
 - README.md
-- ChangeLog.md
 
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
