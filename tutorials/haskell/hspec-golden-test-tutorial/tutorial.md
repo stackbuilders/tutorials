@@ -37,15 +37,15 @@ spec = do
 
 So, in a nutshell we are comparing the output of the function with a string that is stored inside the code of our test. We can take a different approach and store this expected output in a separate file. This approach is known as golden testing and the file in which we store the expected output takes the name of "golden file".
 
-So, now we know what golden testing is, but if unit tests and golden tests are so similar, why don't we just keep up with unit tests right?
+So, now we know what golden testing is, but if unit tests and golden tests are so similar, why don't we just keep up with unit tests, right?
 
 The truth is that unit tests are not useful when evaluating complex and large outputs and that's where the difference lies. Here are some advantages of golden tests over unit tests.
 
  - It wouldn't be practical to store a large output inside the test code.
 
- - With some golden tests libraries the expected output (Golden File) can be automatically generated .
+ - With some golden tests libraries the expected output (Golden File) can be automatically generated.
 
- - Some golden test libraries also automatically updates the golden file.
+ - Some golden test libraries also automatically updates the golden file. So, we don't need to manually update the tests when the expected output changes. 
 
  - It is useful when working with JSON, HTML, images, etc.
 
@@ -101,9 +101,9 @@ sayHi :: String
 sayHi = "Hello Golden Testers"
 
 ```
-Before moving on with testing,lets review some of hspec-golden [documentation](http://hackage.haskell.org/package/hspec-golden-0.1.0.1/docs/Test-Hspec-Golden.html).
+Before moving on with testing, lets review some of hspec-golden [documentation](http://hackage.haskell.org/package/hspec-golden-0.1.0.1/docs/Test-Hspec-Golden.html).
 
-Hspec-golden provides us with a defaultGolden function which creates and compares the SUT output and the golden file. It takes two parameters:
+Hspec-golden provides us with a defaultGolden function which creates and compares the Subject Under Test (SUT) output and the golden file. It takes two parameters:
 
   - the name of the test (Directory where our golden file will be located)
   - the output of our SUT 
@@ -150,8 +150,8 @@ Finally lets write the test.
 spec :: Spec
 spec =
     describe "sayHi" $
-    it "returns Hello Golden Testers string" $
-    defaultGolden "hello" sayHi
+      it "returns Hello Golden Testers string" $
+        defaultGolden "hello" sayHi
 
 ```
 We are now ready to test our module.
@@ -325,8 +325,8 @@ and write our test.
 spec :: Spec
 spec =
     describe "renderHtml" $
-    it "Renders an Html5 file " $
-    defaultGolden "html" (htmlRendered somePage)
+      it "Renders an Html5 file " $
+       defaultGolden "html" (htmlRendered somePage)
 
 ```
 
@@ -470,7 +470,7 @@ data Golden str =
 ```
 For example here we can define a different directory for storing our golden files, also we can define how our test will be read and how the output will be written. Finally the ```encodePretty``` characteristic determines how a non-string type will be transformed to string.
 
-With dataa-type we are now able to create a new function to assert our output. Lets start by importing some modules.
+With data-type we are now able to create a new function to assert our output. Lets start by importing some modules.
 
 ``` Haskell
 module Json.JsonGoldenSpec where
