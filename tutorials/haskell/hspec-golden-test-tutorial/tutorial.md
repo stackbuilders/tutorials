@@ -92,13 +92,19 @@ dependencies:
 
 Now that we have all dependencies installed, lets create our golden tests.
 
-First lets create a ```HelloWorld ``` module to be tested and add the "Hello Golden Testers" function described earlier.
+First lets create a ```FizBuz ``` module to be tested. For convinience I have created a FIZBUZ directory. Now let's add some code to our module. 
 
 ```haskell
-module HelloWorld where
+module FIZBUZ.FizBuz where 
 
-sayHi :: String
-sayHi = "Hello Golden Testers"
+fizzBuzz :: [Int] -> [String]
+fizzBuzz list = map fizzOrBuzz list
+
+fizzOrBuzz ::Int -> String
+fizzOrBuzz n | n `mod` 15 == 0  = "FizzBuzz"
+             | n `mod` 3  == 0  = "Fizz"
+             | n `mod` 5  == 0  = "Buzz"
+             | otherwise        = show n
 
 ```
 Before moving on with testing, lets review some of hspec-golden [documentation](http://hackage.haskell.org/package/hspec-golden-0.1.0.1/docs/Test-Hspec-Golden.html).
@@ -126,11 +132,11 @@ By default this function search for golden tests inside a "/.golden" directory, 
 
 ```
 
-Ok enough reading, lets create our tests. We will first create a test module named ```HelloGoldenSpec``` . For convenience I have created this module under test/Hello directory.
+Ok enough reading, lets create our tests. We will first create a test module named ```FizBuzGoldenSpec``` . For convenience I have created this module under ```test/Hello/``` directory.
 
 ```Haskell
 
-module Hello.HelloGoldenSpec where
+module FizBuz.FizBuzGoldenSpec where
 
 ```
 
@@ -138,9 +144,9 @@ We need some imports.
 
 ```Haskell
 
-import           Test.Hspec              -- Test
-import           Test.Hspec.Golden       -- Golden Tests  
-import           HelloWorld              -- SUT
+import           Test.Hspec                --Tests
+import           Test.Hspec.Golden         --Golden Tests
+import           FIZBUZ.FizBuz             -- SUT
 
 ```
 Finally lets write the test.
@@ -148,11 +154,10 @@ Finally lets write the test.
 ```Haskell
 
 spec :: Spec
-spec =
-    describe "sayHi" $
-      it "returns Hello Golden Testers string" $
-        defaultGolden "hello" sayHi
-
+spec = 
+    describe "fizzBuzz" $
+      it "Turns 3 multiples to fizz and 5 multiples to buzz" $
+        defaultGolden "fizzbuzz" (show $ fizzBuzz [1,2,3,4,5,11,12,13,14,15])
 ```
 We are now ready to test our module.
 
@@ -163,9 +168,9 @@ user@ubuntu:~/hspec-golden-test$ stack test
 hspec-golden-tests> test (suite: hspec-golden-tests-test)
 
 
-Hello.HelloGolden
-  sayHi
-    returns Hello Golden Testers string
+FizBuz.FizBuzGolden
+  fizzBuzz
+    Turns 3 multiples to fizz and 5 multiples to buzz
       First time execution. Golden file created.
 
 Hello.Hello
@@ -190,7 +195,7 @@ The test is successful. If we check the "./golden" directory we will find two fi
 
 user@ubuntu:~/hspec-golden-test/.golden$ tree
 .
-└── hello
+└── fizzbuzz
     ├── actual
     └── golden
 
@@ -198,7 +203,7 @@ user@ubuntu:~/hspec-golden-test/.golden$ tree
 
 ```
 
-The testing framework recognized that this was the first execution therefore created the hello test with the actual and golden files. The difference between this two files if that the actual file will be overwritten everytime we run the test while the golden will stay the same. This is useful when we want to update the golden file, but we will see that further in this tutorial. 
+The testing framework recognized that this was the first execution therefore created the fizzbuzz test with the actual and golden files. The difference between this two files is that the actual file will be overwritten everytime we run the test while the golden will stay the same. This is useful when we want to update the golden file, but we will see that further in this tutorial. 
 
 
 
