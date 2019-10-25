@@ -4,22 +4,21 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f5a462c480f5d8b2919ed5a4bec02f65b820bc9dc73418165e0ddf98ffd17fb5
+-- hash: 912f51eb9bf47f96eed20807ba99c10837823e5b44a0f8588bba2bedc583ae0a
 
 name:           hspec-golden-tests
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/hspec-golden-tests#readme>
 homepage:       https://github.com/githubuser/hspec-golden-tests#readme
 bug-reports:    https://github.com/githubuser/hspec-golden-tests/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2019 Author name here
-license:        BSD3
+author:         Stack Builders
+maintainer:     jguerra@stackbuilders.com
+copyright:      2019 Stack Builders
+license:        MIT
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
-    ChangeLog.md
 
 source-repository head
   type: git
@@ -27,6 +26,7 @@ source-repository head
 
 library
   exposed-modules:
+      FIZBUZ.FizBuz
       HelloWorld
       HTML.Html
       JSON.Json
@@ -63,6 +63,7 @@ test-suite hspec-golden-tests-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      FizBuz.FizBuzGoldenSpec
       Hello.HelloGoldenSpec
       Hello.HelloSpec
       Html.HtmlGoldenSpec
