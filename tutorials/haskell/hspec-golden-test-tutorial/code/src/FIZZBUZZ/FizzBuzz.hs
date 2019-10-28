@@ -1,4 +1,4 @@
-module FIZBUZ.FizBuz where 
+module FIZZBUZZ.FizzBuzz where 
 
 fizzBuzz :: [Int] -> [String]
 fizzBuzz list = map fizzOrBuzz list

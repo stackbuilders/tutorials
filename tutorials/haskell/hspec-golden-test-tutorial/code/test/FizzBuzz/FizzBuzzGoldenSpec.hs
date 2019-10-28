@@ -1,9 +1,9 @@
-module FizBuz.FizBuzGoldenSpec where
+module FizzBuzz.FizzBuzzGoldenSpec where
 
 
 import           Test.Hspec
 import           Test.Hspec.Golden
-import           FIZBUZ.FizBuz
+import           FIZZBUZZ.FizzBuzz
 
 spec :: Spec
 spec = 
