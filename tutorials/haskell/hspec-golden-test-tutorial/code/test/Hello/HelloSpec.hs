@@ -7,4 +7,4 @@ spec :: Spec
 spec = do
     describe "sayHi" $ 
         it "shows a Hello Golden Testers string" $
-            sayHi `shouldBe` "Hello Golden Testers"
+            (sayHi "John Doe") `shouldBe` "Welcome to the Golden Tests tutorial John Doe"

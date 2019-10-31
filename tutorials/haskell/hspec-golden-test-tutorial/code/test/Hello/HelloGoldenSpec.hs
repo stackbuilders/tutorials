@@ -9,4 +9,4 @@ spec :: Spec
 spec =
     describe "sayHi" $
       it "returns Hello Golden Testers string" $
-        defaultGolden "hello" sayHi
+        defaultGolden "hello" (sayHi "John Doe")
