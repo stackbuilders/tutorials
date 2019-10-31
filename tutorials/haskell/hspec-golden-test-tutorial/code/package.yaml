@@ -1,6 +1,6 @@
-name:                hspec-golden-tests
+name:                hspec-golden-tutorial
 version:             0.1.0.0
-github:              "githubuser/hspec-golden-tests"
+github:              "stackbuilders/tutorials/tree/tutorials/tutorials/haskell/hspec-golden-test-tutorial/code"
 license:              MIT 
 author:              "Stack Builders"
 maintainer:          "jguerra@stackbuilders.com"
@@ -9,13 +9,6 @@ copyright:           "2019 Stack Builders"
 extra-source-files:
 - README.md
 
-# Metadata used when publishing your package
-# synopsis:            Short description of your package
-# category:            Web
-
-# To avoid duplicated efforts in documentation and dealing with the
-# complications of embedding Haddock markup inside cabal files, it is
-# common to point users to the README.md file.
 description:         Please see the README on GitHub at <https://github.com/githubuser/hspec-golden-tests#readme>
 
 dependencies:
@@ -29,7 +22,7 @@ library:
   source-dirs: src
 
 executables:
-  hspec-golden-tests-exe:
+  hspec-golden-tutorial-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -37,10 +30,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - hspec-golden-tests
+    - hspec-golden-tutorial
 
 tests:
-  hspec-golden-tests-test:
+  hspec-golden-tutorial-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -48,6 +41,6 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - hspec-golden-tests
+    - hspec-golden-tutorial
     - hspec
     - hspec-golden
