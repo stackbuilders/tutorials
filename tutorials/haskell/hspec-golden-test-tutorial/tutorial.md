@@ -110,8 +110,10 @@ Before moving on with testing, lets review some of ```hspec-golden``` [documenta
 
 Hspec-golden provides us with a ```defaultGolden``` function which creates and compares the Subject Under Test (SUT) output and the golden file. It takes two parameters:
 
-  - the name of the test 
+  - the name of the test __*__
   - the output of our SUT 
+
+__*Note__ : _It is important to give the tests unique names otherwise `hspec-golden` won't work_ 
 
 ```haskell
 defaultGolden :: String -> String -> Golden String
