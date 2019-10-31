@@ -2,7 +2,7 @@
 
 module JSON.Json where
 
-import            Data.Aeson                                  (ToJSON, FromJSON, encode, decode)
+import            Data.Aeson                                  (ToJSON, encode)
 import            GHC.Generics                                (Generic)
 import            Data.ByteString.Lazy                        (ByteString)
 
@@ -16,8 +16,6 @@ data Country = Country
   } deriving (Generic, Show)
 
 instance ToJSON Country
-instance FromJSON Country
-
 
 ecuador = Country "Ecuador" "America" 1
 germany = Country "Germany" "Europe" 2
