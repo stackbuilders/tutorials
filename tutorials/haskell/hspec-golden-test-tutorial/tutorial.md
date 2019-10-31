@@ -15,11 +15,11 @@ description: Software testing is necessary to check if an application behaves in
 
 The importance of software testing relies on the ability to check if a determined application behaves in an appropriate way. Unit tests are the first level of testing and helps developers to detect early bugs in the code by testing each component individually.
 
-For example, lets create a function that outputs the string "Hello Golden Testers":
+For example, lets create a function that welcomes someone to this tutorial:
 
 ```haskell
-sayHi :: String
-sayHi = "Hello Golden Testers"
+sayHi :: String -> String
+sayHi name = "Welcome to the Golden Tests tutorial " ++ name
 ```
 
 Using ```hspec``` we can easily test our function :
@@ -30,9 +30,9 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-    describe "sayHi" $
+    describe "sayHi" $ 
         it "shows a Hello Golden Testers string" $
-            sayHi `shouldBe` "Hello Golden Testers"
+            (sayHi "John Doe") `shouldBe` "Welcome to the Golden Tests tutorial John Doe"
 ```
 
 So, in a nutshell we are comparing the output of the function with a string that is stored inside the code of our test. We can take a different approach and store this expected output in a separate file. This approach is known as golden testing and the file in which we store the expected output takes the name of "golden file".
