@@ -3,7 +3,7 @@ module Json.JsonGoldenSpec where
 import           Test.Hspec
 import           Test.Hspec.Golden
 import           JSON.Json
-import qualified Data.ByteString.Lazy as B         
+import qualified Data.ByteString.Lazy as B
 
 
 goldenBytestring :: String -> B.ByteString -> Golden B.ByteString
