@@ -119,7 +119,7 @@ __*Note__ : _It is important to give the tests unique names otherwise `hspec-gol
 defaultGolden :: String -> String -> Golden String
 ```
 
-By default this function search for golden tests inside a ```/.golden``` directory. This directory is created automatically when the test runs so you don't have to create it.
+By default this function search for golden tests inside a ```/.golden``` directory. This directory is created automatically when the test runs.
 
 Ok enough reading, lets create our tests. We will first create a test module named ```FizzBuzzGoldenSpec``` . For convenience I have created this module under ```test/FizzBuzz/``` directory.
 
