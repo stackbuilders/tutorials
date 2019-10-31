@@ -55,7 +55,7 @@ You can either code along with this tutorial or better undestand it by looking a
 
 ## Hspec-golden
 
-```Hspec-golden``` is a StackBuilders testing library, written in haskell, that helps users implement golden test. It is an OpenSource project so feel free to [review](https://github.com/stackbuilders/hspec-golden) it.
+```Hspec-golden``` is a StackBuilders testing library, written in haskell, that helps users implement golden tests. It is an OpenSource project so feel free to [review](https://github.com/stackbuilders/hspec-golden) it.
 
 ## Getting Started
 
@@ -179,7 +179,7 @@ $ tree
      └── golden
 ```
 
-The testing framework recognized that this was the first execution, therefore created the fizzbuzz test with the ```actual``` and ```golden``` files. The difference between this two files is that the actual file will be overwritten everytime we run the test while the golden will stay the same. This is useful when we want to update the golden file, but we will see that further in this tutorial. 
+The testing framework recognized that this was the first execution, therefore created the fizzbuzz test with the ```actual``` and ```golden``` files. The difference between this two files is that the ```actual``` file will be overwritten everytime we run the test while the ```golden``` will stay the same. This is useful when we want to update the golden file, but we will see that further in this tutorial. 
 
 
 ## A more complete test
@@ -339,7 +339,7 @@ $cabal install hspec-golden
 ```
 Once installed we can use the --help flag to see how the CLI works.
 
-According to [hspec-golden](http://hackage.haskell.org/package/hspec-golden) when hgold is used without flags it updates on default the ```/.golden``` directory. If we store our golden files in a different directory we should use the --update flag and specify the name of the directory as an argument.
+According to [hspec-golden](http://hackage.haskell.org/package/hspec-golden), when hgold is used without flags it updates on default the ```/.golden``` directory. If we store our golden files in a different directory we should use the --update flag and specify the name of the directory as an argument.
 
 Ok, lets update our golden files. Hgold replaces the ```golden``` file (Expected output) with the ```actual``` file (SUT Output).
 
@@ -412,7 +412,7 @@ data Golden str =
     directory    :: FilePath                  --  Directory where you write your tests
   }
 ```
-For example we can define a different directory for storing our golden files or we can define how our test will be read and how the output should be written. Finally the ```encodePretty``` characteristic determines how the prompt can print a easy readable putput when tests fails.
+For example we can define a different directory for storing our golden files or we can define how our test will be read and how the output should be written. Also the ```encodePretty``` characteristic determines how the prompt can print a easy readable putput when tests fails.
 
 With ```Golden``` data-type we are now able to create a new function to assert our output. Lets start by importing some modules.
 
@@ -480,7 +480,7 @@ Finished in 0.0034 seconds
 Lets remember that our golden files are stored in a different directory so in case of making an update we should use the ```hgold``` CLI with the update flag, followed by the name of our golden tests directory, in this case ```/.otherGolden```.
 
 ```shell
-user@ubuntu:~/hspec-golden-test$ hgold --update ".otherGolden"
+$ hgold --update ".otherGolden"
 
 Replacing golden with actual...
   Replacing file: .otherGolden/json/golden with: .otherGolden/json/actual
