@@ -3,4 +3,4 @@ module Main where
 import HelloWorld
 
 main :: IO ()
-main = putStrLn sayHi
+main = putStrLn $ sayHi "Everybody"

@@ -1,4 +1,4 @@
 module HelloWorld where
 
-sayHi :: String
-sayHi = "Hello Golden Testers"
+sayHi :: String -> String
+sayHi name = "Welcome to the Golden Tests tutorial " ++ name
