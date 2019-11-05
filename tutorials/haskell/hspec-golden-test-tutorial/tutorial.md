@@ -13,7 +13,7 @@ description: Software testing is necessary to check if an application behaves in
 ---
 
 
-The importance of software testing relies on the ability to check if a determined application behaves in an appropriate way. Unit tests are the first level of testing and helps developers to detect early bugs in the code by testing each component individually.
+The importance of software testing relies on the ability to check if a determined application behaves in an appropriate way. Unit tests are the first level of testing and help developers to detect early bugs in the code by testing each component individually.
 
 For example, lets create a function that welcomes someone to this tutorial:
 
@@ -40,13 +40,13 @@ So, in a nutshell we are comparing the output of the function with a string that
 So, now we know what golden testing is, but if unit tests and golden tests are so similar, why don't we just keep up with unit tests, right?
 
 
-The truth is that unit tests are not useful when evaluating complex and large outputs and that's where the difference lies. Test are all about maintainability and readability and when we tests large outputs we tend to add visual noise to our code. Helpfully Golden Tests fixes this issue, lets check the main advantages.
+The truth is that unit tests are not useful when evaluating complex and large outputs and that's where the difference lies. Test are all about maintainability and readability and when we test large outputs we tend to add visual noise to our code. Helpfully Golden Tests fixes this issue, lets check the main advantages.
 
  - Large outputs are stored in a golden file reducing the visual noise in our code.
 
- - With some golden tests libraries the expected output (Golden File) can be automatically generated.
+ - With some golden tests libraries the Golden Files can be automatically generated.
 
- - Some golden test libraries also automatically updates the golden file. So, we don't need to manually update the tests when the expected output changes. 
+ - Some golden test libraries also automatically update the golden file. So, we don't need to manually update the tests when the expected output changes. 
 
  - It is useful when working with JSON, HTML, images, etc.
 
@@ -56,19 +56,19 @@ You can either code along with this tutorial or check at the finished [code](htt
 
 ## Hspec-golden
 
-`Hspec-golden` is a StackBuilders testing library, written in haskell, that helps users implement golden tests. It is an OpenSource project so feel free to [review](https://github.com/stackbuilders/hspec-golden) it.
+`Hspec-golden` is a StackBuilders testing library, written in haskell, that helps users implement golden tests. It is an open source project so feel free to [review](https://github.com/stackbuilders/hspec-golden) it.
 
 ## Getting Started
 
 First things first, lets create a new Haskell project on which we will be working:
 
 ```bash
-stack new "hspec-golden-tests"
+stack new "hspec-golden-tests-tutorial"
 ```
 
 and add the necessary dependencies in order to follow this tutorial without issues.
 
-Project dependencies
+Project dependencies.
 
 ``` yaml
 dependencies:
@@ -79,7 +79,7 @@ dependencies:
 - blaze-html
 ```
 
-Testing dependencies
+Testing dependencies.
 
 ``` yaml
 dependencies:
@@ -107,7 +107,7 @@ fizzOrBuzz n | n `mod` 15 == 0  = "FizzBuzz"
              | otherwise        = show n
 
 ```
-For simplicity we will test a simple function `fizzbuzz` that replaces 3 multiples with fizz and 5 multiples with buzz, in case a number is multiple of both it replaces the number with fizzbuzz. But before moving on with testing, lets review some of ```hspec-golden``` [documentation](http://hackage.haskell.org/package/hspec-golden-0.1.0.1/docs/Test-Hspec-Golden.html).
+For simplicity we will test a simple function `fizzbuzz` that replaces multiples of 3 with Fizz and multiples of 5 with Buzz, in case a number is multiple of both it replaces the number with FizzBuzz. But before moving on with testing, lets review some of ```hspec-golden``` [documentation](http://hackage.haskell.org/package/hspec-golden-0.1.0.1/docs/Test-Hspec-Golden.html).
 
 Hspec-golden provides us with a ```defaultGolden``` function which creates the golden files and compares it with the Subject Under Test (SUT) output. It takes two parameters:
 
@@ -167,7 +167,7 @@ Finished in 0.0006 seconds
 hspec-golden-tests> Test suite hspec-golden-tests-test passed
 ```
 
-The test is successful. If we check the "./golden" directory we will find two files.
+The test is successful. If we check the ".golden" directory we will find two files.
 
  - golden : Stores the expected output.
  - actual : Stores the real output from the SUT.
