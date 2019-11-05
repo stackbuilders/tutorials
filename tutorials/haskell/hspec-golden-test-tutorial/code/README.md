@@ -10,9 +10,9 @@ Here three examples are defined in order to better explain and understand the ``
 
 ## Requirements
 
-This project was created using stack. 
+This project was created using `stack`. 
 
-It is also necessary to install ```hspec-golden``` CLI named ```hgold```.
+It is also necessary to install `hspec-golden` CLI named `hgold`.
 
 ```shell
 $ stack install hspec-golden
