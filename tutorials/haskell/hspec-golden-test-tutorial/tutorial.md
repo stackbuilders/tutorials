@@ -56,7 +56,7 @@ You can either code along with this tutorial or check at the finished [code](htt
 
 ## Hspec-golden
 
-```Hspec-golden``` is a StackBuilders testing library, written in haskell, that helps users implement golden tests. It is an OpenSource project so feel free to [review](https://github.com/stackbuilders/hspec-golden) it.
+`Hspec-golden` is a StackBuilders testing library, written in haskell, that helps users implement golden tests. It is an OpenSource project so feel free to [review](https://github.com/stackbuilders/hspec-golden) it.
 
 ## Getting Started
 
@@ -125,7 +125,7 @@ By default this function searchs for golden tests inside a `/.golden` directory.
 Ok enough reading, lets create our tests. Let's first create a test module named ```FizzBuzzGoldenSpec``` under `test/FizzBuzz/` directory.
 
 ```Haskell
-module FizBuz.FizBuzGoldenSpec where
+module FizzBuzz.FizzBuzzGoldenSpec where
 ```
 
 We need some imports.
@@ -182,12 +182,12 @@ $ tree
      └── golden
 ```
 
-The testing framework recognized that this was the first execution, therefore created the fizzbuzz test with the ```actual``` and ```golden``` files. The difference between this two files is that the ```golden``` will stay the same unless we want to update it while the ```actual``` file will be overwritten everytime we run the test. This is useful when we want to updating test, but we will see that further in this tutorial. 
+The testing framework recognized that this was the first execution, therefore created the fizzbuzz test with the ```actual``` and ```golden``` files. The difference between this two files is that the ```golden``` will stay the same unless we want to update it while the ```actual``` file will be overwritten everytime we run the test. This is useful when updating the tests, but we will see that further in this tutorial. 
 
 
-## A more real test case
+## A More Real Test Case
 
-The `fizzbuzz` module was used to create a simply and didactic example but it could have been easily tested with unit tests. In the practice golden tests are often used when testing JSON, HTML or images which generate large outputs. We haven't also tested the whole functionality of `hspec-golden` library yet. For example the `hgold` CLI for updating the golden files.
+The `fizzbuzz` module was used to create a simple and didactic example but it could have been easily tested with unit tests. In the practice golden tests are often used when testing JSON, HTML or images which generate large outputs. We haven't also tested the whole functionality of `hspec-golden` library yet. For example the `hgold` CLI for updating the golden files.
 
 Lets create some new modules to demostrate a real case in which golden tests are needed.
 
@@ -326,9 +326,9 @@ Finished in 0.0013 seconds
 3 examples, 1 failure
 ```
 
-Our html test failed but not big deal, we can edit our ```golden``` file and things will work just fine. Pretty simple right?
+Our HTML test failed, but not big deal, we can edit our ```golden``` file and things will work just fine. Pretty simple right?
 
-Actually its not, lets remeber this is just a didactic example, in the real life golden files stores really large outputs and it would be a waste of time to update them by hand. Fortunately `hspec-golden` provides us with `hgold` CLI tool that automatically updates golden files using. Let's install it.
+Actually its not, let{s remeber this is just a didactic example, in the real life golden files stores really large outputs and it would be a waste of time to update them by hand. Fortunately `hspec-golden` provides us with `hgold` CLI tool that automatically updates golden files using. Let's install it.
 
 Using stack:
 
@@ -348,7 +348,7 @@ According to [hspec-golden](http://hackage.haskell.org/package/hspec-golden), wh
 Ok, lets update our golden files. 
 
 ```shell
-user@ubuntu:~/hspec-golden-test$ hgold
+$ hgold
 Replacing golden with actual...
   Replacing file: .golden/hello/golden with: .golden/hello/actual
   Replacing file: .golden/html/golden with: .golden/html/actual
@@ -418,7 +418,7 @@ data Golden str =
     directory    :: FilePath                  --  Directory where you write your tests
   }
 ```
-For example we can define a different directory for storing our golden files or we can define how our test will be read and how the output should be written. Also the `encodePretty` characteristic determines how the prompt can print a readable output when tests fails. With this data-type we are now able to create a new function to assert our output. Let's start by importing some modules.
+For example we can define a different directory for storing our golden files or we can define how our test will be read and how the output should be written. Also the `encodePretty` characteristic determines how the prompt should print a readable output when tests fails. With this data-type we are now able to create a new function to assert our output. Let's start by importing some modules.
 
 ``` Haskell
 module Json.JsonGoldenSpec where
@@ -449,7 +449,7 @@ Let's analyze a little our `goldenBytestring` function:
 
  - It return type is a `Golden ByteString`.
  - To print our failed tests it makes use of haskell's `show` function. 
- - To write the bytestring into a file as well as reading it from a file we have used the `writeFile` function from the Data.ByteString.Lazy module.
+ - To write the bytestring into a file as well as reading it from a file we have used the `writeFile` and `readFile` functions from the Data.ByteString.Lazy module.
  - We will be saving the output into a different directory called `/.otherGolden`. 
 
 ```shell
