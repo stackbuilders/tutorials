@@ -22,7 +22,7 @@ sayHi :: String -> String
 sayHi name = "Welcome to the Golden Tests tutorial " ++ name
 ```
 
-Using ```hspec``` we can easily test our function :
+Using `hspec` we can easily test our function :
 
 ```haskell
 import HelloWorld
@@ -50,7 +50,7 @@ The truth is that unit tests are not useful when evaluating complex and large ou
 
  - It is useful when working with JSON, HTML, images, etc.
 
-In this tutorial we will use [hspec-golden](http://hackage.haskell.org/package/hspec-golden) library to build golden tests. We will also use the ```hspec-golden``` CLI to easily update them.
+In this tutorial we will use [hspec-golden](http://hackage.haskell.org/package/hspec-golden) library to build golden tests. We will also use the `hspec-golden` CLI to easily update them.
 
 You can either code along with this tutorial or check at the finished [code](https://github.com/stackbuilders/tutorials/tree/tutorials/tutorials/haskell/hspec-golden-test-tutorial/code) in Github. 
 
@@ -92,7 +92,7 @@ dependencies:
 
 Now that we have all dependencies installed, lets get started with golden tests.
 
-First lets create a ```FizzBuzz ``` module to be tested and add some code. For convinience I have created it inside a ```FIZZBUZZ``` directory. 
+First lets create a `FizzBuzz ` module to be tested and add some code. For convinience I have created it inside a `FIZZBUZZ` directory. 
 
 ```haskell
 module FIZZBUZZ.FizzBuzz where 
@@ -107,9 +107,9 @@ fizzOrBuzz n | n `mod` 15 == 0  = "FizzBuzz"
              | otherwise        = show n
 
 ```
-For simplicity we will test a simple function `fizzbuzz` that replaces multiples of 3 with Fizz and multiples of 5 with Buzz, in case a number is multiple of both it replaces the number with FizzBuzz. But before moving on with testing, lets review some of ```hspec-golden``` [documentation](http://hackage.haskell.org/package/hspec-golden-0.1.0.1/docs/Test-Hspec-Golden.html).
+For simplicity we will test a simple function `fizzbuzz` that replaces multiples of 3 with Fizz and multiples of 5 with Buzz, in case a number is multiple of both it replaces the number with FizzBuzz. But before moving on with testing, lets review some of `hspec-golden` [documentation](http://hackage.haskell.org/package/hspec-golden-0.1.0.1/docs/Test-Hspec-Golden.html).
 
-Hspec-golden provides us with a ```defaultGolden``` function which creates the golden files and compares it with the Subject Under Test (SUT) output. It takes two parameters:
+Hspec-golden provides us with a `defaultGolden` function which creates the golden files and compares it with the Subject Under Test (SUT) output. It takes two parameters:
 
   - the **name** of the test 
   - the output of our SUT 
@@ -122,7 +122,7 @@ defaultGolden :: String -> String -> Golden String
 
 By default this function searchs for golden tests inside a `/.golden` directory. This directory is created automatically when the test runs.
 
-Ok enough reading, lets create our tests. Let's first create a test module named ```FizzBuzzGoldenSpec``` under `test/FizzBuzz/` directory.
+Ok enough reading, lets create our tests. Let's first create a test module named `FizzBuzzGoldenSpec` under `test/FizzBuzz/` directory.
 
 ```Haskell
 module FizzBuzz.FizzBuzzGoldenSpec where
@@ -182,7 +182,7 @@ $ tree
      └── golden
 ```
 
-The testing framework recognized that this was the first execution, therefore created the fizzbuzz test with the ```actual``` and ```golden``` files. The difference between this two files is that the ```golden``` will stay the same unless we want to update it while the ```actual``` file will be overwritten everytime we run the test. This is useful when updating the tests, but we will see that further in this tutorial. 
+The testing framework recognized that this was the first execution, therefore created the fizzbuzz test with the `actual` and `golden` files. The difference between this two files is that the `golden` will stay the same unless we want to update it while the `actual` file will be overwritten everytime we run the test. This is useful when updating the tests, but we will see that further in this tutorial. 
 
 
 ## A More Real Test Case
@@ -268,7 +268,7 @@ encodeCountries :: [Country] -> ByteString
 encodeCountries = encode
 ```
 
-Before coding our tests, lets create and organize ```HtmlGoldenSpec.hs``` and ```JsonGoldenSpec.hs``` modules into directories as well.
+Before coding our tests, lets create and organize `HtmlGoldenSpec.hs` and `JsonGoldenSpec.hs` modules into directories as well.
 
 ```shell
 $ tree tests
@@ -326,7 +326,7 @@ Finished in 0.0013 seconds
 3 examples, 1 failure
 ```
 
-Our HTML test failed, but not big deal, we can edit our ```golden``` file and things will work just fine. Pretty simple right?
+Our HTML test failed, but not big deal, we can edit our `golden` file and things will work just fine. Pretty simple right?
 
 Actually its not, let{s remeber this is just a didactic example, in the real life golden files stores really large outputs and it would be a waste of time to update them by hand. Fortunately `hspec-golden` provides us with `hgold` CLI tool that automatically updates golden files using. Let's install it.
 
@@ -343,7 +343,7 @@ $cabal install hspec-golden
 ```
 Once installed we can use the --help flag to see how the CLI works.
 
-According to [hspec-golden](http://hackage.haskell.org/package/hspec-golden), when `hgold` is used without flags it updates by default the ```/.golden``` directory. If we store our golden files in a different directory we should use the `--update` flag and specify the name of the directory as an argument.
+According to [hspec-golden](http://hackage.haskell.org/package/hspec-golden), when `hgold` is used without flags it updates by default the `/.golden` directory. If we store our golden files in a different directory we should use the `--update` flag and specify the name of the directory as an argument.
 
 Ok, lets update our golden files. 
 
