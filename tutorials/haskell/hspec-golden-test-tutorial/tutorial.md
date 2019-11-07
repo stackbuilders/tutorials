@@ -13,7 +13,7 @@ description: Software testing is necessary to check if an application behaves in
 ---
 
 
-The importance of software testing relies on the ability to check if a determined application behaves in an appropriate way. Unit tests are the first level of testing and help developers to detect early bugs in the code by testing each component individually.
+The importance of software testing relies on the ability to check if a determined application behaves in an appropriate way. Unit tests are the first level of testing and help developers detect early bugs in the code by testing each component individually.
 
 For example, lets create a function that welcomes someone to this tutorial:
 
@@ -35,12 +35,12 @@ spec = do
             (sayHi "John Doe") `shouldBe` "Welcome to the Golden Tests tutorial John Doe"
 ```
 
-So, in a nutshell we are comparing the output of the function with a string that is stored inside the code of our test. We can take a different approach and store this expected output in a separate file. This approach is known as golden testing and the file in which we store the expected output takes the name of "golden file".
+In a nutshell we are comparing the output of the function with a string that is stored inside the code of our test. We can take a different approach and store this expected output in a separate file. This approach is known as golden testing and the file in which we store the expected output takes the name of "golden file".
 
-So, now we know what golden testing is, but if unit tests and golden tests are so similar, why don't we just keep up with unit tests, right?
+So, now we know what golden testing is, but if unit tests and golden tests are so similar, why don't we just keep up with unit tests? Right?
 
 
-The truth is that unit tests are not useful when evaluating complex and large outputs and that's where the difference lies. Test are all about maintainability and readability and when we test large outputs we tend to add visual noise to our code. Helpfully Golden Tests fixes this issue, lets check the main advantages.
+The truth is that unit tests are not useful when evaluating complex and large outputs and that's where the difference lies. Test are all about maintainability and readability and when we test large outputs we tend to add visual noise to our code. Golden Tests helpfully fixes this issue, lets check the main advantages.
 
  - Large outputs are stored in a golden file reducing the visual noise in our code.
 
@@ -90,9 +90,9 @@ dependencies:
 ```
 ## A Simple Test
 
-Now that we have all dependencies installed, lets get started with golden tests.
+Now, that we have all dependencies installed, lets get started with golden tests.
 
-First lets create a `FizzBuzz ` module to be tested and add some code. For convinience I have created it inside a `FIZZBUZZ` directory. 
+First lets create a `FizzBuzz ` module to be tested and add some code. For convinience, I have created it inside a `FIZZBUZZ` directory. 
 
 ```haskell
 module FIZZBUZZ.FizzBuzz where 
@@ -122,7 +122,7 @@ defaultGolden :: String -> String -> Golden String
 
 By default this function searchs for golden tests inside a `/.golden` directory. This directory is created automatically when the test runs.
 
-Ok enough reading, lets create our tests. Let's first create a test module named `FizzBuzzGoldenSpec` under `test/FizzBuzz/` directory.
+Okay enough reading, lets create our tests. Let's first create a test module named `FizzBuzzGoldenSpec` under `test/FizzBuzz/` directory.
 
 ```Haskell
 module FizzBuzz.FizzBuzzGoldenSpec where
@@ -194,7 +194,7 @@ Lets create some new modules to demostrate a real case in which golden tests are
 - Html.hs : Renders a HTML template.
 - Json.hs : Encodes a data type into a JSON Bytestring.  
 
-For convenience each module will be placed inside its own directory.
+For convenience, each module will be placed inside its own directory.
 
 ```shell
 $ tree src
@@ -326,9 +326,9 @@ Finished in 0.0013 seconds
 3 examples, 1 failure
 ```
 
-Our HTML test failed, but not big deal, we can edit our `golden` file and things will work just fine. Pretty simple right?
+Our HTML test failed but not big deal, we can edit our `golden` file and things will work just fine. Pretty simple right?
 
-Actually its not, let{s remeber this is just a didactic example, in the real life golden files stores really large outputs and it would be a waste of time to update them by hand. Fortunately `hspec-golden` provides us with `hgold` CLI tool that automatically updates golden files using. Let's install it.
+Actually it's not, let's remember this is just a didactic example, in the real life golden files stores really large outputs and it would be a waste of time to update them by hand. Fortunately, `hspec-golden` provides us with `hgold` CLI tool that automatically updates golden files using. Let's install it.
 
 Using stack:
 
@@ -380,7 +380,7 @@ And we can see that everything works fine.
 
 #### JSON Golden Test
 
-Until now we have managed components that returns strings only, but what if our return type is different like a ByteString or Text? For example, lets analize the `encodeCountries` function in the `Json.hs` module.
+Until now, we have managed components that returns strings only, but what if our return type is different like a ByteString or Text? For example, lets analize the `encodeCountries` function in the `Json.hs` module.
 
 ```Haskell
 encodeCountries :: [Country] -> ByteString
@@ -404,7 +404,7 @@ $stack test
         Actual type: B.ByteString
 ```
 
-Conviniently `hspec-golden` exports a `Golden` data type. With this tool we can configure our Golden test 
+Conviniently, `hspec-golden` exports a `Golden` data type. With this tool we can configure our Golden test 
 specifying the functions `hspec-golden` should use for our test to work.
 
 ```
@@ -418,7 +418,7 @@ data Golden str =
     directory    :: FilePath                  --  Directory where you write your tests
   }
 ```
-For example we can define a different directory for storing our golden files or we can define how our test will be read and how the output should be written. Also the `encodePretty` characteristic determines how the prompt should print a readable output when tests fails. With this data-type we are now able to create a new function to assert our output. Let's start by importing some modules.
+For example, we can define a different directory for storing our golden files or we can define how our test will be read and how the output should be written. Also, the `encodePretty` characteristic determines how the prompt should print a readable output when tests fails. With this data-type we are now able to create a new function to assert our output. Let's start by importing some modules.
 
 ``` Haskell
 module Json.JsonGoldenSpec where
@@ -488,7 +488,7 @@ Finished in 0.0034 seconds
 
 Everithing works fine.
 
-Lets remember that our golden files are stored in a different directory so in case of making an update we should use the `hgold` CLI with the `--update` flag, followed by the name of our golden tests directory, in this case `/.otherGolden`.
+Lets remember that our golden files are stored in a different directory so in case we make an update we should use the `hgold` CLI with the `--update` flag, followed by the name of our golden tests directory, in this case `/.otherGolden`.
 
 ```shell
 $ hgold --update ".otherGolden"
@@ -501,6 +501,6 @@ Finish...
 ## Final Words
 
 
-Golden testing provides us a practical way to store and test large outputs generated by our components. For example testing an API that sends huge amounts of data or testing our HTML templates in front-end. In Haskell, the `hspec-golden` testing tool, makes it easy to implement golden tests in a project. This tool provides a module capable of asserting the outputs from our SUT with our golden files as well as creating them in case they dont exist. It is also useful when updating our tests. With its CLI, we can replace old golden files with the new output of our SUT.
+Golden testing provides us a practical way to store and test large outputs generated by our components. For example, testing an API that sends huge amounts of data or testing our HTML templates in front-end. In Haskell, the `hspec-golden` testing tool, makes it easy to implement golden tests in a project. This tool provides a module capable of asserting the outputs from our SUT with our golden files as well as creating them in case they dont exist. It is also useful when updating our tests. With its CLI, we can replace old golden files with the new output of our SUT.
 
 Using this tool, haskell developers will be able to start golden testing applications with very little effort.
