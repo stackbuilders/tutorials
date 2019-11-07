@@ -15,7 +15,7 @@ description: Software testing is necessary to check if an application behaves in
 
 The importance of software testing relies on the ability to check if a determined application behaves in an appropriate way. Unit tests are the first level of testing and help developers detect early bugs in the code by testing each component individually.
 
-For example, lets create a function that welcomes someone to this tutorial:
+For example, let's create a function that welcomes someone to this tutorial:
 
 ```haskell
 sayHi :: String -> String
@@ -40,7 +40,7 @@ In a nutshell we are comparing the output of the function with a string that is 
 So, now we know what golden testing is, but if unit tests and golden tests are so similar, why don't we just keep up with unit tests? Right?
 
 
-The truth is that unit tests are not useful when evaluating complex and large outputs and that's where the difference lies. Test are all about maintainability and readability and when we test large outputs we tend to add visual noise to our code. Golden Tests helpfully fixes this issue, lets check the main advantages.
+The truth is that unit tests are not useful when evaluating complex and large outputs and that's where the difference lies. Test are all about maintainability and readability and when we test large outputs we tend to add visual noise to our code. Golden Tests helpfully fixes this issue, let's check the main advantages.
 
  - Large outputs are stored in a golden file reducing the visual noise in our code.
 
@@ -60,7 +60,7 @@ You can either code along with this tutorial or check at the finished [code](htt
 
 ## Getting Started
 
-First things first, lets create a new Haskell project on which we will be working:
+First things first, let's create a new Haskell project on which we will be working:
 
 ```bash
 stack new "hspec-golden-tests-tutorial"
@@ -90,9 +90,9 @@ dependencies:
 ```
 ## A Simple Test
 
-Now, that we have all dependencies installed, lets get started with golden tests.
+Now, that we have all dependencies installed, let's get started with golden tests.
 
-First lets create a `FizzBuzz ` module to be tested and add some code. For convinience, I have created it inside a `FIZZBUZZ` directory. 
+First let's create a `FizzBuzz ` module to be tested and add some code. For convinience, I have created it inside a `FIZZBUZZ` directory. 
 
 ```haskell
 module FIZZBUZZ.FizzBuzz where 
@@ -107,7 +107,7 @@ fizzOrBuzz n | n `mod` 15 == 0  = "FizzBuzz"
              | otherwise        = show n
 
 ```
-For simplicity we will test a simple function `fizzbuzz` that replaces multiples of 3 with Fizz and multiples of 5 with Buzz, in case a number is multiple of both it replaces the number with FizzBuzz. But before moving on with testing, lets review some of `hspec-golden` [documentation](http://hackage.haskell.org/package/hspec-golden-0.1.0.1/docs/Test-Hspec-Golden.html).
+For simplicity we will test a simple function `fizzbuzz` that replaces multiples of 3 with Fizz and multiples of 5 with Buzz, in case a number is multiple of both it replaces the number with FizzBuzz. But before moving on with testing, let's review some of `hspec-golden` [documentation](http://hackage.haskell.org/package/hspec-golden-0.1.0.1/docs/Test-Hspec-Golden.html).
 
 Hspec-golden provides us with a `defaultGolden` function which creates the golden files and compares it with the Subject Under Test (SUT) output. It takes two parameters:
 
@@ -120,9 +120,9 @@ Hspec-golden provides us with a `defaultGolden` function which creates the golde
 defaultGolden :: String -> String -> Golden String
 ```
 
-By default this function searchs for golden tests inside a `/.golden` directory. This directory is created automatically when the test runs.
+By default this function searchs for golden tests inside a `.golden/` directory. This directory is created automatically when the test runs.
 
-Okay enough reading, lets create our tests. Let's first create a test module named `FizzBuzzGoldenSpec` under `test/FizzBuzz/` directory.
+Okay enough reading, let's create our tests. Let's first create a test module named `FizzBuzzGoldenSpec` under `test/FizzBuzz/` directory.
 
 ```Haskell
 module FizzBuzz.FizzBuzzGoldenSpec where
@@ -135,7 +135,7 @@ import           Test.Hspec                   --Tests
 import           Test.Hspec.Golden            --Golden Tests
 import           FIZZBUZ.FizzBuzz             -- SUT
 ```
-Finally lets write the test.
+Finally let's write the test.
 
 ```Haskell
 spec :: Spec
@@ -268,7 +268,7 @@ encodeCountries :: [Country] -> ByteString
 encodeCountries = encode
 ```
 
-Before coding our tests, lets create and organize `HtmlGoldenSpec.hs` and `JsonGoldenSpec.hs` modules into directories as well.
+Before coding our tests, let's create and organize `HtmlGoldenSpec.hs` and `JsonGoldenSpec.hs` modules into directories as well.
 
 ```shell
 $ tree tests
@@ -305,7 +305,7 @@ spec =
        defaultGolden "html" (htmlRendered somePage)
 ```
 
-Just like the previous example, after running the test we will have a new directory `/.golden/html/` that contains our actual and golden file. But what would happen if we would have to change our HTML template ?
+Just like the previous example, after running the test we will have a new directory `.golden/html/` that contains our actual and golden file. But what would happen if we would have to change our HTML template ?
 
 In the practice changes may include several lines and tags but to make a simple example, let's edit the body of our HTML to "Goodbye Golden Testers" and run the tests.    
 
@@ -341,11 +341,11 @@ using Cabal:
 ```shell
 $cabal install hspec-golden
 ```
-Once installed we can use the --help flag to see how the CLI works.
+Once installed we can use the `--help` flag to see how the CLI works.
 
-According to [hspec-golden](http://hackage.haskell.org/package/hspec-golden), when `hgold` is used without flags it updates by default the `/.golden` directory. If we store our golden files in a different directory we should use the `--update` flag and specify the name of the directory as an argument.
+According to [hspec-golden](http://hackage.haskell.org/package/hspec-golden), when `hgold` is used without flags it updates by default the `.golden/` directory. If we store our golden files in a different directory we should use the `--update` flag and specify the name of the directory as an argument.
 
-Ok, lets update our golden files. 
+Okay, let's update our golden files. 
 
 ```shell
 $ hgold
@@ -355,7 +355,7 @@ Replacing golden with actual...
 Finish...
 ```
 
-Hgold replaces the `golden` file (Expected output) with the content of the `actual` file (SUT Output) so it is necessary to run the test first (even if they fail) to update our tests.
+Hgold replaces the `golden` file (expected output) with the content of the `actual` file (SUT output) so it is necessary to run the test first (even if they fail) to update our tests.
 
 So now we are ready to test our updated golden files.
 
@@ -380,7 +380,7 @@ And we can see that everything works fine.
 
 #### JSON Golden Test
 
-Until now, we have managed components that returns strings only, but what if our return type is different like a ByteString or Text? For example, lets analize the `encodeCountries` function in the `Json.hs` module.
+Until now, we have managed components that returns strings only, but what if our return type is different like a `ByteString` or `Text`? For example, let's analize the `encodeCountries` function in the `Json.hs` module.
 
 ```Haskell
 encodeCountries :: [Country] -> ByteString
@@ -420,7 +420,7 @@ data Golden str =
 ```
 For example, we can define a different directory for storing our golden files or we can define how our test will be read and how the output should be written. Also, the `encodePretty` characteristic determines how the prompt should print a readable output when tests fails. With this data-type we are now able to create a new function to assert our output. Let's start by importing some modules.
 
-``` Haskell
+```haskell
 module Json.JsonGoldenSpec where
 
 import           Test.Hspec
@@ -429,9 +429,9 @@ import           JSON.Json
 import qualified Data.ByteString.Lazy as B    
 ```
 
-Next, based on the `Golden` data type documentation , lets create our assert function.
+Next, based on the `Golden` data type documentation , let's create our assert function.
 
-```Haskell
+```haskell
 goldenBytestring :: String -> B.ByteString -> Golden B.ByteString
 goldenBytestring name actualOutput =
     Golden {
@@ -447,10 +447,10 @@ goldenBytestring name actualOutput =
 
 Let's analyze a little our `goldenBytestring` function: 
 
- - It return type is a `Golden ByteString`.
+ - Its type is `Golden ByteString`.
  - To print our failed tests it makes use of haskell's `show` function. 
  - To write the bytestring into a file as well as reading it from a file we have used the `writeFile` and `readFile` functions from the Data.ByteString.Lazy module.
- - We will be saving the output into a different directory called `/.otherGolden`. 
+ - We will be saving the output into a different directory called `.otherGolden/`. 
 
 ```shell
 $ tree 
@@ -475,7 +475,7 @@ spec =
    it "encodes a group of Countries into a JSON bytestring " $
     goldenBytestring "json" (encodeCountries countries)
 ```
-And run them to see if our assert function is working fine.
+And run it to see if our assert function is working fine.
 
 ```shell
   encodeCountries
@@ -488,7 +488,7 @@ Finished in 0.0034 seconds
 
 Everithing works fine.
 
-Lets remember that our golden files are stored in a different directory so in case we make an update we should use the `hgold` CLI with the `--update` flag, followed by the name of our golden tests directory, in this case `/.otherGolden`.
+Let's remember that our golden files are stored in a different directory so in case we make an update we should use the `hgold` CLI with the `--update` flag, followed by the name of our golden tests directory, in this case `.otherGolden/`.
 
 ```shell
 $ hgold --update ".otherGolden"
