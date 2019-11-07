@@ -418,7 +418,7 @@ data Golden str =
     directory    :: FilePath                  --  Directory where you write your tests
   }
 ```
-For example, we can define a different directory for storing our golden files or we can define how our test will be read and how the output should be written. Also, the `encodePretty` characteristic determines how the prompt should print a readable output when tests fails. With this data-type we are now able to create a new function to assert our output. Let's start by importing some modules.
+For example, we can define a different directory for storing our golden files or we can define how our test will be read and how the output should be written. Also, the `encodePretty` characteristic determines how the prompt should print a readable output when tests fail. With this data-type we are now able to create a new function to assert our output. Let's start by importing some modules.
 
 ```haskell
 module Json.JsonGoldenSpec where
@@ -445,7 +445,7 @@ goldenBytestring name actualOutput =
     }
 ```
 
-Let's analyze a little our `goldenBytestring` function: 
+Let's analyze a little bit our `goldenBytestring` function: 
 
  - Its type is `Golden ByteString`.
  - To print our failed tests it makes use of haskell's `show` function. 
