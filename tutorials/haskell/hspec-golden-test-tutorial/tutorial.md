@@ -70,7 +70,7 @@ and add the necessary dependencies in order to follow this tutorial without issu
 
 Project dependencies:
 
-``` yaml
+```yaml
 dependencies:
 - base >= 4.7 && < 5
 - aeson
@@ -81,7 +81,7 @@ dependencies:
 
 Testing dependencies:
 
-``` yaml
+```yaml
 dependencies:
 - hspec-golden-tests
 - hspec
@@ -124,20 +124,20 @@ By default this function searches for golden tests inside a `.golden/` directory
 
 Okay, enough reading, let's create our tests. Let's first create a test module named `FizzBuzzGoldenSpec` under `test/FizzBuzz/` directory.
 
-```Haskell
+```haskell
 module FizzBuzz.FizzBuzzGoldenSpec where
 ```
 
 We need some imports.
 
-```Haskell
+```haskell
 import           Test.Hspec                   --Tests
 import           Test.Hspec.Golden            --Golden Tests
 import           FIZZBUZ.FizzBuzz             -- SUT
 ```
 Finally let's write the test.
 
-```Haskell
+```haskell
 spec :: Spec
 spec = 
     describe "fizzBuzz" $
@@ -383,14 +383,14 @@ And we can see, everything works fine.
 
 Until now, we have managed components that return only strings, but what if our return type is different like a `ByteString` or `Text`? For example, let's analyze the `encodeCountries` function in the `Json.hs` module.
 
-```Haskell
+```haskell
 encodeCountries :: [Country] -> ByteString
 encodeCountries = encode
 ```
 
 This function returns a ByteString. That means that if we try to assert the output with our `defaultGolden` function,
 
-``` Haskell
+```haskell
   describe "encodeCountries" $ do
    it "encodes a group of Countries into a JSON String " $
     defaultGolden "json" (encodeCountries countries)
@@ -407,7 +407,7 @@ $stack test
 
 Conveniently, `hspec-golden` exports a `Golden` data type. With this tool we can configure our Golden test by specifying the functions `hspec-golden` should use for our test to work.
 
-```
+```haskell
 data Golden str =
   Golden {
     output       :: str,                      --  Output
@@ -467,7 +467,7 @@ $ tree
 
 We are now ready to create our test,
 
-```Haskell
+```haskell
 spec :: Spec
 spec =
 
