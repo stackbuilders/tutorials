@@ -9,11 +9,11 @@ language: haskell
 author-name: Jorge Andrés Guerra Landázuri
 twitter-profile: Jorge_257
 github-profile: Jagl257
-description: Software testing is necessary to check if an application behaves in an expected way. Sometimes it is useful to store the expected output in a separate file. This is how golden tests works and in this tutorial we will be using the Hspec-golden haskell library to easily create and update our golden tests.
+description: Software testing is necessary to check if an application behaves in an expected way. Sometimes it is useful to store the expected output in a separate file. This is how golden tests work and in this tutorial we will be using the Hspec-golden haskell library to easily create and update our golden tests.
 ---
 
 
-The value of software testing relies on the ability to check if a determined application behaves in an appropriate way. Unit tests are the first level of testing and help developers detect early bugs in the code by testing each component individually.
+The value of software testing relies on the ability to check if an application behaves properly. Unit tests are the first layer of testing and help developers detect bugs early in the code by testing each component individually.
 
 For example, let's create a function that welcomes someone to this tutorial:
 
@@ -35,7 +35,7 @@ spec = do
             (sayHi "John Doe") `shouldBe` "Welcome to the Golden Tests tutorial John Doe"
 ```
 
-In a nutshell, we are comparing the output of the function with a string that is stored inside the code of our test. We can take a different approach and store this expected output in a separate file. This approach is known as golden testing and the file in which we store the expected output takes the name of "golden file".
+In a nutshell, we are comparing the output of the function with a string that is stored inside the body of our test. We can take a different approach and store this expected output in a separate file. This approach is known as golden testing and the file in which we store the expected output takes the name of "golden file".
 
 So, now we know what golden testing is, but if unit tests and golden tests are so similar, why don't we just keep up with unit tests? Right?
 
@@ -405,7 +405,7 @@ $stack test
         Actual type: B.ByteString
 ```
 
-Conveniently, `hspec-golden` exports a `Golden` data type. With this tool we can configure our Golden test by specifying the functions `hspec-golden` should use for our test to work.
+Conveniently, `hspec-golden` exports a `Golden` data type. With this tool, we can configure our Golden test by specifying the functions `hspec-golden` should use for our test to work.
 
 ```haskell
 data Golden str =
@@ -418,7 +418,7 @@ data Golden str =
     directory    :: FilePath                  --  Directory where you write your tests
   }
 ```
-For example, we can define a different directory for storing our golden files or we can define how our test will be read and how the output should be written. Also, the `encodePretty` characteristic determines how the prompt should print a readable output when tests fail. With this data-type we are now able to create a new function to assert our output. Let's start by importing some modules.
+For example, we can define a different directory for storing our golden files or how our test will be read and how the output should be written. Also, the `encodePretty` characteristic determines how the prompt should print a readable output when tests fail. With this data-type we are now able to create a new function to assert our output. Let's start by importing some modules.
 
 ```haskell
 module Json.JsonGoldenSpec where
@@ -449,7 +449,7 @@ Let's analyze a little bit our `goldenBytestring` function:
 
  - Its type is `Golden ByteString`.
  - To print our failed tests it makes use of haskell's `show` function. 
- - To write the bytestring into a file as well as reading it from a file we have used the `writeFile` and `readFile` functions from the Data.ByteString.Lazy module.
+ - To write the bytestring into a file, as well as reading it,  we have used the `writeFile` and `readFile` functions from the Data.ByteString.Lazy module.
  - We will be saving the output into a different directory called `.otherGolden/`. 
 
 ```shell
@@ -488,7 +488,7 @@ Finished in 0.0034 seconds
 
 Everything works fine.
 
-Let's remember that our golden files are stored in a different directory. So in the case that we make an update we should use the `hgold` CLI with the `--update` flag, followed by the name of our golden tests directory; in this case `.otherGolden/`.
+Let's remember that we stored our golden files in a different directory. So in the case that we make an update we should use the `hgold` CLI with the `--update` flag, followed by the name of our golden tests directory; in this case `.otherGolden/`.
 
 ```shell
 $ hgold --update ".otherGolden"
