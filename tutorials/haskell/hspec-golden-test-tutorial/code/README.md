@@ -1,8 +1,6 @@
 # Golden Testing with hspec-golden
 
-This code refers to StackBuilders ```hspec-golden``` tutorial.
-
-Here three examples are defined in order to better explain and understand the ```hspec-golden``` library functionality.
+Here you will find three ways to use Stack Builders' `hspec-golden` library.
 
  - FizzBuzz
  - HTML
