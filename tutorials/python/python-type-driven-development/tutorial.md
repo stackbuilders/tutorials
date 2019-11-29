@@ -6,22 +6,22 @@ language: python
 author-name: Carlos Villavicencio
 twitter-profile: po5i
 github-profile: po5i
-description: Learn how to improve the software quality and readability in our Python code by using the built-in typing system as it complements other software development processes like type-driven development and test-driven development.
+description: Learn how to improve the software quality and readability in Python code by using the built-in typing system as it complements other software development processes like type-driven development and test-driven development.
 ---
 
 _Type-Driven Development_ is a technique in which we plan our program development by adding types first and then write the code that satisfies that type. It brings many benefits such as increasing the robustness, accuracy, testability, readability, and extensibility of your code by taking advantage of the language’s type system.
 
-In a [previous article][types-vs-tests], we discussed the benefits of working with _Type-Driven Development_ and the importance of static type checking at compilation time for strongly typed languages such as Java or Haskell. Type-checking strengthens our code, reduces the number of tests we need to write which decreases our dependency on them no matter if the paradigm is object-oriented or functional.
+In a [previous article][types-vs-tests], we discussed the benefits of working with _Type-Driven Development_ and the importance of static type checking at compilation time for strongly typed languages such as Haskell. Type-checking strengthens our code and reduces the number of tests we need to write which decreases our dependency on them no matter if the paradigm is object-oriented or functional.
 
 ## What about Python?
 
-Is it possible to use a strong type system in a language like Python? The answer is yes. [PEP-484][pep-484] introduced _Type Annotations to Python_ 3.5 back in 2014. It’s been a while, right? Why is this not popular? It's because Python being a dynamic language doesn’t require to explicitly write variable or return types, they’re completely optional and mostly used by editors and IDEs.
+Is it possible to use a strong type system in a language like Python? The answer is yes. [PEP-3107][pep-3107] and [PEP-484][pep-484] introduced _Type Annotations to Python_ 3.5 back in 2014. It’s been a while, right? Why is this not more popular? It's because Python, being a dynamic language doesn’t require us to explicitly write variable or return types, they’re completely optional and mostly used by editors and IDEs.
 
-In this article, we’ll be walking through the Python - how to add types to our code and Docstrings and perform static type checking using [mypy][mypy]. There are plenty options for static type-checking in Python, but in this tutorial we will follow [Guido van Rossum suggestion][guido-mypy].
+In this article, we’ll be walking through the Python type system - how to add types to our code and Docstrings and perform static type checking using [mypy][mypy]. There are plenty options for static type-checking in Python, but in this tutorial we will follow [Guido van Rossum suggestion][guido-mypy].
 
 ### Mypy
 
-Mypy is a third-party Python library that provides optional static type checking. Unlike other non-dynamic programming languages like Java, where the static type-checking takes place at compilation time, Mypy CLI does the type-check to a file (or a set of files) on demand. Apart of having type-checking at development time, it's helpful to also include this check automatically in the Continous Integration pipeline.
+Mypy is a third-party Python library that provides optional static type checking. Unlike other non-dynamic programming languages like Java, where the static type-checking takes place at compilation time, Mypy CLI does the type-check to a file (or a set of files) on demand. Apart from type-checking at development time, it's helpful to also include this check automatically in the Continuous Integration pipeline.
 
 To start using mypy, install it using any version of `pip` globally or in your virtual environment.
 
@@ -37,11 +37,11 @@ mypy my_file.py
 
 ## Primitive types
 
-You might know that programming languages can be statically or dynamically typed. A statically typed language does type checking at compile-time while dynamically type languages do it at run-time.
+You might know that programming languages can be statically or dynamically typed. A statically typed language does type checking at compile-time while dynamically typed language does it at run-time.
 
-Another concept that is important to know before we continue is the difference between weak and strong typed languages. I short, a strong typed language has stricter rules such as variable assignment, return values and function calling while weak typed ones can produce unpredictable results.
+Another concept that is important to know before we continue is the difference between weakly and strongly typed languages. I short, a strongly typed language has stricter rules such as variable assignment, return values and function calling while weakly typed ones can produce unpredictable results.
 
-That said, Python is a multi-paradigm dynamic language, so the type of variable is determined based on the value. This might be confusing, but it doesn't mean that Python has _weak typing_. Python is _strongly typed_. Surprised? Check this out:
+That said, Python is a multi-paradigm dynamic language, so the type of variable is determined based on the value. This might be confusing, but it doesn't mean that Python has _weakly typing_. Python is _strongly typed_. Surprised? Check this out:
 
 ```python
 movie = "Die Hard"
@@ -101,7 +101,7 @@ What happened here? We defined the function’s arguments types: string for `mea
 
 ## Type Alias
 
-You can also define your custom type names for known structures, which is very useful for improving readability. Let’s say if we want to consider a hamburger is a list of strings, we can define a type `Hamburger` in the following way:
+You can also define your custom type names for known structures, which is very useful for improving readability. Let’s say if we want to specify that a hamburger is a list of strings, we can define a type `Hamburger` in the following way:
 
 ```python
 Hamburger = List[str]
@@ -112,7 +112,7 @@ def make_hamburger(meat: str, number_of_meats: int) -> Hamburger:
 
 ## Callables
 
-A callable is anything you can call, using parenthesis, and possibly passing arguments. Callables are functions, classes, methods and even instances of classes can be callables if their class implements a `__call__()` method.
+A callable is anything you can call, using parenthesis, and possibly passing arguments. Callables can be functions, classes, methods, or even instances of classes (if their class implements a `__call__` method).
 
 Are you doing functional programming? No problem, the typing library includes a type for callables which accepts a two-dimensional list like `[[argument1_type, … argumentN_type], return_type]`.
 
@@ -136,11 +136,11 @@ print(output)
 # True
 ```
 
-First of all, we are creating a function that takes two integer values, sums them up and returns the output of an incoming callback. This callback `is_positive` is defined as a function that takes one mandatory integer and one optional string. If the message exists it will print it, and always returns if the incoming value is positive.
+First of all, we are creating a function that takes two integer values, sums them up and returns the output of an incoming callback. The callback `is_positive` is defined as a function that takes one mandatory integer and one optional string. If the message exists it will print it, and it returns `true` if the incoming value is greater than `0` (or `false` otherwise).
 
 ## Generics and Union Types
 
-One of the most powerful features in a type system are the generics and union types. It’s also possible to use these in-Python annotations. Let’s take a look at the following example:
+One of the most powerful features in a type system are generics and union types. It’s also possible to use these in-Python annotations. Let’s take a look at the following example:
 
 ```python
 from typing import TypeVar, List
@@ -168,7 +168,7 @@ print(generic_add(x3, y3))
 # error: Value of type variable "T" of "generic_add" cannot be "str"
 ```
 
-Above, we defined a type variable `T` that can be integer or List of strings and a `generic_add` function that performs the “addition” operation for the incoming arguments which are limited by the `TypeVar` declaration.
+Above, we defined a type variable `T` that can be an integer or List of strings and a `generic_add` function that performs the “addition” operation for the incoming arguments which are limited by the `TypeVar` declaration.
 
 The first two invocations will work because we're passing arguments that belong to the `TypeVar` set of types and the function will behave accordingly since both types implements the `+` operation. It will actually run for the third invocation because Python implements the add operation for strings, but mypy will raise the error as `str` is not supported by the `T` definition.
 
@@ -201,7 +201,11 @@ print(union_add(x3, y3))
 # error: Argument 2 to "union_add" has incompatible type "str"; expected "Union[float, int]"
 ```
 
-To wrap up, static type checking will always be important to prevent bugs or implementation misuse. It allows us to take advantage of Type-Driven Development without relying on an excessive amount of unit tests that check the values. The difference with Test-Driven Development is that, "unlike tests, which can usually only be used to show the _presence_ of errors, types (used appropriately) can show the _absence_ of errors. But although types _reduce_ the need for tests, they rarely eliminate it entirely" (Brady, 2017, p.3). We strongly suggest as follow up reading [_Type-Driven Development with Idris_][tdd-idris] and extrapolate these practices to Python or other languages.
+To wrap up, static type checking will always be important to prevent bugs or implementation misuse. It allows us to take advantage of Type-Driven Development without relying on an excessive amount of unit tests that check the values. The difference with Test-Driven Development is that, "unlike tests, which can usually only be used to show the _presence_ of errors, types (used appropriately) can show the _absence_ of errors. But although types _reduce_ the need for tests, they rarely eliminate it entirely" (Brady, 2017, p.3).
+
+For a deeper reading about the Type-driven Development topic, we suggest [_Type-Driven Development with Idris_][tdd-idris]. While Idris allows for more expressive types than Python, many of the concepts in that book can be utilized in Python or other languages.
+
+Are you worried that the performance of the program can be affected using Type Annotations? You don't need to. Python doesn't check the types in run-time although loading the `typing` library does add a small overhead with a negligible effect.
 
 Also, don't forget to check out the official Python [documentation for typings][python-docs]. There you will find more useful stuff such as `Tuples`, `IO`, `Generator`, `Iterable` and `Any` (_spoiler alert:_ don’t use `Any`).
 
@@ -209,5 +213,6 @@ Also, don't forget to check out the official Python [documentation for typings][
 [tdd-idris]: https://www.manning.com/books/type-driven-development-with-idris
 [guido-mypy]: https://mail.python.org/pipermail/python-ideas/2014-August/028618.html
 [pep-484]: https://www.python.org/dev/peps/pep-0484/
+[pep-3107]: https://www.python.org/dev/peps/pep-3107/
 [mypy]: http://mypy-lang.org/
 [python-docs]: https://docs.python.org/3/library/typing.html
