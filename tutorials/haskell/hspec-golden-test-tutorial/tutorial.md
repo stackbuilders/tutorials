@@ -107,7 +107,7 @@ fizzOrBuzz n | n `mod` 15 == 0  = "FizzBuzz"
              | otherwise        = show n
 
 ```
-For simplicity we will test a simple function `fizzbuzz` that replaces multiples of 3 with Fizz and multiples of 5 with Buzz. In case that a number is a multiple of both it replaces the number with FizzBuzz. Before moving on with testing, let's review some of `hspec-golden` [documentation](http://hackage.haskell.org/package/hspec-golden-0.1.0.1/docs/Test-Hspec-Golden.html).
+For simplicity we will test a simple function `fizzBuzz` that replaces multiples of 3 with Fizz and multiples of 5 with Buzz. In case that a number is a multiple of both it replaces the number with FizzBuzz. Before moving on with testing, let's review some of `hspec-golden` [documentation](http://hackage.haskell.org/package/hspec-golden-0.1.0.1/docs/Test-Hspec-Golden.html).
 
 Hspec-golden provides us with a `defaultGolden` function which creates the golden files and compares it with the Subject Under Test (SUT) output. It takes two parameters:
 
@@ -187,7 +187,7 @@ The testing framework recognized that this was the first execution, therefore cr
 
 ## A More Real Test Case
 
-The `fizzbuzz` module was used to create a simple and didactic example but it could have been easily tested with unit tests. In practice golden tests are often used when testing JSON, HTML or images which generate large outputs. We also haven't yet tested the entire functionality of the `hspec-golden` library yet. For example the `hgold` CLI for updating the golden files.
+The `fizzbuzz` module was used to create a simple and didactic example but it could have been easily tested with unit tests. In practice golden tests are often used when testing JSON, HTML or images which generate large outputs. We also haven't yet tested the entire functionality of the `hspec-golden` library. For example the `hgold` CLI for updating the golden files.
 
 Let's create some new modules to demonstrate a real case in which golden tests are needed.
 
@@ -271,7 +271,7 @@ encodeCountries = encode
 Before coding our tests, let's create and organize `HtmlGoldenSpec.hs` and `JsonGoldenSpec.hs` modules into directories as well.
 
 ```shell
-$ tree tests
+$ tree test
 test
 ├── FizzBuzz
 │   └── FizzBuzzGoldenSpec.hs
