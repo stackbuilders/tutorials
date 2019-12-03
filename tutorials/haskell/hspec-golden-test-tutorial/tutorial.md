@@ -356,7 +356,7 @@ Replacing golden with actual...
 Finish...
 ```
 
-Hgold replaces the `golden` file (expected output) with the content of the `actual` file (SUT output) so it is necessary to run the test first (even if they fail) to update our tests.
+Hgold replaces the `golden` file (expected output) with the content of the `actual` file (SUT output).
 
 So now we are ready to test our updated golden files.
 
