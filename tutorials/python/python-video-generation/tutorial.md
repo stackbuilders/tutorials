@@ -69,8 +69,8 @@ and Gizeh in a fun way.
 ### Importing the libraries
 
 ```python
-import Moviepy.editor as mpy
-import Gizeh as gz
+import moviepy.editor as mpy
+import gizeh as gz
 from math import pi
 ```
 In this piece of code we are telling Python to add the libraries that are
