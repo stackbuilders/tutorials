@@ -1,10 +1,9 @@
 ---
 title: How to start using Python Type Annotations with Mypy
 published: 2020-02-11
-tags: Python tutorial, Mypy , Python types, TDD
+tags: Python, Mypy, Python types, TDD
 language: python
 author-name: Carlos Villavicencio
-twitter-profile:
 github-profile: po5i
 description: Learn how to improve software quality and readability in Python code by leveraging the built-in typing system, as it complements other software development processes like type-driven development and test-driven development.
 ---
@@ -286,7 +285,7 @@ If you are concerned about program performance being affected by using Type
 Annotations, there’s no need to be since Python doesn't check the types during
 execution time. Loading the `typing` library does add some overhead during
 development, but the effect is negligible. Because of this, types are available
-in development for many [use cases](function-annotations) such as function
+in development for many [use cases][function-annotations] such as function
 overloading, adaptation, database query mapping and meta-programming.
 
 Are you ready to start adding types in Python? If the answer is yes, let’s
@@ -295,7 +294,7 @@ you will start noticing is how the runtime bugs decrease. Please check out the
 official Python [documentation for typings][python-docs]. There you can find
 examples for other structures such as `Tuples`, `Dict`, `Generator`, and
 inheritance. If you are interested in sharing another technique to complement
-this tutorial please send us an email to community@stackbuilders.com.
+this tutorial please send us an email to <community@stackbuilders.com>.
 
 [types-vs-tests]: https://www.stackbuilders.com/news/types-versus-tests-two-approaches-for-writing-correct-software
 [tdd-idris]: https://www.manning.com/books/type-driven-development-with-idris
