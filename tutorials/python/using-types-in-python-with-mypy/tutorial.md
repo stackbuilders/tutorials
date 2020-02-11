@@ -288,7 +288,7 @@ For a deeper dive into Type-Driven Development, we suggest books like
 expressive types than Python, but many of the concepts in the book can be used
 in Python and other languages. If you are interested in sharing other ways to
 leverage types in Python, please feel free to reach out and share your
-experience with us at community@stackbuilders.com.
+experience with us at <community@stackbuilders.com>.
 
 [types-vs-tests]: https://www.stackbuilders.com/news/types-versus-tests-two-approaches-for-writing-correct-software
 [tdd-idris]: https://www.manning.com/books/type-driven-development-with-idris
