@@ -268,6 +268,13 @@ print(union_add(x3, y3))
 
 ## Conclusion
 
+Are you ready to start adding types in Python? If the answer is yes, let’s
+create robust and type-safe code by using Type Annotations. The first thing that
+you will start noticing is how the runtime bugs decrease. Please check out the
+official Python [documentation for typings][python-docs]. There you can find
+examples for other structures such as `Tuples`, `Dict`, `Generator`, and
+inheritance.
+
 Using static types will help us to prevent bugs and implementation issues by
 proving program consistency. It also allows us to use Type-Driven Development,
 and by doing this we decrease the amount of unit tests that we need to write.
@@ -279,22 +286,9 @@ need for tests, they rarely eliminate it entirely" (Brady, 2017, p.3).
 For a deeper dive into Type-Driven Development, we suggest books like
 [_Type-Driven Development with Idris_][tdd-idris]. Idris allows for more
 expressive types than Python, but many of the concepts in the book can be used
-in Python and other languages.
-
-If you are concerned about program performance being affected by using Type
-Annotations, there’s no need to be since Python doesn't check the types during
-execution time. Loading the `typing` library does add some overhead during
-development, but the effect is negligible. Because of this, types are available
-in development for many [use cases][function-annotations] such as function
-overloading, adaptation, database query mapping and meta-programming.
-
-Are you ready to start adding types in Python? If the answer is yes, let’s
-create robust and type-safe code by using Type Annotations. The first thing that
-you will start noticing is how the runtime bugs decrease. Please check out the
-official Python [documentation for typings][python-docs]. There you can find
-examples for other structures such as `Tuples`, `Dict`, `Generator`, and
-inheritance. If you are interested in sharing another technique to complement
-this tutorial please send us an email to <community@stackbuilders.com>.
+in Python and other languages. If you are interested in sharing other ways to
+leverage types in Python, please feel free to reach out and share your
+experience with us at <community@stackbuilders.com>.
 
 [types-vs-tests]: https://www.stackbuilders.com/news/types-versus-tests-two-approaches-for-writing-correct-software
 [tdd-idris]: https://www.manning.com/books/type-driven-development-with-idris
