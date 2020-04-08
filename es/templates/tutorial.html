@@ -1,0 +1,154 @@
+<div class="row">
+    <div class="tutorial-content">
+      <h2>
+        $title$
+      </h2>
+
+      <p>
+        Primera publicacion: $published$
+        $if(updated)$
+          (Ultima actualizacion: $updated$)
+        $endif$
+        <br/>
+        por $author-name$
+        <br/>
+        $if(tags)$
+          Etiquetas: $tags$
+          $endif$
+      </p>
+  
+      <div>
+        <div class="social-links-inline">
+          <p>
+            Sigue al autor:
+          </p>
+        </div>
+        <div class="tutorials_social_icons news social-links-inline">
+          <div class="social-links scroll-always desktop">
+            $if(twitter-profile)$
+            <div class="hoverable twitter-share">
+              <a href="https://twitter.com/intent/follow?screen_name=$twitter-profile$">
+                <img data-no-retina="" class="img-responsive image-normal" alt="twitter-icon.png" src="$host$/assets/img/twitter-icon.png">
+                <img data-no-retina="" class="img-responsive image-hover" alt="twitter-icon-hover.png" src="$host$/assets/img/twitter-icon-hover.png">
+              </a>
+            </div>
+            $endif$
+            $if(github-profile)$
+            <div class="hoverable github-share">
+              <a target="_blank" href="https://github.com/$github-profile$">
+                <img data-no-retina="" class="img-responsive image-normal" alt="github-icon.png" src="$host$/assets/img/github-icon.png">
+                <img data-no-retina="" class="img-responsive image-hover" alt="github-icon-hover.png" src="$host$/assets/img/github-icon-hover.png">
+              </a>
+            </div>
+            $endif$
+          </div>
+        </div>
+      </div>
+  
+      $if(lts)$
+      <p>
+        Probado con:
+        <ul>
+          $if(lts)$
+          <li>
+            Resolver:
+            <a href="https://www.stackage.org/lts-$lts$">
+              LTS Haskell $lts$ (ghc-$ghc$)
+            </a>
+          </li>
+          $endif$
+          $if(nightly)$
+          <li>
+            Resolver:
+            <a href="http://www.stackage.org/nightly-$nightly$">
+              Stackage Nightly $nightly$ (ghc-$ghc$)
+            </a>
+          </li>
+          $endif$
+          $if(libs)$
+          <li>
+            Librerias:
+            $for(libs)$
+            <a href="https://hackage.haskell.org/package/$lib$">
+              $lib$
+            </a>
+            $endfor$
+          </li>
+          $endif$
+        </ul>
+      </p>
+      $endif$
+  
+      <div>
+        <div class="social-links-inline">
+          <p>
+            Comparte este articulo:
+          </p>
+        </div>
+        <div class="tutorials_social_icons news social-links-inline">
+          <div class="social-links scroll-always desktop">
+            <div class="hoverable mail-share">
+              <a href="mailto:?subject=$title$&body=$title$%0D%0A$host$$url$">
+                <img data-no-retina="" class="img-responsive image-normal" alt="mail-icon.png" src="$host$/assets/img/mail-icon.png">
+                <img data-no-retina="" class="img-responsive image-hover" alt="mail-icon-hover.png" src="$host$/assets/img/mail-icon-hover.png">
+              </a>
+            </div>
+            <div class="hoverable twitter-share">
+              <a href="https://twitter.com/intent/tweet?text=$title$&url=$protocol$$host$$url$">
+                <img data-no-retina="" class="img-responsive image-normal" alt="twitter-icon.png" src="$host$/assets/img/twitter-icon.png">
+                <img data-no-retina="" class="img-responsive image-hover" alt="twitter-icon-hover.png" src="$host$/assets/img/twitter-icon-hover.png">
+              </a>
+            </div>
+            <div class="hoverable facebook-share">
+              <a href="$protocol$$host$$url$">
+                <img data-no-retina="" class="img-responsive image-normal" alt="facebook-icon.png" src="$host$/assets/img/facebook-icon.png">
+                <img data-no-retina="" class="img-responsive image-hover" alt="facebook-icon-hover.png" src="$host$/assets/img/facebook-icon-hover.png">
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <hr>
+  
+      $body$
+  
+      <hr>
+  
+      <p>
+        ¡Gracias por leer este tutorial! Si tienes algún comentario o sugerencia, por favor siéntete en la libertad de mencionarla
+        en <a href="https://twitter.com/stackbuilders">Twitter</a> o
+        <a href="https://www.facebook.com/StackBuildersEcuador/">Facebook</a>. 
+        También puedes abrir issues y pull requests en
+        <a href="https://github.com/stackbuilders/tutorials">GitHub</a>.
+      </p>
+  
+      <section>
+        <div class="subscribe-tutorials">
+          <div class="subscribe-tutorials__container">
+            <div class="subscribe-tutorials__form-section">
+              <form id="subscriber_form" method="POST">
+                <h2>Suscríbete a nuestra lista de correo</h2>
+                <h3>Entérate del contenido más reciente de Stack Builders. Puedes cancelar tu suscripción en cualquier momento.</h3>
+                <div class="subscribe-tutorials__form__fields">
+                  <input type="text" name="fname" class="input_text" id="FNAME" placeholder="¿Cuál es tu nombre?">
+                  <input type="email" name="email" class="required email input_text" id="EMAIL" placeholder="¿Cuál es tu correo electrónico?">
+                  <input type="hidden" name="interest" value="tutorials">
+                  <p id="email_message" style="display:none">* Por favor revisa que tu correo sea correcto</p>
+                  <p id="member_message" style="display:none">* Ya te encuentras suscrito al boletín de Stack Builders</p>
+                  <p id="error_message" style="display:none">* Algo salió mal, por favor inténtalo de nuevo</p>
+                  <input type="submit" value="Subscribe" class="subscribe-tutorials__form__submit" id="subscribe_submit">
+                </div>
+              </form>
+            </div>
+            <div class="subscribe-tutorials__message" style="display:none">
+              <hr><h2>¡Te damos la bienvenida a Stack Builders!</h2><hr>
+              <h3>Por favor revisa tu correo para confirmar tu suscripción.</h3>
+            </div>
+          </div>
+        </div>
+      </section>
+  
+    </div>
+  </div>
+  
