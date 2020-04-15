@@ -1,6 +1,6 @@
 ---
 title: Nonsense! Getting started with Reason and ReasonReact
-published: 2020-04-15
+published: 2020-04-16
 tags: reason
 language: reason
 author-name: Juan Pedro Villa Isaza
@@ -141,7 +141,7 @@ Next, let’s create a `src/index.re` file that prints something to the console:
 Js.log("Nonsense!");
 ```
 
-To build the file, we first need to add some scripts in the `package.json` file:
+To build the file, we first need to add some scripts to the `package.json` file:
 
 ```
 "scripts": {
@@ -193,7 +193,7 @@ syntax for React:
 "refmt": 3
 ```
 
-Let’s create a `src/Nonsense.re`, which will contain a React component that
+Let’s create a `src/Nonsense.re` file, which will contain a React component that
 initially just displays a message (instead of logging a message):
 
 ```reason
@@ -214,9 +214,9 @@ The element ID has to exist somewhere in the HTML, so we also need to update the
 <div id="nonsense"></div>
 ```
 
-This time, running `npm run build` and opening the `src/index.html` with a
-browser shouldn’t work because now we have some additional dependencies and
-would need to bundle the JavaScript files. A simple solution is to install
+This time, running `npm run build` and opening `src/index.html` with a browser
+shouldn’t work because now we have some additional dependencies and would need
+to bundle the JavaScript files. A simple solution is to install
 [`moduleserve`][moduleserve]:
 
 [moduleserve]: https://www.npmjs.com/package/moduleserve
@@ -235,8 +235,8 @@ And add a new script to serve the application:
 },
 ```
 
-But the scripts in the `src/index.html` file have to be updated as well
-following the `moduleserve` documentation:
+The scripts in the `src/index.html` file have to be updated as well following
+the `moduleserve` documentation:
 
 ```html
 <script>
@@ -545,7 +545,7 @@ React.useEffect0(() => {
 });
 ```
 
-We also moved to the `ignore` part to the effect code. Now, we get a noun from
+We also moved the `ignore` part to the effect code. Now, we get a noun from
 Wordbot, and then, once we have a noun, we request a verb in the past tense
 (we’re using verbs in the past tense because they’re already conjugated). This
 allows us to simply add a new line to request the next type of word, an object:
