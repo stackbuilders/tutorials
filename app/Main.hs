@@ -11,6 +11,7 @@ import System.Environment
 import System.FilePath
 import Text.Jasmine
 import Text.Pandoc
+import Data.Function (on)
 
 import qualified Data.ByteString.Lazy.Char8 as C
 
@@ -31,7 +32,7 @@ markdownPattern :: Pattern
 markdownPattern = filePattern "md"
 
 markdownPatternEs :: Pattern
-markdownPatternEs = filePatternEs "md"
+markdownPatternEs = filePattern "es.md"
 
 imagePattern :: Pattern
 imagePattern = filePattern "png"
@@ -121,7 +122,7 @@ rules env = do
   match ("tutorials/index.html") $ do
     route idRoute
     compile $ do
-      tutorials <- recentFirst =<< loadAll markdownPattern
+      tutorials <- recentFirst =<< loadAll (markdownPattern .&&. hasNoVersion)
       let
         indexContext =
           listField "tutorials" tutorialCtx (return tutorials)
@@ -137,7 +138,7 @@ rules env = do
   match ("es/tutorials/index.html") $ do
     route idRoute
     compile $ do
-      tutorials <- recentFirst =<< loadAll markdownPattern
+      tutorials <- recentFirst =<< loadAll (markdownPattern .&&. hasVersion "tutorials-es")
       let
         indexContext =
           listField "tutorials" tutorialCtxEs (return tutorials)
@@ -179,6 +180,24 @@ rules env = do
         >>= loadAndApplyTemplate "templates/tag.html" ctx
         >>= loadAndApplyTemplate "templates/default.html" ctx
         >>= relativizeUrls
+
+  tagsEs <- buildTags markdownPattern (fromCapture "tutorials/tags/*.html")
+  tagsRules tagsEs $ \tag pattern -> version "es-tags" $ do
+    let title = "Publicaciones etiquetadas \"" ++ tag ++ "\""
+        tagRouteEs i = "es" </> (toFilePath i)
+    route (customRoute tagRouteEs)
+    compile $ do
+      tutorials <- recentFirst =<< loadAll pattern
+      let ctx = constField "title" title
+                `mappend` constField "title-list" title
+                `mappend` listField "tutorials" tutorialCtxEs (return tutorials)
+                `mappend` defaultContext
+                `mappend` commonCtx
+
+      makeItem ""
+        >>= loadAndApplyTemplate "es/templates/tag.html" ctx
+        >>= loadAndApplyTemplate "es/templates/default.html" ctx
+        >>= relativizeUrls
   
   match markdownPattern $ do
     let
@@ -187,20 +206,21 @@ rules env = do
     route (customRoute tutorialRoute)
     compile $
       tutorialsCompiler
+        >>= saveSnapshot "tutorials-english"
         >>= loadAndApplyTemplate "templates/tutorial.html" (tutorialCtxWithTags env tags)
         >>= loadAndApplyTemplate "templates/default.html" (tutorialCtxWithTags env tags)
         >>= relativizeUrls
         >>= cleanIndexUrls
 
-  match markdownPatternEs  $ do
+  match markdownPattern $ version "tutorials-es" $ do
     let
-      tutorialRoute i = takeDirectory p </> "index.html"
+      tutorialRoute i = "es" </> takeDirectory p </> "index.html"
         where p = toFilePath i
     route (customRoute tutorialRoute)
     compile $
       tutorialsCompiler
-        >>= loadAndApplyTemplate "es/templates/tutorial.html" (tutorialCtxWithTagsEs env tags)
-        >>= loadAndApplyTemplate "es/templates/default.html" (tutorialCtxWithTagsEs env tags)
+        >>= loadAndApplyTemplate "es/templates/tutorial.html" (tutorialCtxWithTagsEs env tagsEs)
+        >>= loadAndApplyTemplate "es/templates/default.html" (tutorialCtxWithTagsEs env tagsEs)
         >>= relativizeUrls
         >>= cleanIndexUrls
 
@@ -287,7 +307,7 @@ datedContext :: [(String, String)] -> Context String
 datedContext env = dateField "published" "%B %e, %Y" <> commonContext Post env
 
 datedContextEs :: [(String, String)] -> Context String
-datedContextEs env = dateField "published" "%D" <> commonContext Post env
+datedContextEs env = dateField "published" "%d/%m/%Y " <> commonContext Post env
 
 tutorialContext :: [(String, String)] -> Context String
 tutorialContext env = libs <> datedContext env
