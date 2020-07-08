@@ -6,7 +6,7 @@ language: java
 author-name: José Luis León
 twitter-profile: JoseLeonT
 github-profile: JoseLion
-description: Contributing to r2dbc-postgresql open-source library, the POstgreSQL implementation of the R2DBC project. The reactive alternative to JDBC that let us work on Spring WebFlux with relational databases.
+description: The programming world is adopting practices from the functional and reactive programming paradigms. Here, we’ll review how we can integrate a relational database like PostgreSQL with Spring WebFlux while keeping the reactive design. Then we’ll see how we contributed to r2dbc-postgresql to solve a datatype decoding issue related to array-like types.
 ---
 
 Reading Roman Elizarov's article "[Functional Programming is on the rise](https://medium.com/@elizarov/functional-programing-is-on-the-rise-ebd5c705eaef) [1]," we can tell that the programming world is adopting practices from the functional and reactive programming paradigms. At Stack Builders, we encourage functional programming practices for creating reliable applications. These practices allow us to focus on implementing the core business logic instead of more frequently fixing bugs. Some of the contributions that we've made include a [couple of pull requests](https://github.com/r2dbc/r2dbc-postgresql/pulls?q=is%3Apr+author%3AJoseLion+is%3Amerged) in the open-source project `r2dbc-postgresql`, a reactive/non-blocking alternative for JDBC in Spring WebFlux.
