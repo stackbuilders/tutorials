@@ -1,0 +1,42 @@
+<div>
+    <div class="row">
+      <p>
+        En Stack Builders, consideramos nuestra misión no solamente desarrollar aplicaciones
+        robustas y confiables para nuestros clientes, sino también ayudar a la industria como un todo
+        facilitando el acceso a tecnología que consideramos valiosa. Esperamos que disfrutes, y encuentres 
+        útil, nuestros tutoriales. Si tienes alguna sugerencia para futuros tutoriales, por favor siéntete 
+        en la libertad de abrir un issue o PR en nuestro 
+        <a href="https://github.com/stackbuilders/tutorials" target="_new">
+          repositorio de tutoriales en GitHub</a>.
+      </p>
+      <p>
+        <a href="/tutorials/atom.xml" title="Atom Feed">Atom Feed</a>
+        &nbsp;
+        <a href="/tutorials/rss.xml" title="RSS Feed">RSS Feed</a>
+      </p>
+    </div>
+  
+    <h1 class="title">$title-list$</h1>
+  
+    <div class="news">
+      $for(tutorials)$
+      <div itemscope itemtype="http://schema.org/TechArticle">
+        <div class="index row">
+          <div class="blog-content">
+            <a class="blog-link-from-index" href="/$customUrl$" itemprop="url">
+              <h1 class="blog-title" itemprop="headline">$title$</h1>
+            </a>
+            <div class="blog-info tutorial-info">
+              <span itemprop="datePublished">$published$</span>
+            </div>
+            <br>
+            <div class="synopsis">
+              <span itemprop="description">$description$</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      $endfor$
+    </div>
+  </div>
+  

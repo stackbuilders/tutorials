@@ -30,3 +30,4 @@ with the steps required for accomplishing your tutorial. Use
 twitter-profile: jpvillaisaza
 github-profile: jpvillaisaza
 ```
+5. Finally copy your `tutorial.md` file to `es/tutorials/<langugage>/<your-tutorial-dir>/`  

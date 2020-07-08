@@ -3,7 +3,7 @@
 module Main (main) where
 
 import Data.Char (toLower)
-import Data.List (isSuffixOf)
+import Data.List (isSuffixOf, isPrefixOf, intercalate)
 import Data.Maybe (fromMaybe)
 import Data.Monoid ((<>))
 import Hakyll
@@ -11,6 +11,7 @@ import System.Environment
 import System.FilePath
 import Text.Jasmine
 import Text.Pandoc
+import Data.Function (on)
 
 import qualified Data.ByteString.Lazy.Char8 as C
 
@@ -32,13 +33,24 @@ supportedLanguages = [  -- Name here the directories of the programming language
 markdownPattern :: Pattern
 markdownPattern = filePattern "md"
 
+markdownPatternEs :: Pattern
+markdownPatternEs = filePattern "es.md"
+
 imagePattern :: Pattern
 imagePattern = filePattern "png"
+
+imagePatternEs :: Pattern
+imagePatternEs = filePattern "png"
 
 filePattern :: String -> Pattern
 filePattern extension = foldl (.||.) (head patterns) (tail patterns)
   where
     patterns = fmap (\dir -> fromGlob $ "tutorials/" ++ dir ++ "/*/*." ++ extension) supportedLanguages
+
+filePatternEs :: String -> Pattern
+filePatternEs extension = foldl (.||.) (head patterns) (tail patterns)
+  where
+    patterns = fmap (\dir -> fromGlob $ "es/tutorials/" ++ dir ++ "/*/*." ++ extension) supportedLanguages
 
 configuration :: Configuration
 configuration =
@@ -68,9 +80,10 @@ cleanIndex url
 
 rules :: [(String, String)] -> Rules ()
 rules env = do
-  let commonCtx   = commonContext Blog env
-      datedCtx    = datedContext env
-      tutorialCtx = tutorialContext env
+  let commonCtx     = commonContext Blog env
+      datedCtx      = datedContextEs env
+      tutorialCtx   = tutorialContext env
+      tutorialCtxEs = tutorialContextEs env
 
   create ["archive.html"] $ do
     route idRoute
@@ -90,20 +103,53 @@ rules env = do
         >>= relativizeUrls
         >>= cleanIndexUrls
 
-  match "tutorials/index.html" $ do
+  create ["archive.es.html"] $ do
     route idRoute
     compile $ do
       tutorials <- recentFirst =<< loadAll markdownPattern
+      let
+        title = "Archives"
+        archiveContext =
+          listField "tutorials" tutorialCtxEs (return tutorials)
+            <> constField "title" title
+            <> constField "title-list" title
+            <> commonCtx
+
+      makeItem ""
+        >>= loadAndApplyTemplate "es/templates/archive.html" archiveContext
+        >>= loadAndApplyTemplate "es/templates/default.html" archiveContext
+        >>= relativizeUrls
+        >>= cleanIndexUrls
+
+  match ("tutorials/index.html") $ do
+    route idRoute
+    compile $ do
+      tutorials <- recentFirst =<< loadAll (markdownPattern .&&. hasNoVersion)
       let
         indexContext =
           listField "tutorials" tutorialCtx (return tutorials)
             <> constField "title" "Home"
             <> constField "title-list" ""
             <> commonCtx
-
       getResourceBody
         >>= applyAsTemplate indexContext
         >>= loadAndApplyTemplate "templates/default.html" indexContext
+        >>= relativizeUrls
+        >>= cleanIndexUrls
+
+  match ("es/tutorials/index.html") $ do
+    route idRoute
+    compile $ do
+      tutorials <- recentFirst =<< loadAll (markdownPattern .&&. hasVersion "tutorials-es")
+      let
+        indexContext =
+          listField "tutorials" tutorialCtxEs (return tutorials)
+            <> constField "title" "Home"
+            <> constField "title-list" ""
+            <> commonCtx
+      getResourceBody
+        >>= applyAsTemplate indexContext
+        >>= loadAndApplyTemplate "es/templates/default.html" indexContext
         >>= relativizeUrls
         >>= cleanIndexUrls
 
@@ -116,6 +162,8 @@ rules env = do
     compile compressJsCompiler
 
   match "templates/*" (compile templateCompiler)
+
+  match "es/templates/*" (compile templateCompiler)
 
   tags <- buildTags markdownPattern (fromCapture "tutorials/tags/*.html")
 
@@ -135,6 +183,24 @@ rules env = do
         >>= loadAndApplyTemplate "templates/default.html" ctx
         >>= relativizeUrls
 
+  tagsEs <- buildTags markdownPattern (fromCapture "tutorials/tags/*.html")
+  tagsRules tagsEs $ \tag pattern -> version "es-tags" $ do
+    let title = "Publicaciones etiquetadas \"" ++ tag ++ "\""
+        tagRouteEs i = "es" </> (toFilePath i)
+    route (customRoute tagRouteEs)
+    compile $ do
+      tutorials <- recentFirst =<< loadAll pattern
+      let ctx = constField "title" title
+                `mappend` constField "title-list" title
+                `mappend` listField "tutorials" tutorialCtxEs (return tutorials)
+                `mappend` defaultContext
+                `mappend` commonCtx
+
+      makeItem ""
+        >>= loadAndApplyTemplate "es/templates/tag.html" ctx
+        >>= loadAndApplyTemplate "es/templates/default.html" ctx
+        >>= relativizeUrls
+  
   match markdownPattern $ do
     let
       tutorialRoute i = takeDirectory p </> "index.html"
@@ -142,8 +208,21 @@ rules env = do
     route (customRoute tutorialRoute)
     compile $
       tutorialsCompiler
+        >>= saveSnapshot "tutorials-english"
         >>= loadAndApplyTemplate "templates/tutorial.html" (tutorialCtxWithTags env tags)
         >>= loadAndApplyTemplate "templates/default.html" (tutorialCtxWithTags env tags)
+        >>= relativizeUrls
+        >>= cleanIndexUrls
+
+  match markdownPattern $ version "tutorials-es" $ do
+    let
+      tutorialRoute i = "es" </> takeDirectory p </> "index.html"
+        where p = toFilePath i
+    route (customRoute tutorialRoute)
+    compile $
+      tutorialsCompiler
+        >>= loadAndApplyTemplate "es/templates/tutorial.html" (tutorialCtxWithTagsEs env tagsEs)
+        >>= loadAndApplyTemplate "es/templates/default.html" (tutorialCtxWithTagsEs env tagsEs)
         >>= relativizeUrls
         >>= cleanIndexUrls
 
@@ -178,6 +257,11 @@ tutorialCtxWithTags env tags = do
   let tutorialCtx = tutorialContext env
   tagsField "tags" tags `mappend` tutorialCtx
 
+tutorialCtxWithTagsEs :: [(String, String)] -> Tags -> Context String
+tutorialCtxWithTagsEs env tags = do
+  let tutorialCtxEs = tutorialContextEs env
+  tagsField "tags" tags `mappend` tutorialCtxEs
+
 feedConfiguration :: FeedConfiguration
 feedConfiguration =
   FeedConfiguration
@@ -203,13 +287,40 @@ commonContext hero env =
     constField "host" host
       <> constField "protocol" protocol
       <> constField "hero" (map toLower (show hero))
+      <> customUrl
       <> defaultContext
+
+
+customUrl :: Context String
+customUrl = mapContext changeLanguage $ urlField "customUrl"
+
+changeLanguage :: String -> String
+changeLanguage url
+  | "/es" `isPrefixOf` url = intercalate "/" $ tail $ wordsWhen (=='/') url
+  | otherwise = "es" ++ url
+
+wordsWhen     :: (Char -> Bool) -> String -> [String]
+wordsWhen p s =  case dropWhile p s of
+                      "" -> []
+                      s' -> w : wordsWhen p s''
+                            where (w, s'') = break p s'
 
 datedContext :: [(String, String)] -> Context String
 datedContext env = dateField "published" "%B %e, %Y" <> commonContext Post env
 
+datedContextEs :: [(String, String)] -> Context String
+datedContextEs env = dateField "published" "%d/%m/%Y " <> commonContext Post env
+
 tutorialContext :: [(String, String)] -> Context String
 tutorialContext env = libs <> datedContext env
+  where
+    libs = listFieldWith "libs" libraryContext $ \item -> do
+      libraries <- getMetadataField' (itemIdentifier item) "libraries"
+      mapM makeItem (words libraries)
+    libraryContext = field "lib" (return . itemBody)
+
+tutorialContextEs :: [(String, String)] -> Context String
+tutorialContextEs env = libs <> datedContextEs env
   where
     libs = listFieldWith "libs" libraryContext $ \item -> do
       libraries <- getMetadataField' (itemIdentifier item) "libraries"
