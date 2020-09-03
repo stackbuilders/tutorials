@@ -1,0 +1,4 @@
+*.o
+*.hi
+worker/
+node/
