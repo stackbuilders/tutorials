@@ -30,3 +30,7 @@ with the steps required for accomplishing your tutorial. Use
 twitter-profile: jpvillaisaza
 github-profile: jpvillaisaza
 ```
+5. If you want to add a personalized open graph image to your tutorial add this into `tutorial.md`:
+```
+image: <language>/<your-tutorial-dir>/<your-image>.png
+```

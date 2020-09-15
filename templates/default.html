@@ -20,6 +20,40 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="google-site-verification" content="uUpeU0Xsc1oiaKwIVW1RnAbHbKozHBAJdd9XA-fJm-k">
 
+    <meta property="og:locale" content="en_US">
+    <meta property="og:url" content="$protocol$$host$$url$">
+    <meta property="og:title" content="$title$">
+    <meta property="og:type" content="article">
+    <meta property="og:section" content="Technology">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="$title$">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="$protocol$$host$$url$">
+    <meta property="twitter:title" content="$title$">
+
+    $if(description)$
+      <meta property="og:description" content="$description$">
+      <meta property="twitter:description" content="$description$">
+    $endif$
+
+    $if(author-name)$
+      <meta property="og:author" content="$author-name$">
+    $endif$
+
+    $if(published)$
+      <meta property="og:published_time" content="$published$">
+    $endif$
+
+    $if(image)$
+      <meta property="og:image" content="$protocol$$host$/tutorials/$image$"/>
+      <meta property="twitter:image" content="$protocol$$host$/tutorials/$image$">
+    $else$
+      <meta property="og:image" content="$protocol$$host$/tutorials/DefaultPost.jpg"/>
+      <meta property="twitter:image" content="$protocol$$host$/tutorials/DefaultPost.jpg">
+    $endif$
+
     <link rel="shortcut icon" type="image/png"
           href="$host$/assets/img/favicon.png">
 
