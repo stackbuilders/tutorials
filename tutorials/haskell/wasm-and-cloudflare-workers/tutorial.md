@@ -1,6 +1,6 @@
 ---
 title: Let's build a Cloudflare Worker with WebAssembly and Haskell
-published: 2020-08-26
+published: 2020-09-22
 ghc: 8.8
 tags: haskell, webassembly, wasm, cloudflare, cloudflare workers, cfw
 libraries: asterius
@@ -10,6 +10,7 @@ github-profile: CristhianMotoche
 description: Let's combine the power of Haskell and WebAssembly in a Cloudflare Worker!
 ---
 
+At [Stack Builders][sb], we believe that Haskell's system of expressive static types offers many benefits to the software industry and the world-wide community that depends on our services. In order to realize these benefits, proper training and an ecosystem that allows for reliable deployment of services is necessary. In exploring the tools that help us to run our systems based on Haskell, our developer Cristhian Motoche has created a tutorial demonstrating how to compile Haskell to WebAssembly using Asterius for deployment on Cloudflare.
 
 ## What is a Cloudflare Worker
 
@@ -302,11 +303,15 @@ CFW [limits][cfw-limits] your JavaScript and WebAssembly in file size. Therefore
 
 ## Conclusion
 
-In this tutorial, we used Asterius to compile Haskell to WebAssembly and deployed it to Cloudflare Worker using the Workers API. Asterius supports a lot of Haskell features (e. g. Template Haskell) and it provides an easy to use JavaScript FFI to easily interact with JavaScript. Additionally, it provides prebuilt containers that contain a lot of Haskell packages so you can start writing a script right away.
+Stack Builders supports the community by building better software for better living through technologies like expressive static types, we used Asterius to compile Haskell to WebAssembly and deployed it to Cloudflare Worker using the Workers API. Asterius supports a lot of Haskell features (e. g. Template Haskell) and it provides an easy to use JavaScript FFI to easily interact with JavaScript. Additionally, it provides prebuilt containers that contain a lot of Haskell packages so you can start writing a script right away.
 
 Following this approach, we can write functional type safe code in Haskell, target it to WebAssembly and publish it to CFW which runs on the edge of the Cloudflare infrastructure.
 
+For more content check our [blogs][sb-blogs] and [tutorials][sb-tutorials]!
 
+[sb]: https://www.stackbuilders.com/
+[sb-blogs]: https://www.stackbuilders.com/news/page/1
+[sb-tutorials]: https://www.stackbuilders.com/tutorials/
 [cfw]: https://developers.cloudflare.com/workers/
 [cfw-limits]: https://developers.cloudflare.com/workers/about/limits/#script-size
 [wasm]: https://webassembly.org/
