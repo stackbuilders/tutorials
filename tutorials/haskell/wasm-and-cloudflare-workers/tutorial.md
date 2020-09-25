@@ -1,6 +1,6 @@
 ---
 title: Let's build a Cloudflare Worker with WebAssembly and Haskell
-published: 2020-09-22
+published: 2020-09-25
 ghc: 8.8
 tags: haskell, webassembly, wasm, cloudflare, cloudflare workers, cfw
 libraries: asterius
@@ -10,29 +10,30 @@ github-profile: CristhianMotoche
 description: Let's combine the power of Haskell and WebAssembly in a Cloudflare Worker!
 ---
 
-At [Stack Builders][sb], we believe that Haskell's system of expressive static types offers many benefits to the software industry and the world-wide community that depends on our services. In order to realize these benefits, proper training and an ecosystem that allows for reliable deployment of services is necessary. In exploring the tools that help us to run our systems based on Haskell, our developer Cristhian Motoche has created a tutorial demonstrating how to compile Haskell to WebAssembly using Asterius for deployment on Cloudflare.
+At [Stack Builders][sb], we believe that Haskell’s system of expressive static types offers many benefits to the software industry and the world-wide community that depends on our services. In order to fully realize these benefits, it is necessary to have proper training and access to an ecosystem that allows for reliable deployment of services. In exploring the tools that help us run our systems based on Haskell, our developer Cristhian Motoche has created a tutorial that shows how to compile Haskell to WebAssembly using Asterius for deployment on Cloudflare.
 
 ## What is a Cloudflare Worker
 
-[Cloudflare Workers][cfw] (CFW) is a Function as a Service (FaaS) platform that allows us to run our code on the edge of the Cloudflare infrastructure. It's built on Google V8, so it’s possible to write some functionality in JavaScript or any other language that targets WebAssembly.
+[Cloudflare Workers][cfw] (CFW) is a Function as a Service (FaaS) platform that allows us to run our code on the edge of the Cloudflare infrastructure. It's built on Google V8, so it’s possible to write functionalities in JavaScript or any other language that targets WebAssembly.
 
-[WebAssembly][wasm] is a portable binary instruction format that can be executed fast in a memory-safe sandboxed environment, so it’s really useful for tasks that need to perform resource-demanding and self-contained operations.
+[WebAssembly][wasm] is a portable binary instruction format that can be executed fast in a memory-safe sandboxed environment. For this reason, it’s especially useful for tasks that need to perform resource-demanding and self-contained operations.
 
 ## Why use Haskell to target WebAssembly?
 
-Haskell is one of the few pure functional [languages][wasm-languages] that can target WebAssembly. It helps to think about small functions that can later be compoused to do complex tasks. Additionally, it’s statically typed and has type inference, so it will complain if there are type errors at compile time. Because of that and [much more][haskell-matters], Haskell is a good source language for targeting WebAssembly.
+Haskell is one of the few pure functional [languages][wasm-languages] that can target WebAssembly. As such, It helps developers break down complex tasks into small functions that can later be composed to do complex tasks. Additionally, it’s statically typed and has type inference, so it will complain if there are type errors at compile time. Because of that and [much more][haskell-matters], Haskell is a good source language for targeting WebAssembly.
 
 ## From Haskell to WebAssembly
 
 We’ll use [Asterius][asterius-site] to target WebAssembly from Haskell. It’s a well documented tool that is updated often and supports a lot of Haskell features.
 
-First, as suggested in the [documentation][asterius-docker-images], we’ll pull the Asterius prebuilt container from Docker hub using `podman`. In this tutorial, we will use the [`200617`][asterius-200617] version that works with GHC `8.8`.
+First, as suggested in the [documentation][asterius-docker-images], we’ll use `podman` to pull the Asterius prebuilt container from Docker hub. In this tutorial, we will use Asterius version [`200617`][asterius-200617], which works with GHC 8.8.
 
 ```
 podman run -it --rm -v $(pwd):/workspace -w /workspace terrorjack/asterius:200617
 ```
 
-Now, we’ll create a Haskell module called `fact.hs` file that will export a pure function:
+Now we’ll create a Haskell module called `fact.hs` file that will export a pure function:
+
 
 ```haskell
 module Factorial (fact) where
@@ -48,7 +49,7 @@ foreign export javascript "fact" fact :: Int -> Int
 
 In this module, we define a pure function called `fact`, optimized with tail recursion and exported using the [Asterius JavaScript FFI][asterius-jffi], so that it can be called when a WebAssembly module is instantiated in JavaScript.
 
-Next, we’re going to create a JavaScript file called `fact_node.mjs` that contains the following code:
+Next, we’ll create a JavaScript file called `fact_node.mjs` that contains the following code:
 
 ```javascript
 import * as rts from "./rts.mjs";
@@ -63,11 +64,11 @@ async function handleModule(m) {
 
 module.then(handleModule);
 ```
-This code imports `rts.js` (common runtime), WebAssembly loaders and required parameters for the Asterius instance. It creates a new Asterius instance and calls the exported function `fact` with the input `5`, and prints out the result.
+This code imports `rts.mjs` (common runtime), WebAssembly loaders, and the required parameters for the Asterius instance. It creates a new Asterius instance, it calls the exported function `fact` with the input `5`, and prints out the result.
 
 You probably have noted that `fact` is done __asynchronously__. This happens with any exported function by Asterius, even if it’s a pure function.
 
-Then, we’ll compile this code using the Asterius command line interface (CLI) `ahc-link` and run the JavaScript code in Node:
+Next, we’ll compile this code using the Asterius command line interface (CLI) `ahc-link` and we’ll run the JavaScript code in Node:
 
 ```sh
 ahc-link \
@@ -79,7 +80,7 @@ ahc-link \
   --output-dir=node
 ```
 
-This command takes `fact.hs` as a Haskell input file, specifies that no `main` function is exported and exports the `fact` function. Additionally, it takes `fact_node.mjs` as the entry JavaScript file that replaces the generated file by default, and it places the generated code in a directory called `node`.
+This command takes `fact.hs` as a Haskell input file, specifies that no `main` function is exported, and exports the `fact` function. Additionally, it takes `fact_node.mjs` as the entry JavaScript file that replaces the generated file by default, and it places the generated code in a directory called `node`.
 
 Running the `ahc-link` command from above will print the following output in the console:
 
@@ -90,11 +91,12 @@ Running the `ahc-link` command from above will print the following output in the
 120
 ```
 
-As you can see, the result was executed in `node` and it printed out the result of `fact` in the terminal.
+As you can see, the result is executed in `node` and it prints out the result of `fact` in the console.
 
 ## Push your code to Cloudflare Workers
 
-Now, we’re going to set everything up for deploying our code to Cloudflare workers.
+Now we’ll set everything up for deploying our code to Cloudflare workers.
+
 
 First, let’s add a `metadata.json` file with the following content:
 
@@ -146,12 +148,13 @@ addEventListener("fetch", event => {
 ```
 
 There are a few interesting things to point out in this code:
-1. We’re importing the `rts.js` and the required code to import the exported functions from our WebAssembly module.
+
+1. We import `rts.mjs` and `fact.req.mjs` to load the exported functions from our WebAssembly module.
 2. `handleFact` is an asynchronous function that creates an instance of Asterius with the global `WASM` module, as a CFW global variable, and calls the exported function `fact` with some input.
-3. `handleRequest` handles the request of the CFW. It’s expecting a `POST` request, with a parameter called `param` in the request body. If `param` is a number, it calls `handleFact` to respond with the `fact` result.
+3. `handleRequest` handles the request of the CFW. It expects a `POST` request, with a parameter called `param` in the request body. If `param` is a number, it calls `handleFact` to respond with the result of `fact`.
 4. Using the Service Workers API, we listen to the `fetch` event that will respond with the result of `handleRequest`.
 
-We need to build and bundle our code in a single JS file, because CFW accepts only one script per worker. Fortunately, Asterius comes with Parcel.js that will bundle all the necessary code in a single JavaScript file.
+We need to build and bundle our code in a single JavaScript file, because CFW accepts only one script per worker. Fortunately, Asterius comes with Parcel.js, which will bundle all the necessary code in a single JavaScript file.
 
 ```sh
 ahc-link \
@@ -164,7 +167,7 @@ ahc-link \
   --output-dir worker
 ```
 
-`ahc-link` will generate some files inside a  directory called `worker`. For our CFW, we’re only going to care about `fact.js` and `fact.wasm`, the JS script and WebAssembly module, respectively. Now, it’s time to submit both of them to CFW. We can do this with the provided REST API.
+`ahc-link` will generate some files inside a  directory called `worker`. For our CFW, we’re only interested in the JavaScript file (`fact.js`) and the WebAssembly module (`fact.wasm`). Now, it’s time to submit both of them to CFW. We can do this with the provided REST API.
 
 Make sure you have an account id (`$CF_ACCOUNT_ID`), a name for your script (`$SCRIPT_NAME`), and an API Token (`$CF_API_TOKEN`):
 
@@ -176,7 +179,7 @@ curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/worker
      -F "script=@fact.js;type=application/javascript" \
      -F "wasm=@fact.wasm;type=application/wasm"
 ```
-Now, visit CFW, you can edit it in the editor and test it. Also, you can enable it to be on a workers.dev subdomain (`$CFW_SUBDOMAIN`) and then you could simply:
+Now, visit CFW, where you can use the editor to view, edit, and test the script. Also, you can enable it to be on a `workers.dev` subdomain (`$CFW_SUBDOMAIN`); in that case, you could then simply:
 
 ```sh
 curl -X POST $CFW_SUBDOMAIN \
@@ -186,7 +189,7 @@ curl -X POST $CFW_SUBDOMAIN \
 
 ## Beyond a simple Haskell file
 
-So far, we’ve created a WebAssembly module that exports a pure Haskell function that we ran in CFW. However, we can create and build a Cabal project using Asterius `ahc-cabal` CLI, to later use `ahc-dist` to compile it to WebAssembly.
+So far, we’ve created a WebAssembly module that exports a pure Haskell function we ran in CFW. However, we can also create and build a Cabal project using Asterius `ahc-cabal` CLI, and then use `ahc-dist` to compile it to WebAssembly.
 
 First, let’s create the project:
 
@@ -215,7 +218,7 @@ executable cabal-cfw-example
 
 It’s a simple cabal file, except for the `-optl--export-function=handleReq` ghc flag. This is [necessary][asterius-gh-issue-362] when exporting a function from a cabal project.
 
-In this example, we’re going to define a simple `User` record, and we’ll define its instance automatically using Template Haskell!
+In this example, we’ll define a simple `User` record, and we’ll define its instance automatically using Template Haskell!
 
 ```haskell
 {-# LANGUAGE OverloadedStrings #-}
@@ -244,9 +247,9 @@ data User =
 $(deriveJSON defaultOptions 'User)
 ```
 
-**NOTE:** It’s not necessary to create a Cabal project for this example, because the prebuilt container comes with a lot of [prebuilt packages][asterius-gh-issue-354]. (`aesona included). Nevertheless, it will help us to show the potential of `ahc-cabal` and `ahc-dist`.
+**NOTE:** It’s not necessary to create a Cabal project for this example, because the prebuilt container comes with a lot of [prebuilt packages][asterius-gh-issue-354] (aesona included). Nevertheless, it will help us show the potential of `ahc-cabal` and `ahc-dist`.
 
-Now, we’re going to define `handleReq` that we’re going to export using JavaScript FFI as we did before.
+Next, we’ll define `handleReq,` which we’ll export using JavaScript FFI just like we did before.
 
 ```haskell
 handleReq :: JSString -> JSString -> IO JSObject
@@ -268,11 +271,12 @@ foreign import javascript "new Response($1, {\"status\": $2})"
 
 This time, we define `js_new_response`, a Haskell function that creates a JavaScript object, to create a `Response`. `handleReq` takes two string parameters from JavaScript and it uses them to prepare a response.
 
-Now, let’s build and install the binary in the current directory:
+Now let’s build and install the binary in the current directory:
 
 ```
 ahc-cabal new-install --installdir . --overwrite-policy=always
 ```
+
 This will generate a binary for our executable, called `cabal-cfw-example`. We’re going to use `ahc-dist` to take that binary and target WebAssembly:
 
 ```
@@ -295,17 +299,18 @@ addEventListener("fetch", event => {
   event.respondWith(handleRequest(event.request))
 });
 ```
-Finally, we can deploy our code to CFW defining a `metadata.json` file and uploading the script and the WebAssembly module using CFW API as we did before.
+
+Finally, we can deploy our code to CFW by defining a `metadata.json` file and uploading the script and the WebAssembly module using CFW API as we did before.
 
 ### Caveats
 
-CFW [limits][cfw-limits] your JavaScript and WebAssembly in file size. Therefore, you need to be careful with the dependencies you add.
+CFW [limits][cfw-limits] your JavaScript and WebAssembly in file size. Therefore, you need to be careful with any dependencies you add.
 
 ## Conclusion
 
-Stack Builders supports the community by building better software for better living through technologies like expressive static types, we used Asterius to compile Haskell to WebAssembly and deployed it to Cloudflare Worker using the Workers API. Asterius supports a lot of Haskell features (e. g. Template Haskell) and it provides an easy to use JavaScript FFI to easily interact with JavaScript. Additionally, it provides prebuilt containers that contain a lot of Haskell packages so you can start writing a script right away.
+Stack Builders builds better software for better living through technologies like expressive static types. We used Asterius to compile Haskell to WebAssembly and deployed it to Cloudflare Worker using the Workers API. Asterius supports a lot of Haskell features (e.g. Template Haskell) and it provides an easy-to-use JavaScript FFI to interact with JavaScript. Additionally, it provides prebuilt containers that contain a lot of Haskell packages, so you can start writing a script right away.
 
-Following this approach, we can write functional type safe code in Haskell, target it to WebAssembly and publish it to CFW which runs on the edge of the Cloudflare infrastructure.
+Following this approach, we can write functional type-safe code in Haskell, target it to WebAssembly, and publish it to CFW, which runs on the edge of the Cloudflare infrastructure.
 
 For more content check our [blogs][sb-blogs] and [tutorials][sb-tutorials]!
 
