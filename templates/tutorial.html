@@ -14,7 +14,7 @@
       <br/>
       $if(tags)$
         tags: $tags$
-        $endif$
+      $endif$
     </p>
 
     <div>
@@ -94,7 +94,7 @@
             </a>
           </div>
           <div class="hoverable twitter-share">
-            <a href="https://twitter.com/intent/tweet?text=$title$&url=$protocol$$host$$url$">
+            <a href="https://twitter.com/intent/tweet?text=$title$&url=$protocol$$host$$url$" target="_blank">
               <img data-no-retina="" class="img-responsive image-normal" alt="twitter-icon.png" src="$host$/assets/img/twitter-icon.png">
               <img data-no-retina="" class="img-responsive image-hover" alt="twitter-icon-hover.png" src="$host$/assets/img/twitter-icon-hover.png">
             </a>
@@ -103,6 +103,12 @@
             <a href="$protocol$$host$$url$">
               <img data-no-retina="" class="img-responsive image-normal" alt="facebook-icon.png" src="$host$/assets/img/facebook-icon.png">
               <img data-no-retina="" class="img-responsive image-hover" alt="facebook-icon-hover.png" src="$host$/assets/img/facebook-icon-hover.png">
+            </a>
+          </div>
+          <div class="hoverable likedin-share">
+            <a href="http://www.linkedin.com/shareArticle?mini=false&url=$protocol$$host$$url$&title=$title$&source=$protocol$$host$" target="_blank">
+              <img data-no-retina="" class="img-responsive image-normal" alt="linkedin.png" src="$host$/assets/img/linkedin-icon.png">
+              <img data-no-retina="" class="img-responsive image-hover" alt="linkedin-hover.png" src="$host$/assets/img/linkedin-icon-hover.png">
             </a>
           </div>
         </div>
@@ -118,7 +124,7 @@
     <p>
       Thanks for reading this tutorial! If you have any feedback, please feel free to drop us a line
       on <a href="https://twitter.com/stackbuilders">Twitter</a> or
-      <a href="https://www.facebook.com/StackBuildersEcuador/">Facebook</a>. 
+      <a href="https://www.facebook.com/StackBuildersEcuador/">Facebook</a>.
       You could also open issues and pull requests on
       <a href="https://github.com/stackbuilders/tutorials">GitHub</a>.
     </p>

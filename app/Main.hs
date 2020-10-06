@@ -118,6 +118,10 @@ rules env = do
 
   match "templates/*" (compile templateCompiler)
 
+  match "tutorials/*.png" $ do
+    route idRoute
+    compile copyFileCompiler
+
   tags <- buildTags markdownPattern (fromCapture "tutorials/tags/*.html")
 
   tagsRules tags $ \tag pattern -> do
