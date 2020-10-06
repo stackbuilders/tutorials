@@ -1,8 +1,8 @@
 ---
 title: Let's build a Cloudflare Worker with WebAssembly and Haskell
-published: 2020-09-25
+published: 2020-10-06
 ghc: 8.8
-tags: haskell, webassembly, wasm, cloudflare, cloudflare workers, cfw
+tags: haskell, webassembly, wasm, cloudflare, cloudflare workers, cfw, serverless
 libraries: asterius
 language: haskell
 author-name: Cristhian Motoche
@@ -14,13 +14,13 @@ At [Stack Builders][sb], we believe that Haskell’s system of expressive static
 
 ## What is a Cloudflare Worker
 
-[Cloudflare Workers][cfw] (CFW) is a Function as a Service (FaaS) platform that allows us to run our code on the edge of the Cloudflare infrastructure. It's built on Google V8, so it’s possible to write functionalities in JavaScript or any other language that targets WebAssembly.
+[Cloudflare Workers][cfw] is a serverless platform that allows us to run our code on the edge of the Cloudflare infrastructure. It's built on Google V8, so it’s possible to write functionalities in JavaScript or any other language that targets WebAssembly.
 
 [WebAssembly][wasm] is a portable binary instruction format that can be executed fast in a memory-safe sandboxed environment. For this reason, it’s especially useful for tasks that need to perform resource-demanding and self-contained operations.
 
 ## Why use Haskell to target WebAssembly?
 
-Haskell is one of the few pure functional [languages][wasm-languages] that can target WebAssembly. As such, It helps developers break down complex tasks into small functions that can later be composed to do complex tasks. Additionally, it’s statically typed and has type inference, so it will complain if there are type errors at compile time. Because of that and [much more][haskell-matters], Haskell is a good source language for targeting WebAssembly.
+Haskell is a pure functional [languages][wasm-languages] that can target WebAssembly. As such, It helps developers break down complex tasks into small functions that can later be composed to do complex tasks. Additionally, it’s statically typed and has type inference, so it will complain if there are type errors at compile time. Because of that and [much more][haskell-matters], Haskell is a good source language for targeting WebAssembly.
 
 ## From Haskell to WebAssembly
 
@@ -95,7 +95,7 @@ As you can see, the result is executed in `node` and it prints out the result of
 
 ## Push your code to Cloudflare Workers
 
-Now we’ll set everything up for deploying our code to Cloudflare workers.
+Now we’ll set everything up for deploying our code to Cloudflare Workers.
 
 
 First, let’s add a `metadata.json` file with the following content:
@@ -114,7 +114,7 @@ First, let’s add a `metadata.json` file with the following content:
 ```
 This file is needed to specify the `wasm_module` binding. The `name` value corresponds to the global variable to access the WebAssembly module from your Worker code. In our example, it’s going to have the name `WASM`.
 
-Our next step is to define the main point of the CFW script.
+Our next step is to define the main point of the Workers script.
 
 ```javascript
 import * as rts from "./rts.mjs";
@@ -150,11 +150,11 @@ addEventListener("fetch", event => {
 There are a few interesting things to point out in this code:
 
 1. We import `rts.mjs` and `fact.req.mjs` to load the exported functions from our WebAssembly module.
-2. `handleFact` is an asynchronous function that creates an instance of Asterius with the global `WASM` module, as a CFW global variable, and calls the exported function `fact` with some input.
-3. `handleRequest` handles the request of the CFW. It expects a `POST` request, with a parameter called `param` in the request body. If `param` is a number, it calls `handleFact` to respond with the result of `fact`.
+2. `handleFact` is an asynchronous function that creates an instance of Asterius with the global `WASM` module, as a Workers global variable, and calls the exported function `fact` with some input.
+3. `handleRequest` handles the request of the Workers. It expects a `POST` request, with a parameter called `param` in the request body. If `param` is a number, it calls `handleFact` to respond with the result of `fact`.
 4. Using the Service Workers API, we listen to the `fetch` event that will respond with the result of `handleRequest`.
 
-We need to build and bundle our code in a single JavaScript file, because CFW accepts only one script per worker. Fortunately, Asterius comes with Parcel.js, which will bundle all the necessary code in a single JavaScript file.
+We need to build and bundle our code in a single JavaScript file, because Workers accepts only one script per worker. Fortunately, Asterius comes with Parcel.js, which will bundle all the necessary code in a single JavaScript file.
 
 ```sh
 ahc-link \
@@ -167,7 +167,7 @@ ahc-link \
   --output-dir worker
 ```
 
-`ahc-link` will generate some files inside a  directory called `worker`. For our CFW, we’re only interested in the JavaScript file (`fact.js`) and the WebAssembly module (`fact.wasm`). Now, it’s time to submit both of them to CFW. We can do this with the provided REST API.
+`ahc-link` will generate some files inside a  directory called `worker`. For our Workers, we’re only interested in the JavaScript file (`fact.js`) and the WebAssembly module (`fact.wasm`). Now, it’s time to submit both of them to Workers. We can do this with the provided REST API.
 
 Make sure you have an account id (`$CF_ACCOUNT_ID`), a name for your script (`$SCRIPT_NAME`), and an API Token (`$CF_API_TOKEN`):
 
@@ -179,7 +179,7 @@ curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/worker
      -F "script=@fact.js;type=application/javascript" \
      -F "wasm=@fact.wasm;type=application/wasm"
 ```
-Now, visit CFW, where you can use the editor to view, edit, and test the script. Also, you can enable it to be on a `workers.dev` subdomain (`$CFW_SUBDOMAIN`); in that case, you could then simply:
+Now, visit Workers UI, where you can use the editor to view, edit, and test the script. Also, you can enable it to on a `workers.dev` subdomain (`$CFW_SUBDOMAIN`); in that case, you could then simply:
 
 ```sh
 curl -X POST $CFW_SUBDOMAIN \
@@ -308,7 +308,7 @@ CFW [limits][cfw-limits] your JavaScript and WebAssembly in file size. Therefore
 
 ## Conclusion
 
-Stack Builders builds better software for better living through technologies like expressive static types. We used Asterius to compile Haskell to WebAssembly and deployed it to Cloudflare Worker using the Workers API. Asterius supports a lot of Haskell features (e.g. Template Haskell) and it provides an easy-to-use JavaScript FFI to interact with JavaScript. Additionally, it provides prebuilt containers that contain a lot of Haskell packages, so you can start writing a script right away.
+Stack Builders builds better software for better living through technologies like expressive static types. We used Asterius to compile Haskell to WebAssembly and deployed it to Cloudflare Workers using the Workers API. Asterius supports a lot of Haskell features (e.g. Template Haskell) and it provides an easy-to-use JavaScript FFI to interact with JavaScript. Additionally, it provides prebuilt containers that contain a lot of Haskell packages, so you can start writing a script right away.
 
 Following this approach, we can write functional type-safe code in Haskell, target it to WebAssembly, and publish it to CFW, which runs on the edge of the Cloudflare infrastructure.
 
