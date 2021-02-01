@@ -24,6 +24,33 @@ it by [opening an issue][tutorials-issues-new].
 
 ***
 
+## Run tutorials locally
+
+In order to run this repo locally you need to have `stack` installed, for more info you can take a look
+[here](https://docs.haskellstack.org/en/stable/install_and_upgrade/)
+
+To run your project locally all you need to do is:
+
+```bash
+$ make watch
+```
+
+If you ever want to rebuild the project:
+
+```bash
+$ make rebuild
+```
+
+If you're a stack builder and want to bring all assets to this project, you can make a symbolic link to your
+local website's assets directory (assuming that you have that repo), and put it inside the `_site` directory that will be created when
+building the project.
+
+```bash
+$ cd _site
+$ ln -s ../stackbuilders/assets
+```
+
+
 <p align="center">
   <img  src="images/sb-logo.png" />
   </br>
