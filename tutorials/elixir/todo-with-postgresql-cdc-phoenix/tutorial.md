@@ -3,7 +3,6 @@ title: Reactive TODO list with Postgresql, CDC and Phoenix
 published: 2021-04-16
 tags: elixir, CDC, Postgresql, socket, phoenix, live view
 language: elixir
-author: Cristopher
 author-name: Cristopher Rodrigues
 github-profile: cristopher-rodrigues
 description: Learn how CDC can be leveraged to handle data changes, and how to use Phoenix to build an application on top of it.
