@@ -1,6 +1,6 @@
 ---
 title: Getting started with Haskell projects using Scotty
-published: 2021-05-25
+published: 2021-05-26
 tags: haskell
 language: haskell
 author-name: Juan Pedro Villa Isaza
