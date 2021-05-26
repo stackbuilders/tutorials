@@ -5,111 +5,109 @@
     </h2>
 
     <p>
-      First published: $published$
+      <strong>First published:</strong> $published$
       $if(updated)$
-        (Last updated: $updated$)
+        (<strong>Last updated:</strong> $updated$)
       $endif$
       <br/>
-      by $author-name$
+      by <strong>$author-name$</strong>
       <br/>
       $if(tags)$
-        tags: $tags$
+        <strong>Tags:</strong> $tags$
       $endif$
     </p>
 
-    <div>
-      <div class="social-links-inline">
-        <p>
+    <div class="social-container">
+      <div>
+        <div class="social-links-inline">
           Follow this author:
-        </p>
-      </div>
-      <div class="tutorials_social_icons news social-links-inline">
-        <div class="social-links scroll-always desktop">
-          $if(twitter-profile)$
-          <div class="hoverable twitter-share">
-            <a href="https://twitter.com/intent/follow?screen_name=$twitter-profile$">
-              <img data-no-retina="" class="img-responsive image-normal" alt="twitter-icon.png" src="$host$/assets/img/twitter-icon.png">
-              <img data-no-retina="" class="img-responsive image-hover" alt="twitter-icon-hover.png" src="$host$/assets/img/twitter-icon-hover.png">
-            </a>
+        </div>
+        <div class="tutorials_social_icons news social-links-inline">
+          <div class="social-links scroll-always desktop">
+            $if(twitter-profile)$
+            <div class="hoverable twitter-share">
+              <a href="https://twitter.com/intent/follow?screen_name=$twitter-profile$">
+                <img data-no-retina="" class="img-responsive image-normal" alt="twitter-icon.png" src="$host$/assets/img/twitter-icon.png">
+                <img data-no-retina="" class="img-responsive image-hover" alt="twitter-icon-hover.png" src="$host$/assets/img/twitter-icon-hover.png">
+              </a>
+            </div>
+            $endif$
+            $if(github-profile)$
+            <div class="hoverable github-share">
+              <a target="_blank" href="https://github.com/$github-profile$">
+                <img data-no-retina="" class="img-responsive image-normal" alt="github-icon.png" src="$host$/assets/img/github-icon.png">
+                <img data-no-retina="" class="img-responsive image-hover" alt="github-icon-hover.png" src="$host$/assets/img/github-icon-hover.png">
+              </a>
+            </div>
+            $endif$
           </div>
-          $endif$
-          $if(github-profile)$
-          <div class="hoverable github-share">
-            <a target="_blank" href="https://github.com/$github-profile$">
-              <img data-no-retina="" class="img-responsive image-normal" alt="github-icon.png" src="$host$/assets/img/github-icon.png">
-              <img data-no-retina="" class="img-responsive image-hover" alt="github-icon-hover.png" src="$host$/assets/img/github-icon-hover.png">
-            </a>
-          </div>
-          $endif$
         </div>
       </div>
-    </div>
 
-    $if(lts)$
-    <p>
-      Tested with:
-      <ul>
-        $if(lts)$
-        <li>
-          Resolver:
-          <a href="https://www.stackage.org/lts-$lts$">
-            LTS Haskell $lts$ (ghc-$ghc$)
-          </a>
-        </li>
-        $endif$
-        $if(nightly)$
-        <li>
-          Resolver:
-          <a href="http://www.stackage.org/nightly-$nightly$">
-            Stackage Nightly $nightly$ (ghc-$ghc$)
-          </a>
-        </li>
-        $endif$
-        $if(libs)$
-        <li>
-          Libraries:
-          $for(libs)$
-          <a href="https://hackage.haskell.org/package/$lib$">
-            $lib$
-          </a>
-          $endfor$
-        </li>
-        $endif$
-      </ul>
-    </p>
-    $endif$
+      $if(lts)$
+      <p>
+        Tested with:
+        <ul>
+          $if(lts)$
+          <li>
+            Resolver:
+            <a href="https://www.stackage.org/lts-$lts$">
+              LTS Haskell $lts$ (ghc-$ghc$)
+            </a>
+          </li>
+          $endif$
+          $if(nightly)$
+          <li>
+            Resolver:
+            <a href="http://www.stackage.org/nightly-$nightly$">
+              Stackage Nightly $nightly$ (ghc-$ghc$)
+            </a>
+          </li>
+          $endif$
+          $if(libs)$
+          <li>
+            Libraries:
+            $for(libs)$
+            <a href="https://hackage.haskell.org/package/$lib$">
+              $lib$
+            </a>
+            $endfor$
+          </li>
+          $endif$
+        </ul>
+      </p>
+      $endif$
 
-    <div>
-      <div class="social-links-inline">
-        <p>
+      <div>
+        <div class="social-links-inline">
           Share this article:
-        </p>
-      </div>
-      <div class="tutorials_social_icons news social-links-inline">
-        <div class="social-links scroll-always desktop">
-          <div class="hoverable mail-share">
-            <a href="mailto:?subject=$title$&body=$title$%0D%0A$host$$url$">
-              <img data-no-retina="" class="img-responsive image-normal" alt="mail-icon.png" src="$host$/assets/img/mail-icon.png">
-              <img data-no-retina="" class="img-responsive image-hover" alt="mail-icon-hover.png" src="$host$/assets/img/mail-icon-hover.png">
-            </a>
-          </div>
-          <div class="hoverable twitter-share">
-            <a href="https://twitter.com/intent/tweet?text=$title$&url=$protocol$$host$$url$" target="_blank">
-              <img data-no-retina="" class="img-responsive image-normal" alt="twitter-icon.png" src="$host$/assets/img/twitter-icon.png">
-              <img data-no-retina="" class="img-responsive image-hover" alt="twitter-icon-hover.png" src="$host$/assets/img/twitter-icon-hover.png">
-            </a>
-          </div>
-          <div class="hoverable facebook-share">
-            <a href="$protocol$$host$$url$">
-              <img data-no-retina="" class="img-responsive image-normal" alt="facebook-icon.png" src="$host$/assets/img/facebook-icon.png">
-              <img data-no-retina="" class="img-responsive image-hover" alt="facebook-icon-hover.png" src="$host$/assets/img/facebook-icon-hover.png">
-            </a>
-          </div>
-          <div class="hoverable likedin-share">
-            <a href="http://www.linkedin.com/shareArticle?mini=false&url=$protocol$$host$$url$&title=$title$&source=$protocol$$host$" target="_blank">
-              <img data-no-retina="" class="img-responsive image-normal" alt="linkedin.png" src="$host$/assets/img/linkedin-icon.png">
-              <img data-no-retina="" class="img-responsive image-hover" alt="linkedin-hover.png" src="$host$/assets/img/linkedin-icon-hover.png">
-            </a>
+        </div>
+        <div class="tutorials_social_icons news social-links-inline">
+          <div class="social-links scroll-always desktop">
+            <div class="hoverable mail-share">
+              <a href="mailto:?subject=$title$&body=$title$%0D%0A$host$$url$">
+                <img data-no-retina="" class="img-responsive image-normal" alt="mail-icon.png" src="$host$/assets/img/mail-icon.png">
+                <img data-no-retina="" class="img-responsive image-hover" alt="mail-icon-hover.png" src="$host$/assets/img/mail-icon-hover.png">
+              </a>
+            </div>
+            <div class="hoverable twitter-share">
+              <a href="https://twitter.com/intent/tweet?text=$title$&url=$protocol$$host$$url$" target="_blank">
+                <img data-no-retina="" class="img-responsive image-normal" alt="twitter-icon.png" src="$host$/assets/img/twitter-icon.png">
+                <img data-no-retina="" class="img-responsive image-hover" alt="twitter-icon-hover.png" src="$host$/assets/img/twitter-icon-hover.png">
+              </a>
+            </div>
+            <div class="hoverable facebook-share">
+              <a href="$protocol$$host$$url$">
+                <img data-no-retina="" class="img-responsive image-normal" alt="facebook-icon.png" src="$host$/assets/img/facebook-icon.png">
+                <img data-no-retina="" class="img-responsive image-hover" alt="facebook-icon-hover.png" src="$host$/assets/img/facebook-icon-hover.png">
+              </a>
+            </div>
+            <div class="hoverable likedin-share">
+              <a href="http://www.linkedin.com/shareArticle?mini=false&url=$protocol$$host$$url$&title=$title$&source=$protocol$$host$" target="_blank">
+                <img data-no-retina="" class="img-responsive image-normal" alt="linkedin.png" src="$host$/assets/img/linkedin-icon.png">
+                <img data-no-retina="" class="img-responsive image-hover" alt="linkedin-hover.png" src="$host$/assets/img/linkedin-icon-hover.png">
+              </a>
+            </div>
           </div>
         </div>
       </div>
