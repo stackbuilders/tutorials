@@ -1,0 +1,15 @@
+{
+  "name": "guess-number",
+  "version": "1.0.0",
+  "description": "An example of testing an Elm application following the test trophy",
+  "main": "index.js",
+  "scripts": {
+    "test": "elm-test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "elm-test": "^0.19.1-revision4"
+  }
+}
