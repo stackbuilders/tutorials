@@ -2,15 +2,15 @@
 
 module Main (main) where
 
-import Data.Char (toLower)
-import Data.List (isSuffixOf)
-import Data.Maybe (fromMaybe)
-import Data.Monoid ((<>))
-import Hakyll
-import System.Environment
-import System.FilePath
-import Text.Jasmine
-import Text.Pandoc
+import           Data.Char                  (toLower)
+import           Data.List                  (isSuffixOf)
+import           Data.Maybe                 (fromMaybe)
+import           Data.Monoid                ((<>))
+import           Hakyll
+import           System.Environment
+import           System.FilePath
+import           Text.Jasmine
+import           Text.Pandoc
 
 import qualified Data.ByteString.Lazy.Char8 as C
 
@@ -27,6 +27,7 @@ supportedLanguages = [  -- Name here the directories of the programming language
   , "java"
   , "python"
   , "reason"
+  , "elm"
   ]
 
 markdownPattern :: Pattern
