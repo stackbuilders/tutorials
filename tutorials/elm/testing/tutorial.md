@@ -75,7 +75,7 @@ For this tutorial, the subject under test is a simple guessing number program. I
 
 1) Define a module and the necessary imports:
 
-```elm
+```haskell
 module GuessNumber exposing (..)
 
 import Browser
@@ -88,7 +88,7 @@ import Random as R
 
 2) Define the model (`Model`) and the types of messages (`Msg`) for the program:
 
-```elm
+```haskell
 type alias Model =
   { guess: Int -- Random number to be guessed
   , isInvalid : Bool -- Simple flag to check if the input is a number or not
@@ -104,7 +104,7 @@ type Msg
 
 3) Define the `view` function:
 
-```elm
+```haskell
 view : Model -> H.Html Msg
 view model =
   H.div []
@@ -170,7 +170,7 @@ viewGuess int = H.li [][ H.text <| "Already tried " ++ String.fromInt int ]
 
 4) Define the `update` function, which updates the state of the program based on the messages:
 
-```elm
+```haskell
 update : Msg -> Model -> (Model, Eff)
 update msg model =
   case msg of
@@ -189,7 +189,7 @@ update msg model =
 
 5) Define `init` which represents the initial state of the program:
 
-```elm
+```haskell
 init : flags -> (Model, Eff)
 init _ = (
   { guess = 0
@@ -201,7 +201,7 @@ init _ = (
 
 If you've tried Elm before, you might be wondering about `Eff`. Usually the `update` function returns `Model` or `(Model, Cmd Msg)`.  In this case, `Eff` is just a type that represents the effects in our program. It looks like this:
 
-```elm
+```haskell
 type Eff = NoOP | GenRndGuess ({ onGenerate: Int -> Msg })
 ```
 
@@ -210,7 +210,7 @@ Currently, the details of `Cmd msg` are not available. So, `Eff` is necessary to
 Finally, define `main` which plugs everything together. Of course, `main` needs `update` to match the type `Msg -> Model -> (Model Cmd Msg)` and `init` to match `flags -> (Model, Cmd Msg)`. Consequently, we need a way to convert `Eff` back into `Cmd Msg`. The function `run` will do that:
 
 
-```elm
+```haskell
 run : Eff -> Cmd Msg
 run eff =
   case eff of
@@ -221,7 +221,7 @@ run eff =
 
 Then, we can define `main` like this:
 
-```elm
+```haskell
 main : Program () Model Msg
 main =
   Browser.element {
@@ -241,7 +241,7 @@ Elm is a functional and type safe programming language. Additionally, it avoids 
 
 `GuessState` will hold our attempts or the correct number guessed, and `Attempt` will wrap a correct or wrong attempt:
 
-```elm
+```haskell
 type GuessState = RightGuess Int | Attempts (S.Set Int)
 
 type Attempt = Correct Int | Wrong Int
@@ -249,7 +249,7 @@ type Attempt = Correct Int | Wrong Int
 
 The smart constructor `mkAttempt` can be used to insert attempts into the `GuessState` data structure:
 
-```elm
+```haskell
 mkAttempt : Int -> Int -> Attempt
 mkAttempt guess attempt =
   attempt |>
@@ -271,7 +271,7 @@ insert attempt guessList =
 
 We can write expectations and fuzzy tests to unit test our code. First, let's define a testing module with the following definition and imports:
 
-```elm
+```haskell
 module Test.GuessNumber exposing (..)
 
 import GuessNumber as GN
@@ -294,7 +294,7 @@ We can cover unit test cases using the [expectation module][Expect]. For example
 1. `insert` returns a `RightGuess` when the input is `Correct`.
 1. `insert` appends `Wrong` attempts to the set of `Attempts`.
 
-```elm
+```haskell
   describe "insert
   [
     describe "given a correct attempt"
@@ -319,7 +319,7 @@ These tests are simple in that they only cover specific cases of what `insert` d
 ### Fuzzy tests
 [Property tests or fuzzy tests][property-tests] will increase our confidence in our code because they test multiple scenarios to make sure that a property is satisfied. For example, test that `insert` leaves the game state the same after a correct attempt, it does not matter which is the following attempt. We can write this property test using the [Fuzz module][Fuzz].
 
-```elm
+```haskell
 fuzzTest : Test
 fuzzTest =
   describe "props insert"
@@ -338,7 +338,7 @@ There is much more to say about [property tests][elm-fuzz-testing], but that cou
 
 We could add some unit tests for `update` and `view`:
 
-```elm
+```haskell
 updateTests : Test
 updateTests =
   describe "update"
@@ -389,7 +389,7 @@ Ok, let's write them!
 
 I mentioned earlier that `Cmd` details are not reveled, so we had to create an intermediate type (`Eff`) that can help us to simulate the effects in our test module. We already defined the effects for our program in `run`, now let's do the same for our tests.
 
-```elm
+```haskell
 perform : msg -> PT.SimulatedEffect msg
 perform = STask.perform identity << STask.succeed
 
@@ -424,7 +424,7 @@ Let's implement the first test case following these steps:
 1. Click on the button `"Guess!"`, and
 1. Expect to see the message `"Invalid"`.
 
-```elm
+```haskell
       test "with an invalid input shows message" <|
         \() ->
           start
@@ -441,7 +441,7 @@ Now, the second test case:
 1. Make some wrong attempts, and
 1. Expect to see the wrong attempts listed.
 
-```elm
+```haskell
       test "shows list of wrong messages" <|
         \() ->
           start
@@ -467,7 +467,7 @@ Finally, our last test case follows these steps:
 1. Insert the input text `"10"`, and
 1. Expect to see the message: `"You guessed 10 correctly"`.
 
-```elm
+```haskell
       test "shows message when guess is correct" <|
         \() ->
           start
@@ -488,7 +488,7 @@ These integration tests provide the following benefits:
 1. They add more confidence to our code base.
 1. We can create simple helpers to reduce the tests even more. After all, the actions are composable. For example:
 
-```elm
+```haskell
 clickWithInput input =  PT.fillIn "number" "Number" input |> PT.clickButton "Guess!"
 ```
 
