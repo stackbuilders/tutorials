@@ -5,6 +5,7 @@ jobs:
   build-tutorials:
     docker:
       - image: fpco/stack-build:lts-9.21
+    resource_class: medium+
     steps:
       - checkout
 
