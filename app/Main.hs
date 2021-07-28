@@ -227,8 +227,6 @@ tutorialsCompiler = pandocCompilerWith defaultTutorialsReaderOptions defaultHaky
 
 defaultTutorialsReaderOptions :: ReaderOptions
 defaultTutorialsReaderOptions = defaultHakyllReaderOptions
-    { readerSmart = False
-    }
 
 compressJsCompiler :: Compiler (Item String)
 compressJsCompiler = do
