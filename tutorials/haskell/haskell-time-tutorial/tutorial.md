@@ -17,7 +17,7 @@ of the software industry and we’re happy to announce that the past month
 we were able to contribute to one of Haskell's core libraries, time.
 
 One of our tech leads, Sebastian Estrella, started with the idea:
-“What if we bring some utilities that Ruby on Rails (RoR) has to haskell?”.
+“What if we bring some utilities that Ruby on Rails (RoR) has to Haskell?”.
 For instance, “How can I get the range of days that a quarter has?”
 or “How can I get a month’s boundaries?” were some of the questions
 that came to our mind. In the following example I will show the Haskell
