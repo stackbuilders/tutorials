@@ -7,10 +7,7 @@ language: haskell
 author: Felix Miño
 author-name: Felix Miño
 github-profile: felixminom
-description: In this tutorial we’re going to explore the use of pattern
-synonyms in Haskell, later we’ll give a brief overview to the Stack Builders’
-contribution to the `time` Haskell library and finally we’ll review how to
-use the utilities that were introduced in the contribution.
+description: In this tutorial we’re going to explore the use of pattern synonyms in Haskell, later we’ll give a brief overview to the Stack Builders’ contribution to the `time` Haskell library and finally we’ll review how to use the utilities that were introduced in the contribution.
 ---
 
 As Stack Builders one of the core values of our company is contributing
