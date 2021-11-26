@@ -2,15 +2,15 @@
 title: Time, patterns and a little more
 published: 2021-11-25
 tags: haskell, pattern-synonyms, property-testing
-libraries: gtk3-0.14.4 glib-0.13.2.2
+libraries: time
 language: haskell
 author: Felix Miño
 author-name: Felix Miño
 github-profile: felixminom
-description: In this tutorial we’re going to explore the use of pattern synonyms in Haskell, later we’ll give a brief view to the Stack Builders’ contribution to the `time` Haskell library and finally we’ll review how to use the utilities that were introduced in the contribution.
+description: In this tutorial we’re going to explore the use of pattern synonyms in Haskell, later we’ll give a brief overview to the Stack Builders’ contribution to the `time` Haskell library and finally we’ll review how to use the utilities that were introduced in the contribution.
 ---
 
-As Stack Builder one of the core values of our company is contributing
+As Stack Builders one of the core values of our company is contributing
 to open source (OSS). We believe that we have the power to change
 people’s lives (or at least make it easier) by pushing the boundaries
 of the software industry and we’re happy to announce that the past month
@@ -33,23 +33,30 @@ monthBoundaries day = let (y, m , _) = toGregorian day
 ```
 
 ```ruby
-irb(main):003:0> Date.today.all_week
-=> Mon, 13 Sep 2021..Sun, 19 Sep 2021
+today = Date.today
+today.next_month.all_month
+=> Wed, 01 Dec 2021..Fri, 31 Dec 2021
 ```
-elmsetting the last day to always be 31st if some months have
-less than 31 days? Could be crossing your mind right now. Well that’s
-because `fromGregorian` clip the values to be correct for each month,
-but what is `fromGregorian`? Well that’s exactly what we wanted to
-avoid when using the time library.
 
-We wanted something more clear and readable as uncle bob mentioned:
-"Indeed, the ratio of time spent reading versus writing is well over
-10 to 1. We are constantly reading old code as part of the effort
-to write new code. ...Therefore, making it easy to read makes it easier
-to write.” So this was our motivation, to make something similar to the
+As you can see, Haskell code is not as clear as its RoR equivalent. Why
+are we setting the last day to always be 31st if some months have
+less than 31 days? Could be crossing your mind right now. Well that’s
+because `fromGregorian` clips the values to be correct for each month,
+but what is `fromGregorian`? Well that’s exactly what we wanted to
+avoid when using the time library, to use some functions that we really
+don't know what is their purpose.
+
+We wanted something more clear and readable as Uncle bob mentioned:
+
+>"Indeed, the ratio of time spent reading versus writing is well over
+>10 to 1. We are constantly reading old code as part of the effort
+>to write new code. ...Therefore, making it easy to read makes it easier
+>to write.”
+
+So this was our motivation, to make something similar to the
 utilities that RoR has and to ease Haskell developer’s lives.
 
-We started by opening an [issue][issue] on Github. Quick parentheses here,
+We started by opening an [issue][issue] on GitHub. Quick parenthesis here,
 when you want to work on OSS I’d recommend to start opening an issue
 in the repo and discuss/brainstorm your idea with the maintainers,
 sometimes there are some good reasons why the feature you’re proposing
@@ -68,7 +75,7 @@ First of all I’d like to start with a caveat, this guide is not meant
 to explain pattern synonyms in depth, instead it’s meant to be a practical
 introduction to this concept.
 
-GHC documentation describe pattern synonyms like:
+GHC documentation describes pattern synonyms like:
 
 > “Pattern synonyms enable giving names to parametrized pattern schemes.
 > They can also be thought of as abstract constructors that don’t have a
@@ -87,7 +94,7 @@ type MonthOfYear = Int
 
 As you can see, it is only an alias for `Int`. We now are able to define
 months like `Int`s where January will correspond to 1 and so on. But
-Fortunately, since GHC 7.8 we are able to use pattern synonyms and we
+fortunately, since GHC 7.8 we are able to use pattern synonyms and we
 could, instead of using raw `Int`s, write this down in a pattern style
 and have a more idiomatic way of defining months.
 
@@ -106,19 +113,20 @@ pattern March = 3
 
 -- | The twelve 'MonthOfYear' patterns form a @COMPLETE@ set.
 pattern December :: MonthOf
+pattern December = 12
 
 {-# COMPLETE January, February, March, April, May, June, July, August, September, October, November, December #-}Year
-pattern December = 12
 ```
 
 If you’re curious about why the `{-# COMPLETE #-}` pragma is being
-used here’s a [link][complete-pragma] to a complete explanation.
+used, see the [COMPLETE pragma documentation][complete-pragma] for more
+information.
 
 Now if we need to pass a `MonthOfYear` as a parameter to a function
 we could write something like:
 
 ```haskell
-foo November or foo 11 --Both will be equivalent
+foo November -- or foo 11 --Both will be equivalent
 ```
 
 We’ll use this pattern in a function that basically takes a month and
@@ -128,13 +136,13 @@ a day and yields if the corresponding Date is a holiday.
 dateToHoliday :: MonthOfYear -> DayOfMonth -> String
 dateToHoliday January  _   = "Happy new year!"
 dateToHoliday November 1   = "Let's eat colada morada"
-dateToHoliday December 25  = "Merry Christmas jojojo"
+dateToHoliday December 25  = "Merry Christmas ho ho ho"
 dateToHoliday _ _          = "Probably just a regular day"
 ```
 
-Now you're probably wondering what is “colada morada”? Haha no worries,
-it’s an ecuatorian tradition in Ecuador and we eat this meal that is
-purple corn based with spices and fruits, pretty amazing to be honest.
+(Now you're probably wondering what is “colada morada”? Haha no worries,
+it’s an [Ecuatorian tradition][colada-morada] and we eat this meal that
+is purple corn based with spices and fruits, pretty amazing to be honest.)
 
 Back to Haskell, I think it’s pretty clear what the `dateToHoliday`
 function does, the first clause matches all days of January, second
@@ -180,13 +188,15 @@ First of all we started defining the new type class `DayPeriod`:
 
 ```haskell
 class Ord p => DayPeriod p where
-   -- | Returns the first 'Day' in a period of days.
    periodFirstDay :: p -> Day
-   -- | Returns the last 'Day' in a period of days.
    periodLastDay :: p -> Day
-   -- | Get the period this day is in.
    dayPeriod :: Day -> p
 ```
+As we can see the `DayPeriod` type class defines three methods: `periodFirstDay`
+that will return the first day of a period (no surprises here), `periodLastDay`
+will return the last day and `dayPeriod` will return the period the `Day` pass
+as an argument is in. As a class constrait we have that the period where passing
+must be part of the `Ord` type class.
 
 So after this one was defined all we had to do was create the instances
 of the type class for the different data types: `Year`, `Quarter`, `Month`
@@ -351,7 +361,7 @@ This first part is not related to patterns, instead we're declaring the
 random days in order to make our tests and therefore our code base more robust.
 When using property testing we can stop thinking of generating the data,
 and we can focus on testing that our code is behaving the way it's supposed
-too. We declared wrappers and their `Arbitrary` instaces for: `Day`, `DayOfMonth`,
+to. We declared wrappers and their `Arbitrary` instaces for: `Day`, `DayOfMonth`,
 `Month`, `MonthOfYear`, `Quarter`, `QuarterOfYear` and `Year`. Probably
 a better example is the `MonthOfYear` (sounds familiar? Yes, it's the pattern
 that we took as an example in the previous section) wrapper and instance, so we
@@ -364,16 +374,16 @@ instance Arbitrary WMonthOfYear where
     arbitrary = fmap MkWMonthOfYear $ choose (-5, 17)
 ```
 
-Why it has the `-5` and `17` boundaries, well this function should be in the
-habilty to clip those values to the correct one, so we're testing this too.
+Why does it have `-5` and `17` boundaries? Well, this function should be able
+to clip those values to the correct ones, so we're testing this too.
 
-I think we can forward, so now we're gonna explore the use of patterns in the
-context of test.
+I think we can move forward, so now we're going to explore the use of patterns
+in the context of test.
 
 ```haskell
 testMonth :: [TestTree]
-	testMonth =
-      [ testProperty "periodFirstDay" $ \(MkWMonth my@(YearMonth y m)) ->
+testMonth =
+    [ testProperty "periodFirstDay" $ \(MkWMonth my@(YearMonth y m)) ->
         periodFirstDay my == YearMonthDay y m 1
       , testGroup
          "periodLastDay"
@@ -406,19 +416,23 @@ a month is the same when we use the `periodFirstDay` function than when using th
 `YearMonthDay` pattern.
 
 The `periodLastDay` tests are a little peculiar, we didn't use property testing
-in this case since we wanted to test some particular cases. We tested that February's
-last day in a leap and in a regular is calculated properly.
+in this case since we wanted to test some particular cases. We tested that
+February's last day calculated properly for both leap and regular years. As you
+can see in some case unit tests can be useful too, so don't stick too much to
+property testing.
 
-Well I think the two previous examples are very straight forward, but let me explain
-the `periodAllDays` tests. When you're implementing property tests is a little
-harder to think of what to test, you have to search a common property (that's why
-they are called property test) that let you describe the expected behavior. So what
-we're checking in this test is that `all` elements (`Days`) that the `periodAllDays`
-function produces, when the `DayPeriod` is a `Month`, belong to the same year and month.
-It makes sense right?. Also we can see the best of patterns in action, we're using them
-to generate a random month: `MkWMonth my@(YearMonth y1 m1)`, and we're using them to
-deconstruct a `Day` into `Year`, `MonthOfYear` and `DayOfMonth`:
-`(YearMonthDay y2 m2 _) -> (y2, m2)`.
+Well I think the two previous examples are very straightforward, but let me
+explain the `periodAllDays` tests. When you're implementing property tests is a
+little harder to think of what to test, you have to search a common property
+(that's why they are called property test) that let you describe the expected
+behavior. So what we're checking in this test is that `all` elements (`Days`)
+that the `periodAllDays` function produces, when the `DayPeriod` is a `Month`,
+belong to the same year and month.
+
+It makes sense right?. Also we can see the best of patterns in action, we're
+using them to generate a random month: `MkWMonth my@(YearMonth y1 m1)`, and
+we're using them to deconstruct a `Day` into `Year`, `MonthOfYear` and
+`DayOfMonth`: `(YearMonthDay y2 m2 _) -> (y2, m2)`.
 
 ## Summary
 
@@ -428,17 +442,19 @@ highlight something is the following:
 - When working on OSS always start by opening an issue and brainstorm your ideas with
 the library's mainterners.
 - Pattern synonyms is a Haskell feature that will make our code base more reable, and
-as shown in this tutorial could be useful in many scenarios.
-- Time library now has some cool helper functions that are pretty simple to use and
-hopefully pretty useful too.
-
+as shown in this tutorial could be useful in many scenarios. The `YearMonthDay` pattern
+is probably one of the more versatil ones, so if you're working with the `time` library
+have this in mind.
+- Time library now has some cool helper functions that are pretty simple to use
+and hopefully pretty useful too. Keep in mind the `periodFirstDay`, `periodLastDay`,
+`periodAllDays` and `periodLength` functions.
 
 ## Caveat
 
 As you can see we didn't talk about weeks in this tutorial. That's becasue weeks are
 not canonical, some years have 52 weeks and others have 53 and depending on what part
 of the world you're in, the week could start in different days (Saturday, Sunday,
-Monday). We're dicusing this with the maintainer right now but haven't get an answer yet.
+Monday). We're dicussing this with the maintainer right now but haven't gotten an answer yet.
 But if you want to get all `Days` of a week and specify its starting day, this
 [issue][issue-weeks] could be useful.
 
@@ -451,3 +467,4 @@ But if you want to get all `Days` of a week and specify its starting day, this
 [maintainer-PR]: https://github.com/haskell/time/commit/0f96de3ea411df8470da37c25be3717bfcd6f098
 [property-testing]: https://hackage.haskell.org/package/QuickCheck
 [issue-weeks]: https://github.com/haskell/time/issues/183
+[colada-morada]: https://en.wikipedia.org/wiki/Colada_morada
