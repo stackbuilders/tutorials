@@ -7,7 +7,10 @@ language: haskell
 author: Felix Miño
 author-name: Felix Miño
 github-profile: felixminom
-description: In this tutorial we’re going to explore the use of pattern synonyms in Haskell, later we’ll give a brief overview to the Stack Builders’ contribution to the `time` Haskell library and finally we’ll review how to use the utilities that were introduced in the contribution.
+description: In this tutorial we’re going to explore the use of pattern
+synonyms in Haskell, later we’ll give a brief overview to the Stack Builders’
+contribution to the `time` Haskell library and finally we’ll review how to
+use the utilities that were introduced in the contribution.
 ---
 
 As Stack Builders one of the core values of our company is contributing
@@ -271,6 +274,17 @@ So let's see what we can do with these new features introduced in the contributi
 In this section we will review some concrete code samples of how these new features
 can help us in our daily software development routine. After making the proper imports
 we can have something like this:
+
+- Let's compare the first function that I presented, how to get a month's boundaries.
+As we can see this function is more intuitive when comparing with the first one,
+and the functions that we use now are self-decriptivec
+
+```haskell
+monthBoundaries :: Day -> (MonthFirstDay, MonthLastDay)
+monthBoundaries day =
+    let my = dayPeriod day :: Month
+    in (periodFirstDay my, periodLastDay my)
+```
 
 - To get starting and ending days of all quarters of a given year:
 
