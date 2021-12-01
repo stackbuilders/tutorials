@@ -1,6 +1,6 @@
 ---
 title: Time, patterns and a little more
-published: 2021-11-25
+published: 2021-12-02
 tags: haskell, pattern-synonyms, property-testing
 libraries: time
 language: haskell
@@ -315,15 +315,13 @@ In this section we will review some concrete code samples of how these new featu
 can help us in our daily software development routine. After making the proper imports
 we can have something like this:
 
-- Let's compare the first function that I presented, how to get a month's boundaries.
-As we can see this function is more intuitive when comparing with the first one,
-and the functions that we use now are self-decriptive:
+- Let's compare the first function that I presented, how to get a month's all days.
+Now in `ghci` we can directly call the `periodAllDays` function with a `Month` and
+that will be enough:
 
-    ```haskell
-    monthBoundaries :: Day -> (MonthFirstDay, MonthLastDay)
-    monthBoundaries day =
-        let my = dayPeriod day :: Month
-        in (periodFirstDay my, periodLastDay my)
+    ```bash
+    ghci> periodAlldays  (YearMonth 2021 November)
+    [2021-11-01 .. 2021-11-30
     ```
 
 - To get starting and ending days of all quarters of a given year:
