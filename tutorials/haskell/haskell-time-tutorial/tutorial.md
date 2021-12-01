@@ -21,8 +21,8 @@ We started with the idea: “What if we bring some utilities that Ruby on
 Rails (RoR) has to Haskell?”. For instance, “How can I get the range of
 days that a month has?” or “How can I get a quarter’s boundaries?” were
 some of the questions that came to our mind. In the following example
-I will show the Haskell code needed to get all days in a month and its
-version in RoR.
+I will show the RoR code needed to get all days in a month and then Haskell
+version to do so:
 
 ```ruby
 today = Date.today
@@ -37,7 +37,7 @@ allMonth day =
     in [fromGregorian y m 1 .. fromGregorian y m 31]
 ```
 
-and then in a `stack repl` we can invoque our function:
+and then in `ghci` we can call our function:
 
 ```bash
 > today <- utctDay <$> getCurrentTime
@@ -45,10 +45,10 @@ and then in a `stack repl` we can invoque our function:
 [2021-11-01 .. 2021-11-30]
 ```
 
-As you can see, we had to implement the Haskell code by ourselfs. Why are
+As you can see, we had to implement the Haskell code by ourselves. Why are
 we setting the last day to always be 31st if some months have less than 31
 days? Could be crossing your mind right now. That’s because `fromGregorian`
-clips the values to be correct for each month, but not, what is
+clips the values to be correct for each month, but now, what is
 `fromGregorian`? Well that’s exactly what we wanted to avoid when using
 the `time` library, to avoid using some functions that we really don't know
 what their purpose is.
@@ -103,7 +103,7 @@ As you can see, it is only an alias for `Int`. We now are able to define
 months like `Int`s where January will correspond to 1 and so on. But
 fortunately, since GHC 7.8 we are able to use pattern synonyms and we
 could, instead of using raw `Int`s, write this down in a pattern style
-and have a more idiomatic way of defining months.
+and have a more idiomatic way of defining months:
 
 ```haskell
 pattern January :: MonthOfYear
@@ -130,7 +130,7 @@ used, see the [COMPLETE pragma documentation][complete-pragma] for more
 information.
 
 Just to make sure that `November` and `11` are equivalent, let's test it
-in a stack repl.
+in a stack repl:
 
 ```bash
 > November == 11
@@ -138,7 +138,7 @@ True
 ```
 
 We’ll use this pattern in a function that receives a `Day` and yields if the
-corresponding Date is a holiday.
+corresponding Date is a holiday:
 
 ```haskell
 dayToHoliday :: Day -> String
@@ -189,13 +189,13 @@ Will not be as straightforward as the function that we have right now.
 
 I haven’t mentioned it yet, but the patterns that we built previously
 are called bidirectional patterns, why? Because we can use them as
-expressions as well, so something like this is totally valid.
+expressions as well, so something like this is totally valid:
 
 ``` bash
-ghci> dateToHoliday January 12
+ghci> dateToHoliday (YearMonthDay 2021 January 12)
 "Happy new year!"
 
-ghci> dateToHoliday November 1
+ghci> dateToHoliday (YearMonthDay 2021 November 1)
 "Let's eat colada morada"
 ```
 
@@ -229,7 +229,7 @@ day and `dayPeriod` will return the period the `Day` pass as an argument is in.
 One more thing to highlight is that these functions should satisfy some laws
 (where `p` is period and `d` is day):
 
-- F or all p. `periodFirstDay p <= periodLastDay p`
+- For all p. `periodFirstDay p <= periodLastDay p`
 - For all p. `dayPeriod (periodFirstDay p) == p`
 - For all p. `dayPeriod (periodLastDay p) == p`
 - For all d. `periodFirstDay (dayPeriod d) <= d`
@@ -317,7 +317,7 @@ we can have something like this:
 
 - Let's compare the first function that I presented, how to get a month's boundaries.
 As we can see this function is more intuitive when comparing with the first one,
-and the functions that we use now are self-decriptive.
+and the functions that we use now are self-decriptive:
 
     ```haskell
     monthBoundaries :: Day -> (MonthFirstDay, MonthLastDay)
@@ -349,7 +349,7 @@ leap year the length of the second quarter will be different:
     getAllQuarterLength y = map (\q -> periodLength $ YearQuarter y q) [Q1,Q2,Q3,Q4]
     ```
 
-- Get all days of a specific quarter.
+- Get all days of a specific quarter:
 
     ```haskell
     allDaysQuarter :: Year -> QuarterOfYear -> [Days]
@@ -418,7 +418,7 @@ to. We declared wrappers and their `Arbitrary` instaces for: `Day`, `DayOfMonth`
 `Month`, `MonthOfYear`, `Quarter`, `QuarterOfYear` and `Year`. Probably
 a better example is the `MonthOfYear` (sounds familiar? Yes, it's the pattern
 that we took as an example in the previous section) wrapper and instance, so we
-all are clear of what is going on here.
+all are clear of what is going on here:
 
 ```haskell
 newtype WMonthOfYear = MkWMonthOfYear MonthOfYear
@@ -431,7 +431,7 @@ Why does it have `-5` and `17` boundaries? Well, this function should be able
 to clip those values to the correct ones, so we're testing this too.
 
 I think we can move forward, so now we're going to explore the use of patterns
-in the context of tests.
+in the context of tests:
 
 ```haskell
 testMonth :: [TestTree]
