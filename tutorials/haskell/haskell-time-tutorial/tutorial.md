@@ -19,8 +19,8 @@ libraries, [time][time-hackage].
 All started with the idea: “What if we bring some utilities that Ruby on Rails
 (RoR) has to Haskell?”. For instance, “How can one get the range of days that a
 month has?” or “How can one get a quarter’s boundaries?” were some of the
-questions that came to our mind. In the following example I will show the RoR
-code needed to get all days in a month and then Haskell version to do so:
+questions that came to our mind. In the following example the RoR code needed to
+get all days in a month will be shown and then Haskell version to do so:
 
 ```ruby
 today = Date.today
@@ -48,7 +48,7 @@ the last day of the month is always set to be 31st, if some months have less tha
 31 days? Could be crossing your mind right now. That’s because `fromGregorian`
 clips the values to be correct for each month, but now, what is `fromGregorian`?
 Well that’s exactly what this contribution wante to avoid when using the `time`
-library, stop using some functions that we really don't know what their purpose
+library, stop using some functions that really don't know what their purpose
 is, or to produce intelligible code.
 
 To have something more clear and readable was the main goal, as Uncle bob
@@ -198,16 +198,16 @@ interchangeably across the code.
 
 ## Stack Builders contribution to Haskell’s time library
 
-Well all of this preamble brings us to the contribution itself.
-Pattern synonyms is what we used when working on `time`’s new features.
-You can see the complete [pull request][PR-1](PR). I have to clarify
-something, the PR has some different code than the one we’re going to
-check here, since the maintainer decided to do some renaming and changed
-the original PR’s code, you can check the changes [here][maintainer-PR].
-Also, some extra features were added, now we can get the days that belong
-to a period (`periodAllDays`) and the period's length (`periodLength`).
+Well all of this preamble was needed to present the contribution itself. Pattern
+synonyms is what was used when working on `time`’s new features. You can check
+the complete [pull request][PR-1](PR). It's important to clarify something, the
+PR has some different code than the one that is going to be reviewed here, since
+the maintainer decided to do some renaming and changed the original PR’s code,
+you can check the changes [here][maintainer-PR]. Also, some extra features were
+added, and now it's possible to get the days that belong to a period
+(`periodAllDays`) and a period's length (`periodLength`).
 
-First of all we started defining the new type class `DayPeriod`:
+The new type class `DayPeriod` was declared as the first step:
 
 ```haskell
 class Ord p => DayPeriod p where
@@ -216,7 +216,7 @@ class Ord p => DayPeriod p where
    dayPeriod :: Day -> p
 ```
 
-As we can see the `DayPeriod` type class defines three methods: `periodFirstDay`
+As you can see the `DayPeriod` type class defines three methods: `periodFirstDay`
 that will return the first day of a period, `periodLastDay` will return the last
 day and `dayPeriod` will return the period the `Day` pass as an argument is in.
 
@@ -238,14 +238,14 @@ Other particular laws for the `periodLength` function are:
 
 Another particular law for the `periodAllDays` function is:
 
-- For all p. `(periodAllDay) p ∈ p`
+- For all p. `(periodAllDay p) ∈ p`
 
-The last two sets of laws will be specially usefull later when talking
-about property testing.
+The last two sets of laws will be specially usefull later when talking about
+property testing, so keep these in mind.
 
-So after this one was defined all we had to do was create the instances
-of the type class for the different data types: `Year`, `Quarter`, `Month`
-and `Day` itself, so here it’s the code:
+After the `DayPeriod` type class was defined all that is missing is to create
+the instances of the type class for the different data types: `Year`, `Quarter`,
+`Month` and `Day` itself, so here is the code:
 
 ```haskell
 instance DayPeriod Year where
@@ -254,9 +254,9 @@ instance DayPeriod Year where
    dayPeriod (YearMonthDay y _ _) = y
 ```
 
-We're using `YearMonthDay` pattern again and defining that January 1st and
-December 31st are the the first and last days of a year. Also we can calculate
-the year that a day is in with the `dayPeriod` function.
+The `YearMonthDay` pattern is being used again to define that January 1st and
+December 31st are the the first and last days of a year, respectively. Also it's
+possible to know the year that a day is in with the `dayPeriod` function.
 
 Now, let’s check the `Quarter` instance:
 
@@ -276,11 +276,11 @@ instance DayPeriod Quarter where
            Q4 -> periodLastDay $ YearMonth y Dec
 ```
 
-Which is defined in terms of the `periodFirstDay` and `periodLastDay` of a `Month`
-and it uses (once again) a pattern named `YearMonth`.
+This instance is defined in terms of the `periodFirstDay` and `periodLastDay`
+of a `Month` and it uses (once again) a pattern named `YearMonth`.
 
 
-Now let’s check the `Month` instance of `DayPeriod`:
+Let’s move over to the `Month` instance of `DayPeriod`:
 
 ```haskell
 instance DayPeriod Month where
@@ -300,22 +300,23 @@ instance DayPeriod Day where
    dayPeriod = id
 ```
 
-As you could imagine, the first and last day of a day is the day itself.
+As you could imagine, the first and last day of a day is the day itself and the
+period is also the same day.
 
 ### Examples of some new `time` features
 
-So let's see what we can do with these new features introduced in the contribution.
-In this section we will review some concrete code samples of how these new features
-can help us in our daily software development routine. After making the proper imports
-we can have something like this:
+So let's see what these new features that were introduced in the contribution
+offers. This section will present some concrete code samples of how these new
+features can help you in your daily software development routine. After making
+the proper imports it's possible to have something like this.
 
-- Let's compare the first function that I presented, how to get a month's all days.
-Now in `ghci` we can directly call the `periodAllDays` function with a `Month` and
-that will be enough:
+- Let's compare the first function that was presented, how to get a month's all
+days. Now in `ghci` it's possible to directly call the `periodAllDays` function
+with a `Month` and that will be enough:
 
     ```bash
-    ghci> periodAlldays  (YearMonth 2021 November)
-    [2021-11-01 .. 2021-11-30
+    ghci> periodAlldays (YearMonth 2021 November)
+    [2021-11-01 .. 2021-11-30]
     ```
 
 - To get starting and ending days of all quarters of a given year:
@@ -331,7 +332,7 @@ that will be enough:
            getQuarter q = YearQuarter y q
     ```
 
-- Get length of the quarters of a given year. Why do we need the year? Because in a
+- Get quarters' lenght of a given year. Why the year is needed? Because in a
 leap year the length of the second quarter will be different:
 
     ```haskell
@@ -348,7 +349,7 @@ leap year the length of the second quarter will be different:
     allDaysQuarter y q = periodAllDays $ YearQuarter y q
     ```
 
-- Get starting and ending days of All months of a given year:
+- Get starting and ending days of every month of a given year:
 
     ```haskell
     type MonthFirstDay = Day
@@ -368,26 +369,18 @@ leap year the length of the second quarter will be different:
     allMonthsLenght y = map (\m -> periodLength $ YearMonth y m) [January .. December]
     ```
 
-- Get all days of a given month:
-
-    ```haskell
-    allDaysMonth :: Year -> MonthOfYear -> [Day]
-    allDaysMonth y m = periodAllDays $ YearMonth y m
-    ```
-
 ## Second Contribution
 
-Once the first contribution was merged and that the maintainer performed
-all the refactoring, we were able to open a follow up PR for adding some
-tests. As I mentioned previously the maintainer added a couple of extra
-functions, these are: `dayPeriod`, `periodAllDays` and `periodLength` but
-they were not tested. We decided to implement the tests by using patterns
-synonyms (yes, once again) and [property testing][property-testing], so
-in this section we will review this code. Here is the [PR][PR-2]
-that we proposed:
+Once the first contribution was merged and that the maintainer performed all the
+refactoring, a follow up PR was opened, the purpose was to add some testing. As
+it was mentioned previously the maintainer added a couple of extra functions,
+these are: `dayPeriod`, `periodAllDays` and `periodLength` but they were not
+tested. The tests implemented in this contribution made use of patterns synonyms
+(yes, once again) and [property testing][property-testing], so in this section
+this code will review . Here is the [PR][PR-2] that was proposed:
 
-In this context, patterns were pretty useful too. We added a lot of value
-almost free. Let me show a piece of code:
+In this context, patterns were pretty useful too. A lot of value was added almost
+free. Let's review a piece of code:
 
 ```haskell
 newtype WDay = MkWDay Day
@@ -401,16 +394,16 @@ instance Arbitrary WDay where
         pure $ MkWDay $ YearMonthDay y m d
 ```
 
-This first part is not related to patterns, instead we're declaring the
-`Arbitray` instance of `WDay` that is a `Day` wrapper so we can generate
-random days in order to make our tests and therefore our code base more robust.
-When using property testing we can stop thinking of generating the data,
-and we can focus on testing that our code is behaving the way it's supposed
-to. We declared wrappers and their `Arbitrary` instaces for: `Day`, `DayOfMonth`,
-`Month`, `MonthOfYear`, `Quarter`, `QuarterOfYear` and `Year`. Probably
-a better example is the `MonthOfYear` (sounds familiar? Yes, it's the pattern
-that we took as an example in the previous section) wrapper and instance, so we
-all are clear of what is going on here:
+This first part is not related to patterns, instead the `Arbitray` instance of
+`WDay` is being declared, this instance is basically a `Day` wrapper that allows
+to generate random days in order to perform property testing. When using property
+testing you can stop thinking of generating the data that will feed the tests
+manually,and you can focus on testing that the code is behaving the way it's
+supposed to. The `Arbitrary` instaces for: `Day`, `DayOfMonth`,
+`Month`, `MonthOfYear`, `Quarter`, `QuarterOfYear` and `Year` were declared too.
+Probably a better example of this instances is the `MonthOfYear` instance (sounds
+familiar? Yes, it's the pattern that was shown as an example in the previous
+section), so what is going on here is all clear:
 
 ```haskell
 newtype WMonthOfYear = MkWMonthOfYear MonthOfYear
@@ -420,10 +413,9 @@ instance Arbitrary WMonthOfYear where
 ```
 
 Why does it have `-5` and `17` boundaries? Well, this function should be able
-to clip those values to the correct ones, so we're testing this too.
+to clip those values to the correct ones, so this clipping is being tested too.
 
-I think we can move forward, so now we're going to explore the use of patterns
-in the context of tests:
+Let's move forward to explore the use of patterns in the context of tests:
 
 ```haskell
 testMonth :: [TestTree]
@@ -453,67 +445,69 @@ testMonth =
     ]
 ```
 
-All of these test are written and will be explained in the `Month`s context.
-So in the first line we're saying that this test is of the type `testProperty`
-(or property test) and that we're testing the `periodFirstDay` function, then we
-create a `MkWMonth` that is the arbitrary version of `Month` and is the one that
-will generate the randomness for us and finally we compare that the first day of
-a month is the same when we use the `periodFirstDay` function than when using the
-`YearMonthDay` pattern.
+All of these test are written and will be explained in the `Month`'s context. So
+in the first line this test is being declared to be of the type `testProperty`
+(or property test) and then it yields the function that is being tested
+(`periodFirstDay`), then it creates a `MkWMonth` that is the arbitrary version
+of `Month` and is the one that will generate the randomness for property testing
+and finally it compares that the first day of a month is the same when the
+`periodFirstDay` function is used than when using the `YearMonthDay` pattern.
 
-The `periodLastDay` tests are a little peculiar, we didn't use property testing
-in this case since we wanted to test some particular cases. We tested that
-February's last day calculated properly for both leap and regular years. As you
-can see in some case unit tests can be useful too, so don't stick too much to
-property testing.
+The `periodLastDay` tests are a little peculiar, property testing was not used
+in this case since it was needed to test some particular cases. Here the tests
+are checking that February's last day is calculated properly for both leap and
+regular years. As you can see in some cases unit tests can be useful too, so
+don't stick too much to property testing.
 
-Well I think the two previous examples are very straightforward, but let me
-explain the `periodAllDays` tests. When you're implementing property tests is a
+Well, probably the two previous examples are very straightforward, but let's see
+what the `periodAllDays` tests are doing. When implementing property tests is a
 little harder to think of what to test, you have to search a common property
 (that's why they are called property test) that let you describe the expected
-behavior. So what we're checking in this test is that `all` elements (`Days`)
+behavior. So what it's being checked in this test is that `all` elements (`Days`)
 that the `periodAllDays` function produces, when the `DayPeriod` is a `Month`,
 belong to the same year and month.
 
-Finally the `periodLength` was tested and in this case the test suite is a
-combination of unit tests and property tests. We are checking that
-the period's lenght of all months is at least 28 days and that February's
-lenght is correctly calculated in a leap and in a regular year.
+Finally the `periodLength` was tested and in in this case the test suite is a
+combination of unit tests and property tests. Test are checking that the period's
+lenght of all months is at least 28 days and that February's lenght is correctly
+calculated in a leap and in a regular year.
 
-Do you remember the laws that we mentioned in the previous section, well those
-were translated to property tests. Isn't it awesome? When we work and create
-property tests we need to think out of the box and find the property (law) that
+Do you remember the laws that were mentioned in the previous section, well those
+were translated to property tests. Isn't it awesome? When working and creating
+property tests you need to think out of the box and find the property (law) that
 every test subject should satisfy, but once that is found is pretty clear what
-we need to check for.
+you should check for.
 
-It makes sense right?. Also we can see the best of patterns in action, we're
-using them to generate a random month: `MkWMonth my@(YearMonth y1 m1)`, and
-we're using them to deconstruct a `Day` into `Year`, `MonthOfYear` and
+In this test code snippet the best of patterns is put in action. They're being
+used to generate a random month: `MkWMonth my@(YearMonth y1 m1)`, and to
+deconstruct a `Day` into `Year`, `MonthOfYear` and
 `DayOfMonth`: `(YearMonthDay y2 m2 _) -> (y2, m2)`.
 
 ## Summary
 
-It was a journey, but hopefully we got something from this tutorial. If I have to
-highlight something is the following:
+It was a journey, but hopefully you got something from this tutorial. If there
+are things that need to be highlighted, they would be the following:
 
-- When working on OSS always start by opening an issue and brainstorm your ideas with
-the library's mainterners.
-- Pattern synonyms is a Haskell feature that will make our code base more reable, and
-as shown in this tutorial could be useful in many scenarios. The `YearMonthDay` pattern
-is probably one of the more versatile ones, so if you're working with the `time`
-library have this in mind.
+- When working on OSS always start by opening an issue and brainstorm your ideas
+with the library's mainterners.
+
+- Pattern synonyms is a Haskell's feature that will make the code base more
+reable, and as shown in this tutorial could be useful in many scenarios.
+The `YearMonthDay` pattern is probably one of the more versatile ones, so if
+you're working with the `time` library have this in mind.
+
 - Time library now has some cool helper functions that are pretty simple to use
-and hopefully pretty useful too. Keep in mind the `periodFirstDay`, `periodLastDay`,
-`periodAllDays` and `periodLength` functions.
+and hopefully pretty useful too. Keep in mind the `periodFirstDay`,
+`periodLastDay`, `periodAllDays` and `periodLength` functions.
 
 ## Caveat
 
-As you can see we didn't talk about weeks in this tutorial. That's becasue weeks are
-not canonical, some years have 52 weeks and others have 53 and depending on what part
-of the world you're in, the week could start in different days (Saturday, Sunday,
-Monday). We're dicussing this with the maintainer right now but haven't gotten an answer yet.
-But if you want to get all `Days` of a week and specify its starting day, this
-[issue][issue-weeks] could be useful.
+As you can see weeks were not mentioned in this tutorial. That's becasue weeks
+are not canonical, some years have 52 weeks and others have 53 and depending on
+what part of the world you're in, the week could start in different days
+(Saturday, Sunday, Monday). A dicussion with the maintainer is going on right
+now but haven't gotten an answer yet. But if you want to get all `Days` of a week
+and specify its starting day, this [issue][issue-weeks] could be useful.
 
 
 [time-hackage]: https://hackage.haskell.org/package/time
