@@ -43,23 +43,22 @@ and then in `ghci` this function can be invoked:
 [2021-11-01 .. 2021-11-30]
 ```
 
-As you can see, the Haskell code has to be implemented to latter be called. Why
-the last day of the month is always set to be 31st, if some months have less than
-31 days? Could be crossing your mind right now. That’s because `fromGregorian`
-clips the values to be correct for each month, but now, what is `fromGregorian`?
-Well that’s exactly what this contribution wante to avoid when using the `time`
-library, stop using some functions that really don't know what their purpose
-is, or to produce intelligible code.
+As you can see, the Haskell code has to be implemented to then be called, there
+is not a helper function that performs the same behavior as in RoR. Why the last
+day of the month is always set to be 31st, if some months have less than 31 days?
+Could be crossing your mind right now. That’s because `fromGregorian` clips the
+values to be correct for each month, but now, what is `fromGregorian`? Well
+that’s exactly what this contribution aims, adding some alternative helper
+functions with clearer names when using the `time` library.
 
-To have something more clear and readable was the main goal, as Uncle bob
-mentioned:
+As Uncle bob mentioned:
 
 >"Indeed, the ratio of time spent reading versus writing is well over 10 to 1.
 >We are constantly reading old code as part of the effort to write new code.
 >...Therefore, making it easy to read makes it easier to write.”
 
 So this was the motivation, to make something similar to the utilities that RoR
-has and to ease Haskell developer’s lives.
+has and to ease Haskell developers' lives.
 
 So first of all, an [issue][issue] on GitHub was opened. Quick parenthesis here,
 when you want to work on OSS it's recommended to start by opening an issue in
@@ -171,8 +170,8 @@ fruits, pretty amazing to be honest.)
 Back to Haskell, probably it’s pretty clear what the `dateToHoliday` function
 does, the first clause matches all days of January, second one matches the All
 Saints holiday, the third one matches for Christmas and the last one it’s the
-fallback for all other days. By using the `MonthOfYears` pattern, it makes it a
-lot more readable. Having something like:
+fallback for all other days. Using the `MonthOfYear` and `YearMontDay` patterns
+makes the code more readable. Having something like:
 
 ```haskell
 dateToHoliday 12 25  = "HO HO HO Merry Christmas"
