@@ -10,19 +10,17 @@ github-profile: felixminom
 description: In this tutorial we’re going to explore the use of pattern synonyms in Haskell, later we’ll give a brief overview to the Stack Builders’ contribution to the `time` Haskell library and finally we’ll review how to use the utilities that were introduced in the contribution.
 ---
 
-As Stack Builders one of the core values of our company is contributing
-to open source (OSS). We believe that we have the power to change
-people’s lives (or at least make it easier) by pushing the boundaries
-of the software industry and we’re happy to announce that the past month
-we were able to contribute to one of Haskell's core libraries,
-[time][time-hackage].
+As Stack Builders one of the core values of our company is contributing to open
+source (OSS). We believe that we have the power to change people’s lives (or at
+least make it easier) by pushing the boundaries of the software industry and
+we’re happy to announce that we were able to contribute to one of Haskell's core
+libraries, [time][time-hackage].
 
-We started with the idea: “What if we bring some utilities that Ruby on
-Rails (RoR) has to Haskell?”. For instance, “How can I get the range of
-days that a month has?” or “How can I get a quarter’s boundaries?” were
-some of the questions that came to our mind. In the following example
-I will show the RoR code needed to get all days in a month and then Haskell
-version to do so:
+All started with the idea: “What if we bring some utilities that Ruby on Rails
+(RoR) has to Haskell?”. For instance, “How can one get the range of days that a
+month has?” or “How can one get a quarter’s boundaries?” were some of the
+questions that came to our mind. In the following example I will show the RoR
+code needed to get all days in a month and then Haskell version to do so:
 
 ```ruby
 today = Date.today
@@ -37,50 +35,46 @@ allMonth day =
     in [fromGregorian y m 1 .. fromGregorian y m 31]
 ```
 
-and then in `ghci` we can call our function:
+and then in `ghci` this function can be invoked:
 
 ```bash
 > today <- utctDay <$> getCurrentTime
-> monthBoundaries today
+> allMonth today
 [2021-11-01 .. 2021-11-30]
 ```
 
-As you can see, we had to implement the Haskell code by ourselves. Why are
-we setting the last day to always be 31st if some months have less than 31
-days? Could be crossing your mind right now. That’s because `fromGregorian`
-clips the values to be correct for each month, but now, what is
-`fromGregorian`? Well that’s exactly what we wanted to avoid when using
-the `time` library, to avoid using some functions that we really don't know
-what their purpose is.
+As you can see, the Haskell code has to be implemented to latter be called. Why
+the last day of the month is always set to be 31st, if some months have less than
+31 days? Could be crossing your mind right now. That’s because `fromGregorian`
+clips the values to be correct for each month, but now, what is `fromGregorian`?
+Well that’s exactly what this contribution wante to avoid when using the `time`
+library, stop using some functions that we really don't know what their purpose
+is, or to produce intelligible code.
 
-We wanted something more clear and readable as Uncle bob mentioned:
+To have something more clear and readable was the main goal, as Uncle bob
+mentioned:
 
->"Indeed, the ratio of time spent reading versus writing is well over
->10 to 1. We are constantly reading old code as part of the effort
->to write new code. ...Therefore, making it easy to read makes it easier
->to write.”
+>"Indeed, the ratio of time spent reading versus writing is well over 10 to 1.
+>We are constantly reading old code as part of the effort to write new code.
+>...Therefore, making it easy to read makes it easier to write.”
 
-So this was our motivation, to make something similar to the
-utilities that RoR has and to ease Haskell developer’s lives.
+So this was the motivation, to make something similar to the utilities that RoR
+has and to ease Haskell developer’s lives.
 
-We started by opening an [issue][issue] on GitHub. Quick parenthesis here,
-when you want to work on OSS I’d recommend to start opening an issue
-in the repo and discuss/brainstorm your idea with the maintainers,
-sometimes there are some good reasons why the feature you’re proposing
-have not been yet implemented and if you open a PR directly it could
-rejected, so save yourself a disappointment and open an issue first.
-Back to our issue, the maintainer of the library surprisingly proposed
-to implement these helper functions using pattern synonyms and I said
-surprisingly because I haven’t heard about them, so that’s why I’ll
-like to introduce you some basics about this Haskell feature that,
-actually, it has been around for some years now.
-
+So first of all, an [issue][issue] on GitHub was opened. Quick parenthesis here,
+when you want to work on OSS it's recommended to start by opening an issue in
+the repo and discuss/brainstorm your ideas with the maintainers, sometimes there
+are some good reasons why the feature you’re proposing have not been yet
+implemented and if you open a PR directly it could rejected, so save yourself a
+disappointment and open an issue first. Back to the issue, the `time`'s library
+maintainer proposed to implement these helper functions using pattern synonyms,
+so let's start with a quick introduction to some basics about this Haskell
+feature that, actually, it has been around for some years now.
 
 ## A little about pattern synonyms
 
-First of all I’d like to start with a caveat, this guide is not meant
-to explain pattern synonyms in depth, instead it’s meant to be a practical
-introduction to this concept.
+First of a little caveat, this guide is not meant to explain pattern synonyms in
+depth, instead it’s meant to be a practical introduction to this concept.
 
 The [GHC documentation][ghc-patterns] describes pattern synonyms like:
 
@@ -88,10 +82,10 @@ The [GHC documentation][ghc-patterns] describes pattern synonyms like:
 > They can also be thought of as abstract constructors that don’t have a
 > bearing on data representation.”
 
-And probably we’re in the same place as in the beginning so I’ve preferred
-to introduce pattern synonyms with a real world example. We’re going to
-borrow a pattern that exists in the time library. The [MonthOfYear][month-pattern]
-pattern allows us to define months of the year not by a number but by its name.
+And probably this does not make sense yet, so let's introduce pattern synonyms
+with a real world example. Let's borrow a pattern that exists in the time library.
+The [MonthOfYear][month-pattern] pattern allows to define months of the year
+not by a number but by its name.
 
 The `MonthOfYear` data type is defined like this:
 
@@ -99,11 +93,11 @@ The `MonthOfYear` data type is defined like this:
 type MonthOfYear = Int
 ```
 
-As you can see, it is only an alias for `Int`. We now are able to define
-months like `Int`s where January will correspond to 1 and so on. But
-fortunately, since GHC 7.8 we are able to use pattern synonyms and we
-could, instead of using raw `Int`s, write this down in a pattern style
-and have a more idiomatic way of defining months:
+As you can see, `MonthOfYear` is only an alias for `Int`. Now, it's possible to
+define months like `Int`s, where January will correspond to 1 and so on. But
+fortunately, since GHC 7.8 it's feasible to use pattern synonyms and, instead of
+using raw `Int`s is possible to write this down in a pattern style and have a
+more idiomatic way of defining months:
 
 ```haskell
 pattern January :: MonthOfYear
@@ -130,27 +124,27 @@ used, see the [COMPLETE pragma documentation][complete-pragma] for more
 information.
 
 Just to make sure that `November` and `11` are equivalent, let's test it
-in a stack repl:
+in a repl:
 
 ```bash
 > November == 11
 True
 ```
 
-We’ll use this pattern in a function that receives a `Day` and yields if the
-corresponding Date is a holiday:
+To exemplify, this pattern will be used in a function that receives a `Day` and
+yields if the corresponding aate is a holiday:
 
 ```haskell
 dayToHoliday :: Day -> String
 dayToHoliday (YearMonthDay _ January  _)  = "Happy new year!"
 dayToHoliday (YearMonthDay _ November 1)  = "Let's eat colada morada"
-dayToHoliday (YearMonthDay _ December 25) = "Merry Christmas jojojo"
-dayToHoliday (YearMonthDay _ _ _)         = "Probably just a regular day"
+dayToHoliday (YearMonthDay _ December 25) = "HO HO HO Merry Christmas"
+dayToHoliday _                            = "Probably just a regular day"
 ```
 
-Another pattern synonym is introduced here. The `YearMonthDay` pattern lets us
-build a `Day` in terms of the `Year`, `MonthOfYear` (do you remember this one?)
-and `DayOfMOnth`, where all three are basically `Int`s. Here is its definition:
+Another pattern synonym is introduced here. The `YearMonthDay` pattern builds
+a `Day` in terms of the `Year`, `MonthOfYear` (do you remember this one?) and
+`DayOfMOnth`, where all three are basically `Int`s. Here is its definition:
 
 ```haskell
 pattern YearMonthDay :: Year -> MonthOfYear -> DayOfMonth -> Day
@@ -160,36 +154,36 @@ pattern YearMonthDay y m d <-
        YearMonthDay y m d = fromGregorian y m d
 ```
 
-Back to our function, let's check that is working:
+Back to the `dayToHoliday` function, let's check that is working:
 
 ```haskell
 > dayToHoliday (YearMonthDay 2021 11 01)
 "Let's eat colada morada"
 
-> dayToHoliday (YearMonthDay 2021 November 01)
-"Let's eat colada morada"
+> dayToHoliday (YearMonthDay 2021 12 25)
+"HO HO HO Merry Christmas"
 ```
 
-(Now you're probably wondering what is “colada morada”? Haha no worries,
-it’s an [Ecuatorian tradition][colada-morada] and we eat this meal that
-is purple corn based with spices and fruits, pretty amazing to be honest.)
+(Now you're probably wondering what “colada morada” is? Haha no worries, it’s an
+[Ecuatorian meal][colada-morada] that is purple corn based with spices and
+fruits, pretty amazing to be honest.)
 
-Back to Haskell, I think it’s pretty clear what the `dateToHoliday`
-function does, the first clause matches all days of January, second
-one matches the All Saints holiday, the third one matches for Christmas
-and the last one it’s the fallback for all other days. I think using
-the `MonthOfYears` patterns makes it a lot more readable. Having something
-like:
+Back to Haskell, probably it’s pretty clear what the `dateToHoliday` function
+does, the first clause matches all days of January, second one matches the All
+Saints holiday, the third one matches for Christmas and the last one it’s the
+fallback for all other days. By using the `MonthOfYears` pattern, it makes it a
+lot more readable. Having something like:
 
 ```haskell
-dateToHoliday 12 25  = "Merry Christmas jojojo"
+dateToHoliday 12 25  = "HO HO HO Merry Christmas"
 ```
 
-Will not be as straightforward as the function that we have right now.
+is not as straightforward and readable as the function that was presented in the
+previous code sample.
 
-I haven’t mentioned it yet, but the patterns that we built previously
-are called bidirectional patterns, why? Because we can use them as
-expressions as well, so something like this is totally valid:
+It has not being mentioned yet, but the patterns that were built previously, are
+called bidirectional patterns, why? Because one can use them as expressions as
+well, so something like this is totally valid:
 
 ``` bash
 ghci> dateToHoliday (YearMonthDay 2021 January 12)
@@ -199,8 +193,8 @@ ghci> dateToHoliday (YearMonthDay 2021 November 1)
 "Let's eat colada morada"
 ```
 
-So now we can use `11`, `November` in the `MonthOfYear` context
-interchangeably across our code.
+So now it's possible to use `11`, `November` in the `MonthOfYear` context
+interchangeably across the code.
 
 ## Stack Builders contribution to Haskell’s time library
 
