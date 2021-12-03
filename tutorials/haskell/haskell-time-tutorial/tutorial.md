@@ -131,7 +131,7 @@ True
 ```
 
 To exemplify, this pattern will be used in a function that receives a `Day` and
-yields if the corresponding aate is a holiday:
+yields if the corresponding date is a holiday:
 
 ```haskell
 dayToHoliday :: Day -> String
@@ -177,7 +177,7 @@ makes the code more readable. Having something like:
 dateToHoliday 12 25  = "HO HO HO Merry Christmas"
 ```
 
-is not as straightforward and readable as the function that was presented in the
+Is not as straightforward and readable as the function that was presented in the
 previous code sample.
 
 It has not being mentioned yet, but the patterns that were built previously, are
@@ -331,7 +331,7 @@ with a `Month` and that will be enough:
            getQuarter q = YearQuarter y q
     ```
 
-- Get quarters' lenght of a given year. Why the year is needed? Because in a
+- Get quarters' length of a given year. Why the year is needed? Because in a
 leap year the length of the second quarter will be different:
 
     ```haskell
@@ -397,7 +397,7 @@ This first part is not related to patterns, instead the `Arbitray` instance of
 `WDay` is being declared, this instance is basically a `Day` wrapper that allows
 to generate random days in order to perform property testing. When using property
 testing you can stop thinking of generating the data that will feed the tests
-manually,and you can focus on testing that the code is behaving the way it's
+manually, and you can focus on testing that the code is behaving the way it's
 supposed to. The `Arbitrary` instaces for: `Day`, `DayOfMonth`,
 `Month`, `MonthOfYear`, `Quarter`, `QuarterOfYear` and `Year` were declared too.
 Probably a better example of this instances is the `MonthOfYear` instance (sounds
@@ -466,9 +466,9 @@ behavior. So what it's being checked in this test is that `all` elements (`Days`
 that the `periodAllDays` function produces, when the `DayPeriod` is a `Month`,
 belong to the same year and month.
 
-Finally the `periodLength` was tested and in in this case the test suite is a
+Finally the `periodLength` was tested and in this case the test suite is a
 combination of unit tests and property tests. Test are checking that the period's
-lenght of all months is at least 28 days and that February's lenght is correctly
+length of all months is at least 28 days and that February's length is correctly
 calculated in a leap and in a regular year.
 
 Do you remember the laws that were mentioned in the previous section, well those
