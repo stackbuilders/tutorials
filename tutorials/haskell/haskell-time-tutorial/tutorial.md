@@ -1,6 +1,6 @@
 ---
 title: Time, patterns and a little more
-published: 2021-12-02
+published: 2021-12-14
 tags: haskell, pattern-synonyms, property-testing
 libraries: time
 language: haskell
