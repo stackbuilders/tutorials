@@ -1,6 +1,6 @@
 ---
 title: Time, patterns and a little more
-published: 2021-12-14
+published: 2021-12-15
 tags: haskell, pattern-synonyms, property-testing
 libraries: time
 language: haskell
@@ -8,6 +8,7 @@ author: Felix Miño
 author-name: Felix Miño
 github-profile: felixminom
 description: In this tutorial we’re going to explore the use of pattern synonyms in Haskell, later we’ll give a brief overview to the Stack Builders’ contribution to the `time` Haskell library and finally we’ll review how to use the utilities that were introduced in the contribution.
+image: haskell/haskell-time-tutorial/haskell-time-tutorial.png
 ---
 
 As Stack Builders one of the core values of our company is contributing to open
