@@ -1,4 +1,14 @@
-# The single table design. What is it?
+---
+title: The single table design. What is it?
+published: 2022-01-17
+ghc: 7.10.3
+lts: 5.15
+tags: serverless, database
+language: NoSQL
+author-name: Nataly Rocha
+github-profile: natar10
+description: This blog post reviews the basics of the Single table design, the reason for its existence, benefits, and downsides.
+---
 
 First, to give the context to what this blog post is talking about, “Serverless” is the key. If you are building a serverless application, or just interested in how the serverless world works one way or another you are going to end up asking yourself how do you handle the data, then find something about NoSQL and finally end up looking for better or different ways to improve your serverless architecture. Well, the single table design is one of them.
 
@@ -216,10 +226,11 @@ Table name: Quotations
 
 The example above shows exactly how a single table design might look using only a partition key and an additional field ‘name’. There are several entities in the same table, but they can be queried by the partition key. So for example if you want to retrieve the product with the ID ‘PRODUCT#W183JD83JK’ can do:
 
-    SELECT * FROM Quotations WHERE PK = 'PRODUCT#W183JD83JK'
+```
+SELECT * FROM Quotations WHERE PK = 'PRODUCT#W183JD83JK'
+```
 
-
-    The partition key helps us cover the ‘Get by id’ access patterns.
+The partition key helps us cover the ‘Get by id’ access patterns.
 
 **NOTE**: The SQL statement above is just a reference. In NoSQL and DynamoDB, PartiSQL is used, but the best practice is to query using the SDK. So for example in JS the queries will look like this:
 
@@ -351,7 +362,9 @@ Table name: Quotations
 
 Reverse means to project the same data but using the SK as PK, and the PK as SK to be able to sort. This strategy solves the access pattern ‘Get all products’:
 
-    SELECT * FROM Quotations WHERE PK = 'PRODUCT'
+```
+SELECT * FROM Quotations WHERE PK = 'PRODUCT'
+```
 
 This not only solves those access patterns. This will also solve ‘Get all clients’, and ‘Get all makes’ and others. To make this easier and more ‘real life’ below you can see the actual table with all the example data of the pet project:
 
@@ -361,9 +374,9 @@ And what about all the other access patterns? To be able to solve them, more GSI
 
 For the pet project, the following additional fields and GSIs were created:
 
-**GSI** **Relations**: This one uses the SK as PK and “auxiliar” as SK. This makes it easy to solve the access patterns like: Get all products by make, by category, get all quotations by make, category, product.
+**GSI** **Relations**: This one uses the SK as PK and “auxiliary” as SK. This makes it easy to solve the access patterns like: Get all products by make, by category, get all quotations by make, category, product.
 
-As you can see the “auxiliar” field has values like Audi#A4, or MAKE#123#CATEGORY#123#PRODUCT#123. This also has a purpose, which is to be able to query using CONTAINS or BEGINS with.
+As you can see the “yy” field has values like Audi#A4, or MAKE#123#CATEGORY#123#PRODUCT#123. This also has a purpose, which is to be able to query using CONTAINS or BEGINS with.
 
 To have all the keys in one field makes it easy to solve the access patterns described above.
 
