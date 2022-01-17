@@ -16,6 +16,9 @@ The single table design is used in NoSQL databases, and it has come more popular
 
 There are no joins and the alternatives to a join will cost extra money because they burn the CPU. So how can this be solved? Using the single table design, the data is pre-joined creating items collections that help to get our data faster and efficiently. It literally turns all the data that exists in many relational tables into one.
 
+![Selection_530](https://user-images.githubusercontent.com/11297071/149829862-70ce9432-bb95-4e96-b2e3-6a03f183b012.png)
+
+
 Let’s check some of the benefits of this approach.
 
 ### Less and more efficient requests :
@@ -24,7 +27,12 @@ The main one is to decrease the number of requests made to retrieve the data. Ho
 
 You can use a NoSql DB with a multi-table design, exactly as you would use a relational database. This means that if you want to retrieve the information to get a simple request like getting the orders of a user you will have to make two requests. One for the user table, and another one for the orders table as you can see in this graphic.
 
+![Selection_531](https://user-images.githubusercontent.com/11297071/149829904-d9ee9d63-5b58-4399-acb8-c314a1df908d.png)
+
 But if you use the single table design we will be pre-joining the data and there will be only a need for a single and more efficient request, as you can see in this graphic.
+
+![Selection_532](https://user-images.githubusercontent.com/11297071/149829917-877eba11-e7c2-4401-8e97-21dcc5848288.png)
+
 
 ### Save us money:
 
@@ -51,11 +59,14 @@ It’s crucial to understand the application to be built and define the use case
 So to do that, a good exercise is to answer these questions:
 
 - What kind of application is being built?
-  - Start digging with the customer or with whoever is going to give the information for the app and start asking questions until it is completely understood how the data should be handled. For this example:
-    - What is the application for?: To receive user requests for quotations.
-    - What data the users need to see: Which products the client has requested, the categories of the products, the clients, all the quotations. The products by make, category, and quotation status. Etc, etc The objective is to start craving all the information the app will need to present and this will be turned into the access patterns later.
-    - What reports do you need to receive:
+- Start digging with the customer or with whoever is going to give the information for the app and start asking questions until it is completely understood how the data should be handled. For this example:
+- What is the application for?: To receive user requests for quotations.
+- What data the users need to see: Which products the client has requested, the categories of the products, the clients, all the quotations. The products by make, category, and quotation status. Etc, etc The objective is to start craving all the information the app will need to present and this will be turned into the access patterns later.
+- What reports do you need to receive:
 - How does the data relate to each other? Ok, here the best approach is to create a relational data model, to have visual representation:
+
+![Selection_533](https://user-images.githubusercontent.com/11297071/149829961-2baae114-55a7-4afb-bbc1-5da5050c28d3.png)
+
 
 ### 2. Access patterns
 
@@ -234,6 +245,9 @@ The partition key helps us cover the ‘Get by id’ access patterns.
 
 **NOTE**: The SQL statement above is just a reference. In NoSQL and DynamoDB, PartiSQL is used, but the best practice is to query using the SDK. So for example in JS the queries will look like this:
 
+![Selection_534](https://user-images.githubusercontent.com/11297071/149830013-d14ac3e0-3fcc-431e-a38d-da6ac688b549.png)
+
+
 Now, what about the other access patterns? For example ‘Get all products’ or ‘Get all products by make’ here is where the sort key comes to help.
 
 2. **SK**: The sort key, this key is optional but helpful. Its function is to help sort and search through the table. So, to be able to get all the products or all the makes we can create a sort key that contains the type of the item to be able to query them. Like this:
@@ -368,7 +382,12 @@ SELECT * FROM Quotations WHERE PK = 'PRODUCT'
 
 This not only solves those access patterns. This will also solve ‘Get all clients’, and ‘Get all makes’ and others. To make this easier and more ‘real life’ below you can see the actual table with all the example data of the pet project:
 
+![Selection_535](https://user-images.githubusercontent.com/11297071/149830169-ba889cdf-2bcf-4000-9d55-11edc41bc58f.png)
+
 Now, applying the GSI: Reverse
+
+![Selection_536](https://user-images.githubusercontent.com/11297071/149830210-d9c24feb-83b8-42a8-93f0-97d92032ec71.png)
+
 
 And what about all the other access patterns? To be able to solve them, more GSIs can be created and more fields that can help to query the information according to what it’s needed. That is why it is so important to define the access patterns first. Because it is the only way to know what strategies, GSIs, and keywords to use.
 
@@ -376,13 +395,20 @@ For the pet project, the following additional fields and GSIs were created:
 
 **GSI** **Relations**: This one uses the SK as PK and “auxiliary” as SK. This makes it easy to solve the access patterns like: Get all products by make, by category, get all quotations by make, category, product.
 
-As you can see the “yy” field has values like Audi#A4, or MAKE#123#CATEGORY#123#PRODUCT#123. This also has a purpose, which is to be able to query using CONTAINS or BEGINS with.
+![Selection_537](https://user-images.githubusercontent.com/11297071/149830294-94568b5a-ac9f-4aae-80ee-7ec060aef5c4.png)
+
+As you can see the “auxiliary” field has values like Audi#A4, or MAKE#123#CATEGORY#123#PRODUCT#123. This also has a purpose, which is to be able to query using `CONTAINS` or `BEGINS WITH`.
 
 To have all the keys in one field makes it easy to solve the access patterns described above.
 
 **GSI DateStatus:** This index helps to get the Quotations by date and status. A specific field “dateStatus” was created to join the date and status. That way is easier to query by a date range and the status of the quotations.
 
+![Selection_538](https://user-images.githubusercontent.com/11297071/149830388-18277836-6218-4d2d-b42e-026160cefbe7.png)
+
 **GSI Clients-Quotations:** This last index serves the purpose of joining tables. Clients and Quotations. Because one access pattern is ”Get all client quotations and client information”. So in order to avoid making two queries, this GSI allows you to retrieve both tables in one query as you can see in the image below.
+
+![Selection_539](https://user-images.githubusercontent.com/11297071/149830419-c5d3d0eb-21a6-4dc8-901f-12c6eec77164.png)
+
 
 ## Wrapping up:
 
