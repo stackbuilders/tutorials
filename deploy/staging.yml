@@ -1,8 +1,0 @@
-deploy_path: /var/projects/tutorials
-host: stackbuilders@staging.stackbuilders.com
-repo: git@github.com:stackbuilders/tutorials.git
-revision: origin/tutorials
-build_script:
-  - stack setup
-  - source config/staging.env && make rebuild
-
