@@ -6,7 +6,7 @@
 
 Make sure you have
 [Cairo](https://pycairo.readthedocs.io/en/latest/getting_started.html) installed
-locally. Follow the instruction in the link above.
+locally. Follow the instruction in the link.
 
 ## Install Python 3
 
