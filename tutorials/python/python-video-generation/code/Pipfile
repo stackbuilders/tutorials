@@ -13,4 +13,4 @@ moviepy = "==1.0.0"
 gizeh = "==0.1.11"
 
 [requires]
-python_version = "3.6"
+python_version = "3.8.0"
